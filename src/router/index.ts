@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 export const routePaths = {
-  signIn: 'sign-in',
-  signUp: 'sign-up',
-  forgetPassword: 'forget-password',
+  portal:'portal',
   workbench: 'workbench',
   grouping:'grouping',
   leaderBoard:'leader-board',
@@ -14,32 +12,14 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: `/${routePaths.signIn}`,
-      name: routePaths.signIn,
-      component: () => import('../views/SignInView.vue'),
+      path: `/${routePaths.portal}`,
+      name: routePaths.portal,
+      component: () => import('../views/PortalView.vue'),
       alias: '/',
       meta: {
         requireAuth: false
       }
     },
-    {
-      path: `/${routePaths.signUp}`,
-      name: routePaths.signUp,
-      component: () => import('../views/SignUpView.vue'),
-      meta: {
-        requireAuth: false
-      }
-    },
-    // {
-    //   path: `/${routePaths.forgetPassword}`,
-    //   name: routePaths.forgetPassword,
-    //   component: () => import('../views/portal/ForgetPasswordView.vue'),
-    //   meta: {
-    //     requireAuth: false
-    //   }
-    // },
-
-
     // {
     //   path: `/${routePaths.workbench}`,
     //   component: () => import('../views/system/WorkspaceView.vue'),
