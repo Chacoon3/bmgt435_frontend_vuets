@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { InLineMsgConfig } from './componentTypes';
+import { InLineMsgConfig } from './types';
 
 const props = withDefaults(defineProps<InLineMsgConfig>(),
     {
@@ -11,17 +11,20 @@ const props = withDefaults(defineProps<InLineMsgConfig>(),
 </script>
 
 <template>
-    <span>
+    <div class="inLineMsg">
         <span v-if="props.show" class="inline-msg">
             <span>{{ props.content }}</span>
         </span>
-    </span>
+    </div>
 </template>
 
 <style scoped>
-.inline-msg {
+.inLineMsg {
     display: block;
     color: red;
     text-align: center;
+    margin: 1em;
 }
-</style>
+
+
+</style>../types

@@ -6,6 +6,7 @@ export const routePaths = {
   grouping:'grouping',
   leaderBoard:'leader-board',
   management:'management',
+  errorPage: 'error',
 };
 
 const router = createRouter({
@@ -20,14 +21,22 @@ const router = createRouter({
         requireAuth: false
       }
     },
-    // {
-    //   path: `/${routePaths.workbench}`,
-    //   component: () => import('../views/system/WorkspaceView.vue'),
-    //   name: routePaths.workbench,
-    //   meta: {
-    //     requireAuth: true
-    //   }
-    // },
+    {
+      path: `/${routePaths.errorPage}`,
+      name: routePaths.errorPage,
+      component: () => import('../views/ErrorView.vue'),
+      meta: {
+        requireAuth: false
+      }
+    },
+    {
+      path: `/${routePaths.workbench}`,
+      component: () => import('../views/WorkbenchView.vue'),
+      name: routePaths.workbench,
+      meta: {
+        requireAuth: true
+      }
+    },
     // {
     //   path: `/${routePaths.grouping}`,
     //   name: routePaths.grouping,

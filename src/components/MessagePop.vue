@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type MessagePopConfig } from './componentTypes';
+import { type MessagePopConfig } from './types';
 
 const props = withDefaults(defineProps<MessagePopConfig>(),
     {
@@ -91,4 +91,4 @@ const props = withDefaults(defineProps<MessagePopConfig>(),
     -webkit-transform: scale(1.1);
     transform: scale(1.1);
 }
-</style>
+</style>.

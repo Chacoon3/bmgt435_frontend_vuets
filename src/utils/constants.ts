@@ -1,6 +1,5 @@
 import { type User } from "../ormTypes";
 
-
 export const EMPTY_USER: User = {
     id: -1,
     user_did: "",

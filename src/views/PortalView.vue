@@ -1,60 +1,55 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import TopStreak from '../components/TopStreak.vue'
-import BottomStreak from '../components/BottomStreak.vue'
 import SignInView from './portalChildren/SignInView.vue'
 import SignUpView from './portalChildren/SignUpView.vue'
 import ForgetPasswordView from './portalChildren/ForgetPasswordView.vue'
-import {Button} from 'ant-design-vue'
+import { Button } from 'ant-design-vue'
+import { usePortalState } from '../utils/portalUtils'
 
+const {portalState, setPortalState} = usePortalState();
 
-type ViewState =
-    | "signIn"
-    | "signUp"
-    | "passwordReset"
-
-const pageState = ref<ViewState>("signIn");
-
-function switchChildren(stateStr: ViewState) {
-    pageState.value = stateStr;
-}
 
 </script>
 
 <template>
-    <TopStreak></TopStreak>
 
     <div>
+        <div class="streak" loc="top"></div>
+
         <div id="titleDiv">
             <h1>BMGT435 Simulation</h1>
             <h2>Experiential Learning Platform</h2>
             <hr>
         </div>
 
-        <nav id="portalNav">
-            <div>
-                <Button type="link" @click="switchChildren('signIn')">Sign In</Button>
-            </div>
-            <div>
-                <Button type="link" @click="switchChildren('signUp')">Sign Up</Button>
-            </div>
-            <div>
-                <Button type="link" @click="switchChildren('passwordReset')">Forget Password</Button>
-            </div>
-        </nav>
+        <div id="portalNav">
+            <Button type="link" @click="setPortalState('signIn')"
+                :disabled="portalState === 'signIn'">Sign In</Button>
+            <Button type="link" @click="setPortalState('signUp')"
+                :disabled="portalState === 'signUp'">Sign Up</Button>
+            <Button type="link" @click="setPortalState('passwordReset')"
+                :disabled="portalState === 'passwordReset'">Forget Password</Button>
+        </div>
 
-        <SignInView v-if="pageState === 'signIn'"></SignInView>
-        <SignUpView v-else-if="pageState === 'signUp'"></SignUpView>
-        <ForgetPasswordView v-else-if="pageState === 'passwordReset'"></ForgetPasswordView>
+        <div>
+            <SignInView v-if="portalState === 'signIn'"></SignInView>
+            <SignUpView v-else-if="portalState === 'signUp'"></SignUpView>
+            <ForgetPasswordView v-else-if="portalState === 'passwordReset'"></ForgetPasswordView>
+        </div>
     </div>
 
-    <BottomStreak></BottomStreak>
+    <div class="streak" loc="bottom"></div>
 </template>
 
 <style scoped>
-form {
-    position: relative;
-    top: 40%;
+.streak {
+    width: 100vw;
+    height: 10vh;
+    background-color: var(--color-red-umd);
+}
+
+div[loc=bottom] {
+    position: fixed;
+    bottom: 0;
 }
 
 h1,
@@ -64,18 +59,7 @@ h2 {
     text-align: center;
 }
 
-
-h3 {
-    font-weight: 12;
-    font-size: 18px;
-    position: relative;
-    text-align: center;
-    text-shadow: 2vh;
-}
-
 #portalNav {
     text-align: center;
-    display: flex;
-    flex-direction: row;
 }
 </style>

@@ -1,22 +1,11 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <!-- <header>
-
-  </header> -->
-
   <body>
     <RouterView />
-
-    <!-- <p v-if="reactiveFetchUsersResult.isLoading">Loading Data ...</p>
-    <p v-else> {{ reactiveFetchUsersResult.data[0].id }}</p> -->
-
   </body>
-
-
 </template>
 
 <style scoped>
@@ -30,10 +19,6 @@ nav {
   font-size: 12px;
   text-align: center;
   margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
 }
 
 nav a.router-link-exact-active:hover {
@@ -57,23 +42,13 @@ nav a:first-of-type {
     padding-right: calc(var(--section-gap) / 2);
   }
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
   nav {
     text-align: left;
-    margin-left: -1rem;
+    /* margin-left: -1rem; */
     font-size: 1rem;
 
-    padding: 1rem 0;
-    margin-top: 1rem;
+    /* padding: 1rem 0; */
+    /* margin-top: 1rem; */
   }
 }
 </style>

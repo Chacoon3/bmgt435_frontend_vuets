@@ -1,39 +1,41 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { type AxiosResponse } from 'axios';
 import { type SignInForm, signIn } from '../../utils/userUtils';
+import InLineMsg from '@/components/InLineMsg.vue';
+import router, { routePaths } from '@/router';
+
+const isSigningIn = ref(false);
 
 const signInForm = reactive<SignInForm>({
     did: "",
     password: ""
 });
 
-const signInState = reactive({
-    isSigningIn: false,
-    isError: false,
-    errorMsg: ""
+const inlineMsgState = reactive({
+    show: false,
+    msg: ""
 })
 
 function handleSignIn() {
     if (signInForm.did === "" || signInForm.password === "") {
-        signInState.errorMsg = "Please input directory id and password!"
-        signInState.isError = true;
+        inlineMsgState.msg = "Please input directory ID and password!"
+        inlineMsgState.show = true;
     }
     else {
-        signInState.isSigningIn = true;
-        signInState.isError = false;
-        signInState.errorMsg = "";
+        isSigningIn.value = true;
+        inlineMsgState.show = false;
+        inlineMsgState.msg = "";
         signIn(signInForm, (resp: AxiosResponse) => {
+            isSigningIn.value = false;
             if (resp.status === 200) {
-                // router.push({ name: routePaths.workbench })
+                router.push({ name: routePaths.workbench })
             }
             else {
-                signInState.errorMsg = resp.data;
-                signInState.isError = true;
+                inlineMsgState.msg = resp.data;
+                inlineMsgState.show = true;
             }
-            signInState.isSigningIn = false;
         })
-
     }
 }
 
@@ -41,79 +43,30 @@ function handleSignIn() {
 
 
 <template>
-
-        <h3>user portal</h3>
-        <span v-if="signInState.isError" id="errorText">{{ signInState.errorMsg }}</span>
-        <form @submit.prevent="handleSignIn" autocomplete="on" enctype="text/plain">
-            <div class="lineDiv">
+    <div class="portalSubmodule">
+        <InLineMsg :show="inlineMsgState.show" :content="inlineMsgState.msg"></InLineMsg>
+        <form @submit.prevent="handleSignIn" autocomplete="on">
+            <div class="formDiv">
+                <label for="did">directory ID</label>
+            </div>
+            <div class="formDiv">
                 <input class="inputField" type='text' name="did" placeholder="directory ID" v-model.lazy="signInForm.did">
             </div>
-            <div class="lineDiv">
+            <div class="formDiv">
+                <label for="password">password</label>
+            </div>
+            <div class="formDiv">
                 <input class="inputField" type="password" name='password' placeholder="password"
                     v-model.lazy="signInForm.password">
             </div>
-            <div class="lineDiv">
-                <button type="submit" :disabled="signInState.isSigningIn">Sign In </button>
+            <div class="formDiv">
+                <input type="submit" :disabled="isSigningIn" :value="isSigningIn? 'Signing in ...' : 'Sign In'">
             </div>
         </form>
-
+    </div>
 </template>
 
 
 <style scoped>
-form {
-    position: relative;
-    top: 40%;
-}
-
-#errorText {
-    display: block;
-    color: red;
-    text-align: center;
-}
-
-
-h1,
-h2 {
-    position: relative;
-    text-shadow: 2vh;
-    text-align: center;
-}
-
-
-h3 {
-    font-weight: 12;
-    font-size: 18px;
-    position: relative;
-    text-align: center;
-    text-shadow: 2vh;
-}
-
-button {
-    margin: 5px;
-}
-
-.lineDiv {
-    padding-bottom: 1%;
-    text-align: center;
-}
-
-input.inputField {
-    width: 175px;
-    height: 20px;
-}
-
-input[type="button"] {
-    height: 25px;
-}
-
-input[type="submit"] {
-    height: 25px;
-}
-
-
-label {
-    padding-left: 10px;
-    padding-right: 10px;
-}
-</style>@/utils/apis
+@import url(./portalChildrenStyle.css);
+</style>
