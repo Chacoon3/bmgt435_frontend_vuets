@@ -47,6 +47,31 @@ export function useCurrentUser() {
   return { isCurrentUserLoading, currentUser, httpGetUser, setCurrentUser };
 }
 
+export function useSignOut() {
+  const isLoading = ref<boolean>(false);
+  function signOut(callback?: (resp: AxiosResponse) => void) {
+    currentUser.value = null;
+    isLoading.value = true;
+    httpPost(endpoints.signOut, null, (resp: AxiosResponse) => {
+      isLoading.value = false;
+      callback?.(resp);
+    });
+  }
+  return { isLoading, signOut };
+}
+
+export function formatUserName(user: User) {
+  if (user.first_name && user.last_name) {
+    return `${user.first_name} ${user.last_name}`;
+  } else if (user.first_name) {
+    return user.first_name;
+  } else if (user.last_name) {
+    return user.last_name;
+  } else {
+    return '';
+  }
+}
+
 export type SignInForm = {
   did: string;
   password: string;

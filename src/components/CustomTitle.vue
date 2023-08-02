@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import {type CustomTitleConfig} from './types';
 
-withDefaults(defineProps<CustomTitleConfig>(),
-    {
-        titleType: "success",
-        title:''
-    }
-);
+defineProps({
+    title: String
+})
 </script>
 
 <template>
     <h1>{{ title }}</h1>
+    <hr>
 </template>
+
+<style scoped>
+
+</style>

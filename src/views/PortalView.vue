@@ -2,12 +2,9 @@
 import SignInView from './portalChildren/SignIn.vue'
 import SignUpView from './portalChildren/SignUp.vue'
 import ForgetPasswordView from './portalChildren/PasswordReset.vue'
-import { Button } from 'ant-design-vue'
 import { usePortalState } from '../utils/portalUtils'
-import { KeepAlive } from 'vue'
 
 const { portalState, setPortalState } = usePortalState();
-
 
 </script>
 
@@ -22,10 +19,9 @@ const { portalState, setPortalState } = usePortalState();
         </div>
 
         <div id="portalNav">
-            <Button type="link" @click="setPortalState('signIn')" :disabled="portalState === 'signIn'">Sign In</Button>
-            <Button type="link" @click="setPortalState('signUp')" :disabled="portalState === 'signUp'">Sign Up</Button>
-            <Button type="link" @click="setPortalState('passwordReset')" :disabled="portalState === 'passwordReset'">Forget
-                Password</Button>
+            <button @click="setPortalState('signIn')" :disabled="portalState === 'signIn'">Sign In</button>
+            |<button @click="setPortalState('signUp')" :disabled="portalState === 'signUp'">Sign Up</button>
+            |<button @click="setPortalState('passwordReset')" :disabled="portalState === 'passwordReset'">Password Reset</button>
         </div>
 
         <div>
@@ -61,5 +57,24 @@ h2 {
 
 #portalNav {
     text-align: center;
+}
+
+button {
+    transition: var(--transition-button);
+    padding: 0;
+    margin: 0;
+    width: 110px;
+    color:#e21833;
+    border: none;
+    background-color: transparent;
+    text-align: center;
+}
+
+button:hover {
+    color: lightcoral;
+}
+
+button:disabled {
+    color: lightgrey;
 }
 </style>

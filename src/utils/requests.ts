@@ -7,7 +7,7 @@ const server = "http://127.0.0.1:8000/";
 axios.defaults.baseURL = server;
 axios.defaults.headers["Content-Type"] = "text/plain"; // for CORS
 axios.defaults.withCredentials = true;
-axios.defaults.validateStatus = (status) => status < 1000;
+axios.defaults.validateStatus = (status) => status < 500;
 axios.defaults.timeout = 7000;
 
 const { setErrorContext } = useErrorUtil();

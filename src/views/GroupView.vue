@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import CustomTitle from '@/components/CustomTitle.vue';
-import { useCurrentUserGroup, usePaginatedGroup } from '@/utils/groupUtils';
+import { useCurrentGroupInfo, usePaginatedGroupInfo } from '@/utils/groupUtils';
 import { reactive } from 'vue';
 
 const createGroupForm = reactive({
     groupName: ''
 })
-const { isCurrentUserGroupLoading, currentUserGroup } = useCurrentUserGroup();
-const paginatedGroup = usePaginatedGroup();
+const { isCurrentGroupInfoLoading, currentGroupInfo } = useCurrentGroupInfo();
+const paginatedGroupInfo = usePaginatedGroupInfo();
 
 function handleCreateGroup() {
 
@@ -20,8 +20,8 @@ function handleCreateGroup() {
 
 <div>
 
-    <div v-if="!isCurrentUserGroupLoading && currentUserGroup === null">
-        <h2>Create a new team</h2>
+    <div v-if="!isCurrentGroupInfoLoading && currentGroupInfo === null">
+        <h2>Create a new group</h2>
         <div id="createTeamDiv">
             <div class="createTeamEle">
                 <label for="groupName">Team name</label>
@@ -34,13 +34,13 @@ function handleCreateGroup() {
         </div>
     </div>
 
-    <div v-if="!isCurrentUserGroupLoading && currentUserGroup !== null">
-        <h2>Team info</h2>
+    <div v-if="!isCurrentGroupInfoLoading && currentGroupInfo !== null">
+        <h2>Group Info</h2>
         <div>
-            <h3>{{ currentUserGroup.name }}</h3>
+            <h3>{{ currentGroupInfo.group.name }}</h3>
             <ul id="userGroupInfo">
-                <li v-for="item in userGroupInfo.groupMembers" :key="item">
-                    <span>{{ item.userName }}</span>
+                <li v-for="item in currentGroupInfo.users" :key="item.id">
+                    <span>{{ item.first_name + ' ' + item.last_name }}</span>
                 </li>
             </ul>
         </div>
@@ -54,9 +54,9 @@ function handleCreateGroup() {
         <h2>Join an existing team</h2>
         <div>
             <ul>
-                <GroupInfoItem v-for="groupInfo in groupList" :key="groupInfo.groupId"
+                <!-- <GroupInfoItem v-for="groupInfo in groupList" :key="groupInfo.groupId"
                     :groupName="groupInfo.groupName" :groupMembers="groupInfo.groupMembers">
-                </GroupInfoItem>
+                </GroupInfoItem> -->
 
             </ul>
         </div>

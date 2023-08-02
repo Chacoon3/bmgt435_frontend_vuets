@@ -25,10 +25,13 @@ function getAllCases() {
 }
 
 watch<number | null | undefined>(() => currentUser.value?.role_id, (newRoleId, oldRoleId) => {
-    if (newRoleId !== undefined && newRoleId !== null && newRoleId !== oldRoleId) {
-        getCasesByRole(newRoleId);
-    } else {
-        cases.value = [];
+    if (newRoleId !== oldRoleId) {
+        if (newRoleId !== undefined && newRoleId !== null ) {
+            getCasesByRole(newRoleId);
+        }
+        else{
+            cases.value = [];
+        }
     }
 })
 

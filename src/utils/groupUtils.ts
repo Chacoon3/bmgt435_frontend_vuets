@@ -2,20 +2,18 @@ import { useCurrentUser } from "./userUtils";
 import { httpGet } from "./requests";
 import { endpoints } from "./apis";
 import { ref, watch } from "vue";
-import { type Group } from "./dbModelTypes";
+import { type GroupInfo } from "./dbModelTypes";
 
 const { currentUser } = useCurrentUser();
-
-
-const isCurrentUserGroupLoading = ref<boolean>(false);
-const currentUserGroup = ref<Group | null>(null);
+const isCurrentGroupInfoLoading = ref<boolean>(false);
+const currentGroupInfo = ref<GroupInfo | null>(null);
 
 watch<number | null | undefined>(
   () => currentUser.value?.group_id,
   (newGroupId, oldGroupId) => {
-    if (newGroupId !== undefined && newGroupId !== oldGroupId) {
-      if (newGroupId === null) {
-        currentUserGroup.value = null;
+    if (newGroupId !== oldGroupId) {
+      if (newGroupId === null || newGroupId === undefined) {
+        currentGroupInfo.value = null;
       } else {
         getGroupById(newGroupId);
       }
@@ -24,48 +22,48 @@ watch<number | null | undefined>(
 );
 
 function getGroupById(groupId: number) {
-  isCurrentUserGroupLoading.value = true;
+  isCurrentGroupInfoLoading.value = true;
   httpGet(endpoints.groups, { id: groupId }, (resp: any) => {
     if (resp.status === 200) {
-      currentUserGroup.value = resp.data;
+      currentGroupInfo.value = resp.data;
     } else {
-      currentUserGroup.value = null;
+      currentGroupInfo.value = null;
     }
-    isCurrentUserGroupLoading.value = false;
+    isCurrentGroupInfoLoading.value = false;
   });
 }
 
-export function useCurrentUserGroup() {
-  return { isCurrentUserGroupLoading, currentUserGroup, getGroupById };
+export function useCurrentGroupInfo() {
+  return { isCurrentGroupInfoLoading: isCurrentGroupInfoLoading, currentGroupInfo: currentGroupInfo, getGroupById };
 }
 
-export function usePaginatedGroup() {
-  const isGroupsLoading = ref<boolean>(false);
-  const groups = ref<Group[]>([]);
+export function usePaginatedGroupInfo() {
+  const isGroupInfoLoading = ref<boolean>(false);
+  const groupInfo = ref<GroupInfo[]>([]);
   const totalGroups = ref<number>(0);
   const currentPage = ref<number>(1);
   const pageSize = ref<number>(10);
   const totalPages = ref<number>(0);
 
-  function getGroups(page: number, size: number) {
-    isGroupsLoading.value = true;
+  function getGroupsPaginated(page: number, size: number) {
+    isGroupInfoLoading.value = true;
     httpGet(endpoints.groups, { page: page, size: size }, (resp: any) => {
-      groups.value = resp.data;
+      groupInfo.value = resp.data;
       totalGroups.value = resp.total;
       currentPage.value = resp.current_page;
       pageSize.value = resp.page_size;
       totalPages.value = resp.total_pages;
-      isGroupsLoading.value = false;
+      isGroupInfoLoading.value = false;
     });
   }
 
   return {
-    isGroupsLoading,
-    groups,
+    isGroupsLoading: isGroupInfoLoading,
+    groupInfo: groupInfo,
     totalGroups,
     currentPage,
     pageSize,
     totalPages,
-    getGroups,
+    getGroupsPaginated: getGroupsPaginated,
   };
 }

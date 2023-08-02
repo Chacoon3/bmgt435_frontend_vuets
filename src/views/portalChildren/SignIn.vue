@@ -26,7 +26,6 @@ function handleSignIn() {
         inlineMsgState.msg = "";
         signIn(signInForm, (resp) => {
             if (resp.status === 200) {
-                // update user info
                 setCurrentUser(resp.data);
                 router.push({ name: routePaths.workbench})
             }
