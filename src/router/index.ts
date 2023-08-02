@@ -37,14 +37,14 @@ const router = createRouter({
         requireAuth: true
       }
     },
-    // {
-    //   path: `/${routePaths.grouping}`,
-    //   name: routePaths.grouping,
-    //   component: () => import('../views/system/GroupingView.vue'),
-    //   meta: {
-    //     requireAuth: true
-    //   }
-    // },
+    {
+      path: `/${routePaths.grouping}`,
+      name: routePaths.grouping,
+      component: () => import('../views/GroupingView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
     // {
     //   path: `/${routePaths.records}`,
     //   name: routePaths.records,

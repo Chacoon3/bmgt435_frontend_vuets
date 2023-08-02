@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import CustomTitle from '@/components/CustomTitle.vue';
+import router, {routePaths} from '@/router';
 import { computed } from 'vue';
 import { useCurrentUser } from '../utils/userUtils'
+import { useCases } from '../utils/caseUtils'
+import { ref } from 'vue';
 // import { inject, reactive, ref, KeepAlive, onMounted } from 'vue';
 // import { keyUserInfo } from '../../static/injKey'
 // import router from '../../router';
@@ -12,17 +15,20 @@ import { useCurrentUser } from '../utils/userUtils'
 // import CaseBriefView from './submodules/CaseBriefView.vue';
 // import { apiAddress, axiosGet } from '../../static/serverAccess';
 
+const pageStateArray = ['caseList', 'caseBrief', 'simulation', 'resultAnalysis']
+const pageState = ref(0)
+const { isCurrentUserLoading, currentUser } = useCurrentUser()
+const { cases } = useCases()
 
-const { isLoading, data: currentUser } = useCurrentUser()
 const titleText = computed(() => {
-    if (isLoading.value) {
-        return "Loading..."
+    if (isCurrentUserLoading.value) {
+        return "Fetching data..."
     }
     else if (currentUser.value === null) {
-        return "";
+        return ""
     }
     else {
-        return `Welcome, ${currentUser.value.first_name}!`
+        return `Welcome, ${currentUser.value.first_name}, ${currentUser.value.last_name}!`
     }
 })
 
@@ -30,7 +36,7 @@ const titleText = computed(() => {
 // this defines the simulation stages
 // const statusArray = ["Case list", "Case brief", "Simulate", "Result Analysis"]
 
-// const simulationStage = ref(0)  // records the user's stage in simulation 
+// const pageState = ref(0)  // records the user's stage in simulation 
 
 // const caseNames = ref([])
 
@@ -49,7 +55,7 @@ const titleText = computed(() => {
 //     }
 //     else {
 //         currentCaseId.value = caseId
-//         simulationStage.value = 1
+//         pageState.value = 1
 //     }
 // }
 
@@ -58,11 +64,11 @@ const titleText = computed(() => {
 //     if (index === -1) {
 //         index = 0;
 //     }
-//     simulationStage.value = index;
+//     pageState.value = index;
 // }
 
 // function handleClickProceed() {
-//     simulationStage.value = 2;
+//     pageState.value = 2;
 // }
 
 // function getCaseInfo() {
@@ -99,33 +105,33 @@ const titleText = computed(() => {
 
     <div>
         <CustomTitle :title=titleText ></CustomTitle>
-<!-- 
-        <div id="contentGrouped" v-if="userInfo.groupId != ''">
+
+        <div id="contentGrouped" v-if="currentUser?.group_id !== null">
             <div id="statusList">
-                <span class="statusItem" v-for="(status, index) in statusArray" :key="index">
-                    <button class="statusButton" :disabled="index > simulationStage"
-                        @click="() => handleClickStatus(status)">
+                <span class="statusItem" v-for="(status, index) in pageStateArray" :key="index">
+                    <button class="statusButton" :disabled="index > pageState" @click="pageState = index">
                         {{ status }}
                     </button>
                 </span>
             </div>
 
-            <KeepAlive>
-                <CaseSelectionView v-if="simulationStage === 0" :case-info="caseNames" @on-select-case="handleSelectCase">
+            <!-- <KeepAlive>
+                <CaseSelectionView v-if="pageState === 0" :case-info="caseNames" @on-select-case="handleSelectCase">
                 </CaseSelectionView>
-                <CaseBriefView v-else-if="simulationStage === 1" :case-id="currentCaseId"
-                    @on-click-proceed="handleClickProceed"></CaseBriefView>
+                <CaseBriefView v-else-if="pageState ===  1" :case-id="currentCaseId"
+                    @on-click-proceed="pageState =2">
+                </CaseBriefView>
 
-                <div v-else-if="simulationStage === 2">
+                <div v-else-if="pageState ===2">
                     <component :is="simulators[currentCaseId]"></component>
                 </div>
-            </KeepAlive>
-        </div> -->
+            </KeepAlive> -->
+        </div>
 
-        <!-- <div id="contentUngrouped" v-else> -->
-            <!-- <h2>It appears you are not in a team yet. Please join or create a team first.</h2>
-            <button id="okayButton" type="button" @click="router.push({ name: flag_routes.grouping })">Okay!</button> -->
-        <!-- </div> -->
+        <div id="contentUngrouped" v-else>
+            <h2>It appears you are not in a team yet. Please join or create a team first.</h2>
+            <button id="okayButton" type="button" @click="router.push({ name: routePaths.grouping })">Okay!</button>
+        </div>
 
     </div>
 </template>

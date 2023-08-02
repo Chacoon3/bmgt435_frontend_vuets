@@ -1,32 +1,50 @@
 import { endpoints } from "./apis";
-import {
-  useGet,
-  usePost,
-  type GetDataResult,
-  type PostDataResult,
-} from "./requests";
-import { type User } from "../ormTypes";
+import { httpGet, httpPost } from "./requests";
+import { type User } from "./dbModelTypes";
+import { type AxiosResponse } from "axios";
+import { ref } from "vue";
 
-
-export function signIn(
-  data: SignInForm,
-  onCompleted: any = null
-): PostDataResult<SignInForm> {
-  return usePost<SignInForm>(endpoints.signIn, data, onCompleted);
+export function useSignIn() {
+  const isLoading = ref<boolean>(false);
+  function signIn(data: SignInForm, callback?: (resp: AxiosResponse) => void) {
+    isLoading.value = true;
+    httpPost<SignInForm>(endpoints.signIn, data, (resp: AxiosResponse) => {
+      isLoading.value = false;
+      callback?.(resp);
+    });
+  }
+  return { isLoading, signIn };
 }
 
-export function signUp(
-  data: SignUpForm,
-  onCompleted: any = null
-): PostDataResult<SignUpForm> {
-  return usePost<SignUpForm>(endpoints.signUp, data, onCompleted);
+export function useSignUp() {
+  const isLoading = ref<boolean>(false);
+  function signUp(data: SignUpForm, callback?: (resp: AxiosResponse) => void) {
+    isLoading.value = true;
+    httpPost<SignUpForm>(endpoints.signUp, data, (resp: AxiosResponse) => {
+      isLoading.value = false;
+      callback?.(resp);
+    });
+  }
+  return { isLoading, signUp };
 }
 
+const isCurrentUserLoading = ref<boolean>(false);
+const currentUser = ref<User | null>(null);
+function httpGetUser(callback?: (resp: AxiosResponse) => void) {
+  isCurrentUserLoading.value = true;
+  httpGet(endpoints.me, null, (resp: AxiosResponse) => {
+    isCurrentUserLoading.value = false;
+    currentUser.value = resp.data;
+    callback?.(resp);
+  });
+}
 
-const {isLoading, data, httpGetter} = useGet<User>(endpoints.me, null)
-export function useCurrentUser():GetDataResult<User> {
-  httpGetter(null);
-  return {isLoading, data, httpGetter}
+function setCurrentUser(user: User) {
+  currentUser.value = user;
+}
+
+export function useCurrentUser() {
+  return { isCurrentUserLoading, currentUser, httpGetUser, setCurrentUser };
 }
 
 export type SignInForm = {

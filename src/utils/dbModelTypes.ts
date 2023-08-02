@@ -30,3 +30,10 @@ export type User = {
     id: number;
     name: string;
   };
+
+
+  // Server-created types
+  export type GroupInfo = {
+    group: Group;
+    users: User[];
+  };

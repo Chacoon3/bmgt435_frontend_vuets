@@ -39,4 +39,4 @@ function handleForgetPassword() {
 
 <style scoped>
 @import url(./portalChildrenStyle.css);
-</style>@/components
+</style>

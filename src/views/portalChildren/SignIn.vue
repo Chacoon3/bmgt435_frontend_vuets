@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { type AxiosResponse } from 'axios';
-import { type SignInForm, signIn } from '../../utils/userUtils';
+import { reactive } from 'vue'
+import { SignInForm, useSignIn, useCurrentUser } from '../../utils/userUtils';
 import InLineMsg from '@/components/InLineMsg.vue';
-import router, { routePaths } from '@/router';
+import router, {routePaths} from '@/router';
 
-const isSigningIn = ref(false);
-
+const { isLoading, signIn } = useSignIn()
+const {setCurrentUser} = useCurrentUser();
 const signInForm = reactive<SignInForm>({
     did: "",
     password: ""
@@ -23,19 +22,19 @@ function handleSignIn() {
         inlineMsgState.show = true;
     }
     else {
-        isSigningIn.value = true;
         inlineMsgState.show = false;
         inlineMsgState.msg = "";
-        signIn(signInForm, (resp: AxiosResponse) => {
-            isSigningIn.value = false;
+        signIn(signInForm, (resp) => {
             if (resp.status === 200) {
-                router.push({ name: routePaths.workbench })
+                // update user info
+                setCurrentUser(resp.data);
+                router.push({ name: routePaths.workbench})
             }
             else {
-                inlineMsgState.msg = resp.data;
+                inlineMsgState.msg = resp === null ? "Sign in failed for unknwon error!" : resp.data;
                 inlineMsgState.show = true;
             }
-        })
+        });
     }
 }
 
@@ -60,7 +59,7 @@ function handleSignIn() {
                     v-model.lazy="signInForm.password">
             </div>
             <div class="formDiv">
-                <input type="submit" :disabled="isSigningIn" :value="isSigningIn? 'Signing in ...' : 'Sign In'">
+                <input type="submit" :disabled="isLoading" :value="isLoading? 'Signing in ...' : 'Sign In'">
             </div>
         </form>
     </div>

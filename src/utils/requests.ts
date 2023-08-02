@@ -28,8 +28,8 @@ function triggerRequestError<T>(
 
 export function httpGet(
   url: string,
-  params: any | null,
-  onCompleted: any
+  params: any | null = null,
+  onCompleted: any = null
 ): void {
     axios
       .get(url, { params: params })
@@ -87,17 +87,17 @@ export function useGet<TData>(
   }
   act(params);
 
-  return { isLoading, data: data, httpGetter: act };
+  return { isLoading, data: data, httpGetUser: act };
 }
 
-export function usePost<TData>(
+export function usePost<TPost>(
   endpoint: string,
-  data: TData,
+  data: TPost,
   onCompleted: any = null
-): PostDataResult<TData> {
+): PostDataResult<TPost> {
   const isLoading = ref<boolean>(true);
   const response = ref<AxiosResponse | null>(null);
-  function act(data: TData) {
+  function act(data: TPost) {
     isLoading.value = true;
     httpPost(endpoint, data, (resp: AxiosResponse) => {
       isLoading.value = false;
@@ -113,13 +113,11 @@ export function usePost<TData>(
 export type GetDataResult<TData> = {
   isLoading: Ref<boolean>;
   data: Ref<UnwrapRef<TData> | null>;
-  httpGetter: (params: any) => void;
+  httpGetUser: (params: any) => void;
 };
 
-export type PostDataResult<TData> = {
+export type PostDataResult<TPost> = {
   isLoading: Ref<boolean>;
   response: Ref<AxiosResponse | null>;
-  httpPoster: (data: TData) => void;
+  httpPoster: (data: TPost) => void;
 };
-
-export default { httpGet, httpPost, httpPut, httpDelete, useGet };
