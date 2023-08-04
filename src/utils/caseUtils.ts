@@ -1,4 +1,4 @@
-import { type Case} from "@/utils/dbModelTypes";
+import { type Case} from "@/utils/ORMTypes";
 import { ref, watch } from "vue";
 import { httpGet } from "./requests";
 import { endpoints } from "./apis";
@@ -10,7 +10,7 @@ const isCasesLoading = ref<boolean>(false);
 const cases = ref<Case[]>([]);
 function getCasesByRole(roleId: number) {
     isCasesLoading.value = true;
-    httpGet(endpoints.cases, { role_id: roleId}, (resp: any) => {
+    httpGet(endpoints.cases.cases, { role_id: roleId}, (resp: any) => {
         cases.value = resp.data;
         isCasesLoading.value = false;
     })
@@ -18,7 +18,7 @@ function getCasesByRole(roleId: number) {
 
 function getAllCases() {
     isCasesLoading.value = true;
-    httpGet(endpoints.cases, null, (resp: any) => {
+    httpGet(endpoints.cases.cases, null, (resp: any) => {
         cases.value = resp.data;
         isCasesLoading.value = false;
     })

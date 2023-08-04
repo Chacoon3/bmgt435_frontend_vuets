@@ -4,6 +4,7 @@ import { computed, reactive, ref } from 'vue';
 import InLineMsg from '@/components/InLineMsg.vue';
 import { type InLineMsgConfig } from '@/components/types';
 import { usePortalState } from '@/utils/portalUtils';
+import {validateText} from '@/utils/formUtils';
 
 
 const { isLoading, signUp } = useSignUp();
@@ -25,7 +26,7 @@ function handleSignUp() {
         inlineMsgState.content = "Passwords do not match!";
         inlineMsgState.show = true;
     }
-    else if (signUpForm.did === '' || signUpForm.password === '') {
+    else if (! validateText(signUpForm.did) || ! validateText(signUpForm.password)) {
         inlineMsgState.content = "Please input directory ID and password!";
         inlineMsgState.show = true;
     }

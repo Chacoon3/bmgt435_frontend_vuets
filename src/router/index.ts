@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 export const routePaths = {
+  loading: "loading",
   portal: "portal",
   workbench: "workbench",
   grouping: "grouping",
@@ -13,6 +14,14 @@ export const routePaths = {
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: `/${routePaths.loading}`,
+      name: routePaths.loading,
+      component: () => import("../views/LoadingView.vue"),
+      meta: {
+        requireAuth: false,
+      }
+    },
     {
       path: `/${routePaths.portal}`,
       name: routePaths.portal,

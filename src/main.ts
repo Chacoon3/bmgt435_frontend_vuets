@@ -1,25 +1,23 @@
 import "./assets/main.css";
 import { createApp } from "vue";
 import App from "./App.vue";
-import router, {routePaths} from "./router";
+import router, { routePaths } from "./router";
 import { globalErrorHandler } from "./utils/errorUtils";
 import { useCurrentUser } from "./utils/userUtils";
 
-const {currentUser} = useCurrentUser();
+const { currentUser, httpGetUser } = useCurrentUser();
 
 router.beforeEach((to, from, next) => {
-    if (currentUser.value === undefined || currentUser.value === null) {
-        if (to.meta.requireAuth) {
-            router.push({name:routePaths.portal});
-        }
-        else {
-            next();
-        }
+  if (currentUser.value === undefined || currentUser.value === null) {
+    if (to.meta.requireAuth) {
+      router.push({ name: routePaths.portal });
     } else {
-        next();
+      next();
     }
+  } else {
+    next();
+  }
 });
-
 
 const app = createApp(App);
 
@@ -29,4 +27,15 @@ app.config.errorHandler = globalErrorHandler;
 
 app.mount("#app");
 
-document.title = "BMGT435 ELP"
+router.push({ name: routePaths.loading });
+
+httpGetUser((resp:any) => {
+    if (resp.status === 200 && currentUser.value !== null) {
+        router.push({ name: routePaths.workbench });
+    }
+    else{
+        router.push({ name: routePaths.portal });
+    }
+})
+
+document.title = "BMGT435 ELP";

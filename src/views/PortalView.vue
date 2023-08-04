@@ -21,15 +21,14 @@ const { portalState, setPortalState } = usePortalState();
         <div id="portalNav">
             <button @click="setPortalState('signIn')" :disabled="portalState === 'signIn'">Sign In</button>
             |<button @click="setPortalState('signUp')" :disabled="portalState === 'signUp'">Sign Up</button>
-            |<button @click="setPortalState('passwordReset')" :disabled="portalState === 'passwordReset'">Password Reset</button>
+            |<button @click="setPortalState('passwordReset')" :disabled="portalState === 'passwordReset'">Password
+                Reset</button>
         </div>
 
         <div>
-            <KeepAlive>
-                <SignInView v-if="portalState === 'signIn'"></SignInView>
-                <SignUpView v-else-if="portalState === 'signUp'"></SignUpView>
-                <ForgetPasswordView v-else-if="portalState === 'passwordReset'"></ForgetPasswordView>
-            </KeepAlive>
+            <SignInView v-if="portalState === 'signIn'"></SignInView>
+            <SignUpView v-else-if="portalState === 'signUp'"></SignUpView>
+            <ForgetPasswordView v-else-if="portalState === 'passwordReset'"></ForgetPasswordView>
         </div>
     </div>
 
@@ -64,7 +63,7 @@ button {
     padding: 0;
     margin: 0;
     width: 110px;
-    color:#e21833;
+    color: #e21833;
     border: none;
     background-color: transparent;
     text-align: center;

@@ -78,6 +78,7 @@ type NavigationItemConfig = {
 
 <style scoped>
 #navigationBar {
+    margin-right: 5vw;
     width: 15vw;
     height: 100vh;
     background-color: var(--color-red-umd);
@@ -87,8 +88,8 @@ type NavigationItemConfig = {
     position: relative;
     display: flex;
     flex-direction: row;
-    align-items:center;
-    justify-content:center;
+    align-items: center;
+    justify-content: center;
     padding: 0 10px 0 10px;
     height: calc(100vh / v-bind("naviItems.length + 1"));
     margin: 0;
@@ -108,5 +109,8 @@ img.naviImg {
 .naviText {
     width: 45%;
     padding-left: 10%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: "";
 }
 </style>

@@ -3,6 +3,7 @@ import { reactive } from 'vue'
 import { SignInForm, useSignIn, useCurrentUser } from '../../utils/userUtils';
 import InLineMsg from '@/components/InLineMsg.vue';
 import router, {routePaths} from '@/router';
+import { validateText } from '@/utils/formUtils'
 
 const { isLoading, signIn } = useSignIn()
 const {setCurrentUser} = useCurrentUser();
@@ -17,7 +18,7 @@ const inlineMsgState = reactive({
 })
 
 function handleSignIn() {
-    if (signInForm.did === "" || signInForm.password === "") {
+    if (!validateText(signInForm.did) || !validateText(signInForm.password)) {
         inlineMsgState.msg = "Please input directory ID and password!"
         inlineMsgState.show = true;
     }

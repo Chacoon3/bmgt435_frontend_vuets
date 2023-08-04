@@ -1,4 +1,4 @@
-import { type User } from "./dbModelTypes";
+import { type User } from "./ORMTypes";
 
 export const EMPTY_USER: User = {
     id: -1,

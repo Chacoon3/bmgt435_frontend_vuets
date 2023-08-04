@@ -24,8 +24,4 @@ import NavigationBar from '@/components/NavigationBar.vue'
   min-width: 800px;
 }
 
-#viewContainer {
-  margin-left: 5vw;
-  padding-top: 5vh;
-}
 </style>

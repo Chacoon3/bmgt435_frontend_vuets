@@ -1,4 +1,4 @@
-// DB ORM types
+// Server-side ORM types
 
 export type User = {
     id: number;
@@ -19,6 +19,7 @@ export type User = {
   export type Group = {
     id: number;
     name: string;
+    users: User[];
   };
   
   export type Role = {
@@ -29,11 +30,4 @@ export type User = {
   export type Tag = {
     id: number;
     name: string;
-  };
-
-
-  // Server-created types
-  export type GroupInfo = {
-    group: Group;
-    users: User[];
   };

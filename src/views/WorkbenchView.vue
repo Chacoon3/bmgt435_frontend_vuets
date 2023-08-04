@@ -2,7 +2,7 @@
 import CustomTitle from '@/components/CustomTitle.vue';
 import router, {routePaths} from '@/router';
 import { computed,ref } from 'vue';
-import { useCurrentUser } from '../utils/userUtils'
+import { useCurrentUser, formatUserName } from '../utils/userUtils'
 import { useCases } from '../utils/caseUtils'
 // import { inject, reactive, ref, KeepAlive, onMounted } from 'vue';
 // import { keyUserInfo } from '../../static/injKey'
@@ -27,7 +27,7 @@ const titleText = computed(() => {
         return ""
     }
     else {
-        return `Welcome, ${currentUser.value.first_name}, ${currentUser.value.last_name}!`
+        return `Welcome, ${formatUserName(currentUser.value)}!`;
     }
 })
 
@@ -128,7 +128,7 @@ const titleText = computed(() => {
         </div>
 
         <div id="contentUngrouped" v-else>
-            <h2>It appears you are not in a team yet. Please join or create a team first.</h2>
+            <h2>It appears you are not in a group yet. Please join or create a group first.</h2>
             <button id="okayButton" type="button" @click="router.push({ name: routePaths.grouping })">Okay!</button>
         </div>
 

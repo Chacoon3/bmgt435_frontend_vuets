@@ -1,6 +1,6 @@
 import { endpoints } from "./apis";
 import { httpGet, httpPost } from "./requests";
-import { type User } from "./dbModelTypes";
+import { type User } from "./ORMTypes";
 import { type AxiosResponse } from "axios";
 import { ref } from "vue";
 
@@ -8,7 +8,7 @@ export function useSignIn() {
   const isLoading = ref<boolean>(false);
   function signIn(data: SignInForm, callback?: (resp: AxiosResponse) => void) {
     isLoading.value = true;
-    httpPost<SignInForm>(endpoints.signIn, data, (resp: AxiosResponse) => {
+    httpPost<SignInForm>(endpoints.auth.signIn, data, (resp: AxiosResponse) => {
       isLoading.value = false;
       callback?.(resp);
     });
@@ -20,7 +20,7 @@ export function useSignUp() {
   const isLoading = ref<boolean>(false);
   function signUp(data: SignUpForm, callback?: (resp: AxiosResponse) => void) {
     isLoading.value = true;
-    httpPost<SignUpForm>(endpoints.signUp, data, (resp: AxiosResponse) => {
+    httpPost<SignUpForm>(endpoints.auth.signUp, data, (resp: AxiosResponse) => {
       isLoading.value = false;
       callback?.(resp);
     });
@@ -32,9 +32,13 @@ const isCurrentUserLoading = ref<boolean>(false);
 const currentUser = ref<User | null>(null);
 function httpGetUser(callback?: (resp: AxiosResponse) => void) {
   isCurrentUserLoading.value = true;
-  httpGet(endpoints.me, null, (resp: AxiosResponse) => {
+  httpGet(endpoints.users.me, null, (resp: AxiosResponse) => {
     isCurrentUserLoading.value = false;
-    currentUser.value = resp.data;
+    if (resp.status === 200) {
+      currentUser.value = resp.data;
+    } else {
+      currentUser.value = null;
+    }
     callback?.(resp);
   });
 }
@@ -52,7 +56,7 @@ export function useSignOut() {
   function signOut(callback?: (resp: AxiosResponse) => void) {
     currentUser.value = null;
     isLoading.value = true;
-    httpPost(endpoints.signOut, null, (resp: AxiosResponse) => {
+    httpPost(endpoints.auth.signOut, null, (resp: AxiosResponse) => {
       isLoading.value = false;
       callback?.(resp);
     });
@@ -68,7 +72,7 @@ export function formatUserName(user: User) {
   } else if (user.last_name) {
     return user.last_name;
   } else {
-    return '';
+    throw new Error("User has no name");
   }
 }
 
