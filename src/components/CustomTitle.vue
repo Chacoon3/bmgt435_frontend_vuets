@@ -6,20 +6,20 @@ defineProps({
 </script>
 
 <template>
-    <div id="titleDiv">
-        <h1>{{ title }}</h1>
+    <!-- <div id="customTitleDiv"> -->
+        <h1 id="titleH1">{{ title }}</h1>
         <hr class="titleHr">
-    </div>
+    <!-- </div> -->
 </template>
 
 <style scoped>
-#titleDiv {
-    position: relative;
-    top: 5vh;
+#titleH1 {  
+    margin: 3% 0 1% 0;
 }
 
 .titleHr {
-    min-width: 50vw;
-    max-width: 60vw;
+    position: relative;
+    float: left;
+    width: 60%;
 }
 </style>

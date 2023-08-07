@@ -4,10 +4,10 @@ export const routePaths = {
   loading: "loading",
   portal: "portal",
   workbench: "workbench",
-  grouping: "grouping",
+  grouping: "groups",
   leaderBoard: "leader-board",
   records: "records",
-  manage: "management",
+  manage: "manage",
   errorPage: "error",
 };
 

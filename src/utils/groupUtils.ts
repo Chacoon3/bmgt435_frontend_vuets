@@ -6,31 +6,37 @@ import { type Group } from "./ORMTypes";
 
 const { currentUser } = useCurrentUser();
 const isCurrentGroupLoading = ref<boolean>(false);
-const currentGroup = ref<Group>();
+const currentGroup = ref<Group | null>(null);
 
-function getGroupById(groupId: number) {
-  isCurrentGroupLoading.value = true;
+function getGroupById(groupId: number, callback: any = null) {
   httpGet(endpoints.groups.groups, { id: groupId }, (resp: any) => {
-    if (resp.status === 200) {
-      currentGroup.value = resp.data;
-    } else {
-      currentGroup.value = undefined;
-    }
-    isCurrentGroupLoading.value = false;
+    callback?.(resp);
   });
 }
 
-watch<number | null | undefined>(
-  () => currentUser.value?.group_id,
-  (newGroupId, oldGroupId) => {
-    if (newGroupId !== oldGroupId) {
-      if (newGroupId === null || newGroupId === undefined) {
-        currentGroup.value = undefined;
-      } else {
-        getGroupById(newGroupId);
-      }
+watch(
+  currentUser,
+  (newCurrenUser) => {
+    if (
+      newCurrenUser === null ||
+      newCurrenUser === undefined ||
+      newCurrenUser.group_id === null
+    ) {
+      currentGroup.value = null;
+      isCurrentGroupLoading.value = false;
+    } else {
+      isCurrentGroupLoading.value = true;
+      getGroupById(newCurrenUser.group_id, (resp: any) => {
+        if (resp.status === 200) {
+          currentGroup.value = resp.data[0];
+        } else {
+          currentGroup.value = null;
+        }
+        isCurrentGroupLoading.value = false;
+      });
     }
-  }
+  },
+  { immediate: true }
 );
 
 export function useCurrentGroup() {
@@ -43,9 +49,9 @@ export function usePaginatedGroups() {
 
 export function useCreateGroup() {
   const isCreatingGroup = ref<boolean>(false);
-  function createGroup(groupName: string, callback: any = null) {
+  function createGroup(callback: any = null) {
     isCreatingGroup.value = true;
-    httpPost(endpoints.groups.groups, { name: groupName, }, (resp: any) => {
+    httpPost(endpoints.groups.groups, null, (resp: any) => {
       isCreatingGroup.value = false;
       callback?.(resp);
     });

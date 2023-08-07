@@ -100,34 +100,13 @@ const titleText = computed(() => {
 
 
 <template>
-    <!-- <LeftNav></LeftNav> -->
+    <div class="moduleDiv">
 
-    <div>
-        <CustomTitle :title=titleText ></CustomTitle>
+        <div class="workbenchContent" v-if="currentUser && currentUser.group_id !== null">
 
-        <div id="contentGrouped" v-if="currentUser?.group_id !== null">
-            <div id="statusList">
-                <span class="statusItem" v-for="(status, index) in pageStateArray" :key="index">
-                    <button class="statusButton" :disabled="index > pageState" @click="pageState = index">
-                        {{ status }}
-                    </button>
-                </span>
-            </div>
-
-            <!-- <KeepAlive>
-                <CaseSelectionView v-if="pageState === 0" :case-info="caseNames" @on-select-case="handleSelectCase">
-                </CaseSelectionView>
-                <CaseBriefView v-else-if="pageState ===  1" :case-id="currentCaseId"
-                    @on-click-proceed="pageState =2">
-                </CaseBriefView>
-
-                <div v-else-if="pageState ===2">
-                    <component :is="simulators[currentCaseId]"></component>
-                </div>
-            </KeepAlive> -->
         </div>
 
-        <div id="contentUngrouped" v-else>
+        <div class="workbenchContent" v-else>
             <h2>It appears you are not in a group yet. Please join or create a group first.</h2>
             <button id="okayButton" type="button" @click="router.push({ name: routePaths.grouping })">Okay!</button>
         </div>
@@ -137,58 +116,5 @@ const titleText = computed(() => {
 
 
 <style scoped>
-h1 {
-    padding-top: 1em;
-    padding-left: 5em;
-}
 
-h2 {
-    padding-top: 25vh;
-    text-align: center;
-}
-
-#okayButton {
-    display: block;
-    margin: 0 auto;
-    height: 5vh;
-    margin-top: 5vh;
-}
-
-
-#statusList {
-    margin-top: 1em;
-    list-style: none;
-    display: flex;
-    flex-direction: row;
-}
-
-#okayButton {
-    text-align: center;
-    width: 10vw;
-}
-
-
-.statusButton {
-    background-color: bisque;
-    border: 0;
-    width: 12em;
-}
-
-
-.statusButton:hover[renderFlag=enabled] {
-    background-color: beige;
-    box-shadow: 2px 2px 2px 1px rgba(0, 0, 255, .2);
-}
-
-
-.statusItem {
-    text-align: center;
-    vertical-align: center;
-    font-size: 1em;
-    height: 2em;
-    width: 12em;
-    margin-right: 2em;
-    border-width: 2cap;
-    border-color: antiquewhite;
-}
 </style>

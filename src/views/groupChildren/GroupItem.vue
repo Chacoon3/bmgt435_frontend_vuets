@@ -12,17 +12,27 @@ function handleExpand() {
 </script>
 
 <template>
-    <div>
-        <h4>{{ props.name }}</h4>
+    <div id="groupItemContainer">
+        <span class="groupName">{{ props.name }}</span>
         <button class="groupItem" @click="handleExpand">{{ buttonExpand ? "Collapse" : "Expand" }}</button>
-    </div>
-    <div v-if="buttonExpand === true">
-        <li v-for="user in props.users" :key="user.id">
-            {{ user.first_name }} {{ user.last_name }}
-        </li>
+        <div v-if="buttonExpand === true">
+            <li class="groupUser" v-for="user in props.users" :key="user.id">
+                {{ user?.first_name }} {{ user?.last_name }}
+            </li>
+        </div>
     </div>
 </template>
 
 <style scoped>
+#groupItemContainer{
+    margin-bottom: 15px;
+}
+.groupName {
+    display: inline-block;
+    min-width: 140px;
+}
 
+.groupUser{
+    list-style: none;
+}
 </style>

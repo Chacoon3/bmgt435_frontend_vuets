@@ -1,10 +1,10 @@
 import useErrorUtil from "./errorUtils";
-import axios, { type AxiosError, type AxiosResponse } from "axios";
+import axios, { type AxiosResponse } from "axios";
 import { type Ref, type UnwrapRef, ref, watch, reactive } from "vue";
 
 const server = "http://127.0.0.1:8000/";
+axios.defaults.headers["Content-Type"] = "text/plain";
 axios.defaults.baseURL = server;
-axios.defaults.headers["Content-Type"] = "text/plain"; // for CORS
 axios.defaults.withCredentials = true;
 axios.defaults.validateStatus = (status) => status < 500;
 axios.defaults.timeout = 7000;
@@ -12,14 +12,11 @@ axios.defaults.timeout = 7000;
 const { setErrorContext } = useErrorUtil();
 
 function triggerRequestError<T>(
-  error: AxiosError,
+  error: Error,
   endpoint: string,
   dataOrParams: T
 ) {
-  setErrorContext(
-    error,
-    ` A request has failed with error: ${error.message} and code ${error.code}`
-  );
+  setErrorContext(error, ` A request has failed with error: ${error.message}`);
   console.log(
     `Request to ${endpoint} failed with error: ${error.message ?? error}`
   );
@@ -27,15 +24,15 @@ function triggerRequestError<T>(
   console.log("logger ends -- -- -- -- -- -- -- --");
 }
 
-export function httpGet(
-  url: string,
-  params: any = null,
-  onCompleted: any = null
-): void {
-  axios
-    .get(url, { params: params })
-    .then(onCompleted)
-    .catch((err: AxiosError) => triggerRequestError(err, url, params));
+export function httpGet(url: string, params: any, onCompleted: any): void {
+  try {
+    axios
+      .get(url, { params: params })
+      .then(onCompleted)
+      .catch((err: Error) => triggerRequestError(err, url, params));
+  } catch (err: any) {
+    triggerRequestError(err, url, params);
+  }
 }
 
 export function httpPost<TData>(
@@ -43,10 +40,14 @@ export function httpPost<TData>(
   data: TData,
   onCompleted: any
 ): void {
-  axios
-    .post(url, data)
-    .then(onCompleted)
-    .catch((err: AxiosError) => triggerRequestError(err, url, data));
+  try {
+    axios
+      .post(url, data)
+      .then(onCompleted)
+      .catch((err: Error) => triggerRequestError(err, url, data));
+  } catch (err: any) {
+    triggerRequestError(err, url, data);
+  }
 }
 
 export function httpPut<TData>(
@@ -54,51 +55,55 @@ export function httpPut<TData>(
   data: TData,
   onCompleted: any
 ): void {
-  axios
-    .put(url, data)
-    .then(onCompleted)
-    .catch((err: AxiosError) => triggerRequestError(err, url, data));
+  try {
+    axios
+      .put(url, data)
+      .then(onCompleted)
+      .catch((err: Error) => triggerRequestError(err, url, data));
+  } catch (err: any) {
+    triggerRequestError(err, url, data);
+  }
 }
 
-export function httpDelete(
-  url: string,
-  params: any,
-  onCompleted: any
-): void {
-  axios
-    .delete(url, { params: params })
-    .then(onCompleted)
-    .catch((err: AxiosError) => triggerRequestError(err, url, params));
+export function httpDelete(url: string, params: any, onCompleted: any): void {
+  try {
+    axios
+      .delete(url, { params: params })
+      .then(onCompleted)
+      .catch((err: Error) => triggerRequestError(err, url, params));
+  } catch (err: any) {
+    triggerRequestError(err, url, params);
+  }
 }
 
 export function useGet<TData>(
   endpoint: string,
-  params: any = null,
-  onCompleted: any = null
+  params: any,
+  onCompleted: any
 ): GetDataResult<TData> {
   const isLoading = ref<boolean>(true);
   const data = ref<TData | null>(null);
-  function act(fetchParams: any = params) {
+  function httpGetter(fetchParams: any = params) {
     isLoading.value = true;
     httpGet(endpoint, fetchParams, (resp: AxiosResponse) => {
       isLoading.value = false;
-      data.value = resp.data;
+      data.value = resp.status === 200 ? resp.data : null;
       onCompleted?.(resp);
     });
   }
-  act(params);
+  httpGetter(params);
 
-  return { isLoading, data: data, httpGetUser: act };
+  return { isLoading, data, httpGetter };
 }
 
-export function usePost<TPost>(
+export function usePost<TData>(
   endpoint: string,
-  data: TPost,
-  onCompleted: any = null
-): PostDataResult<TPost> {
+  data: TData,
+  onCompleted: any
+): PostDataResult<TData> {
   const isLoading = ref<boolean>(true);
   const response = ref<AxiosResponse | null>(null);
-  function act(data: TPost) {
+  function httpPoster(data: TData) {
     isLoading.value = true;
     httpPost(endpoint, data, (resp: AxiosResponse) => {
       isLoading.value = false;
@@ -106,9 +111,9 @@ export function usePost<TPost>(
       onCompleted?.(resp);
     });
   }
-  act(data);
+  httpPoster(data);
 
-  return { isLoading, response: response, httpPoster: act };
+  return { isLoading, response, httpPoster };
 }
 
 export function usePaginatedGet<TData>(endpoint: string) {
@@ -121,9 +126,9 @@ export function usePaginatedGet<TData>(endpoint: string) {
 
   const isLoading = ref<boolean>(false);
 
-  const data = ref<TData>();
+  const data = ref<PaginatedResponse<TData> | null>(null);
 
-  function fetchData(params:any = pagerParams) {
+  function fetchData(params: any = pagerParams) {
     isLoading.value = true;
     httpGet(
       endpoint,
@@ -134,29 +139,23 @@ export function usePaginatedGet<TData>(endpoint: string) {
         order: params.order,
       },
       (resp: AxiosResponse) => {
-        if (resp.status === 200) {
-          console.log(resp.data);
-          data.value = resp.data.data;
-        }
-        else {
-          data.value = undefined;
-        }
+        data.value = resp.status === 200 ? resp.data : null;
         isLoading.value = false;
       }
     );
   }
 
-  watch<PaginatedParams>(pagerParams, fetchData, { deep: true })
+  watch<PaginatedParams>(pagerParams, fetchData, { deep: true });
 
   fetchData();
 
-  return { isLoading, data, pagerParams, fetchData};
+  return { isLoading, data, pagerParams, fetchData };
 }
 
 export type PaginatedParams = {
   page: number;
   size: number;
-  asc: | 1 | 0;  // 1 for true and 0 for false
+  asc: 1 | 0; // 1 for true and 0 for false
   order: string | "id";
 };
 
@@ -169,7 +168,7 @@ export type PaginatedResponse<TData> = {
 export type GetDataResult<TData> = {
   isLoading: Ref<boolean>;
   data: Ref<UnwrapRef<TData> | null>;
-  httpGetUser: (params: any) => void;
+  httpGetter: (params: any) => void;
 };
 
 export type PostDataResult<TPost> = {

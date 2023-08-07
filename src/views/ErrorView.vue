@@ -7,12 +7,18 @@ const { errorContext } = useErrorUtil();
 <template>
     <div>
         <h2 class="errPageH2">Application crashed ...</h2>
-        <p>{{errorContext.message ?? errorContext.error}}</p>
+        <p class="errorP">{{errorContext?.message}}</p>
+        <p class="errorP"> {{ errorContext?.error }}</p>
+        <p class="errorP"> {{ errorContext?.error?.status }}</p>
     </div>
 </template>
 
 <style scoped>
 .errPageH2 {
     text-align: center;
+}
+
+.errorP {
+    margin-left: 5vw;
 }
 </style>

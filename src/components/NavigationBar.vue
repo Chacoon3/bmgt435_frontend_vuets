@@ -63,25 +63,28 @@ type NavigationItemConfig = {
 </script>
 
 <template>
-    <div id="navigationBar">
+    <nav id="navigationBar">
+
         <div v-for="item in naviItems" :key="item.text" :to="{ name: item.url }" class="navigationItemDiv"
             @click="tryNavigate(item.url)">
             <img v-bind:src="item.imgSource" class="naviImg">
             <span class="naviText">{{ item.text }}</span>
         </div>
+
         <div class="navigationItemDiv" @click="handleSignOut()">
             <img v-bind:src="'/icons/navigationBar/exit.svg'" class="naviImg">
             <span class="naviText">Sign Out</span>
         </div>
-    </div>
+
+    </nav>
 </template>
 
 <style scoped>
 #navigationBar {
-    margin-right: 5vw;
-    width: 15vw;
-    height: 100vh;
-    background-color: var(--color-red-umd);
+  position: fixed;
+  height: 100%;
+  min-height: var(--app-min-height);
+  width:  220px;
 }
 
 .navigationItemDiv {
@@ -94,6 +97,7 @@ type NavigationItemConfig = {
     height: calc(100vh / v-bind("naviItems.length + 1"));
     margin: 0;
     border: 0;
+    background-color: var(--color-red-umd);
     transition: var(--transition-button);
 }
 

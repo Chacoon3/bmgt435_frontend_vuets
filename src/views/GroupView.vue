@@ -1,75 +1,57 @@
 <script setup lang="ts">
-import CustomTitle from '@/components/CustomTitle.vue';
 import GroupItem from './groupChildren/GroupItem.vue';
 import { useCurrentGroup, usePaginatedGroups, useCreateGroup } from '@/utils/groupUtils';
 import { reactive } from 'vue';
 import InLineMsg from '@/components/InLineMsg.vue';
-import { validateText } from '@/utils/formUtils';
 
-const createGroupForm = reactive({
-    groupName: ''
-})
+
 const inlineMsgState = reactive({
     show: false,
     msg: '',
 })
 const { isCreatingGroup, createGroup } = useCreateGroup();
 const { isCurrentGroupLoading, currentGroup } = useCurrentGroup();
-const { isLoading: isLoadingGroups, data, fetchData } = usePaginatedGroups();
+const { isLoading: isLoadingGroups, data: paginatedGroups, fetchData } = usePaginatedGroups();
 
 function handleCreateGroup() {
-    if (!validateText(createGroupForm.groupName)) {
-        inlineMsgState.msg = "Please enter a group name!"
-        inlineMsgState.show = true;
-    }
-    else {
-        inlineMsgState.show = false;
-        createGroup(
-            createGroupForm.groupName,
-            (resp: any) => {
-                if (resp.status === 201) {
-                    fetchData();
-                    inlineMsgState.msg = "create group success!"
-                }
-                else {
-                    inlineMsgState.msg = resp.message;
-                }
-                inlineMsgState.show = true;
-            });
-    }
+    inlineMsgState.show = false;
+    createGroup(
+        (resp: any) => {
+            if (resp.status === 201) {
+                fetchData();
+                inlineMsgState.msg = "create group success!"
+            }
+            else {
+                inlineMsgState.msg = resp?.data ?? "create group failed!";
+            }
+            inlineMsgState.show = true;
+        });
 }
 </script>
 
 <template>
-    <CustomTitle title="Groups"></CustomTitle>
+    <div class="groupContent">
 
-    <div id="groupBaseDiv">
-
-        <div v-if="isCurrentGroupLoading">
+        <div v-if="isCurrentGroupLoading" class="groupDiv">
             <h2 class="groupDivH2">Loading Data...</h2>
         </div>
 
-        <div v-else-if="!isCurrentGroupLoading && currentGroup === undefined" class="groupDiv">
+        <div v-else-if="currentGroup === null" class="groupDiv">
             <h2 class="groupDivH2">Create a new group</h2>
             <div id="createGroupDiv">
                 <form @submit.prevent="handleCreateGroup">
                     <div>
                         <InLineMsg :show="inlineMsgState.show" :content="inlineMsgState.msg"></InLineMsg>
                     </div>
-                    <div class="createTeamEle">
-                        <label for="groupName">Group name</label>
-                        <input id="groupNameInput" type="text" name="groupName" v-model="createGroupForm.groupName">
-                    </div>
-
-                    <div class="createTeamEle">
-                        <input id="createTeamButton" type="submit" :value="isCreatingGroup ? 'Creating...' : 'Create!'"
+                    <div class="createGroupEle">
+                        <input id="createGroupButton" type="submit" :value="isCreatingGroup ? 'Creating...' : 'Create!'"
                             :disabled="isCreatingGroup">
                     </div>
                 </form>
             </div>
         </div>
 
-        <div v-else-if="!isCurrentGroupLoading && currentGroup !== undefined" class="groupDiv">
+        <div v-else class="groupDiv">
             <h2 class="groupDivH2">Group Info</h2>
             <div>
                 <ul id="userGroupInfo">
@@ -80,6 +62,7 @@ function handleCreateGroup() {
             </div>
         </div>
 
+
         <div id="splitLine"></div>
 
         <div class="groupDiv">
@@ -87,7 +70,8 @@ function handleCreateGroup() {
             <div>
                 <h3 v-if="isLoadingGroups">Fetching data...</h3>
                 <ul>
-                        <GroupItem v-for="item in data" :key="item.id" :id="item.id" :name="item.name" :users="item.users"></GroupItem>
+                    <GroupItem v-for="item in paginatedGroups?.data" :key="item.id" :id="item.id" :name="item.name"
+                        :users="item.users"></GroupItem>
                 </ul>
             </div>
         </div>
@@ -95,10 +79,10 @@ function handleCreateGroup() {
 </template>
 
 <style scoped>
-#groupBaseDiv {
-    padding-top: 5vh;
+#groupContent {
     display: flex;
     flex-direction: row;
+    padding-top: 5vh;
     justify-content: left;
 }
 
@@ -110,6 +94,7 @@ function handleCreateGroup() {
 
 .groupDiv {
     position: relative;
+    display: block;
     padding-left: 30px;
     width: 420px;
     min-width: 300px;

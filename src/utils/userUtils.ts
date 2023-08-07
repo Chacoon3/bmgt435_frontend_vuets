@@ -72,7 +72,7 @@ export function formatUserName(user: User) {
   } else if (user.last_name) {
     return user.last_name;
   } else {
-    throw new Error("User has no name");
+    return "";
   }
 }
 
