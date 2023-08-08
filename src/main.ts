@@ -5,7 +5,7 @@ import router, { routePaths } from "./router";
 import { globalErrorHandler } from "./utils/errorUtils";
 import { useCurrentUser } from "./utils/userUtils";
 
-const { currentUser, httpGetUser } = useCurrentUser();
+const { currentUser, getCurrentUser } = useCurrentUser();
 
 router.beforeEach((to, from, next) => {
   if (currentUser.value === undefined || currentUser.value === null) {
@@ -29,7 +29,7 @@ app.mount("#app");
 
 router.push({ name: routePaths.loading });
 
-httpGetUser((resp:any) => {
+getCurrentUser((resp:any) => {
     if (resp.status === 200 && currentUser.value !== null) {
         router.push({ name: routePaths.workbench });
     }

@@ -3,7 +3,6 @@ import GroupItem from './groupChildren/GroupItem.vue';
 import { useCurrentGroup, usePaginatedGroups, useCreateGroup, useLeaveGroup } from '@/utils/groupUtils';
 import { reactive } from 'vue';
 import InLineMsg from '@/components/InLineMsg.vue';
-import { useCurrentUser } from '@/utils/userUtils';
 
 
 const inlineMsgState = reactive({
@@ -12,17 +11,15 @@ const inlineMsgState = reactive({
 })
 const { isCreatingGroup, createGroup } = useCreateGroup();
 const { isCurrentGroupLoading, currentGroup } = useCurrentGroup();
-const { isLoading: isLoadingGroups, data: paginatedGroups, fetchData: getPaginatedData } = usePaginatedGroups();
 const { isLeavingGroup, leaveGroup } = useLeaveGroup();
-const {httpGetUser} = useCurrentUser();
+const { isLoading: isLoadingGroups, data: paginatedGroups, getPaginatedGroups } = usePaginatedGroups();
 
 function handleCreateGroup() {
     inlineMsgState.show = false;
     createGroup(
         (resp: any) => {
             if (resp.status === 201) {
-                inlineMsgState.msg = "create group success!"
-                httpGetUser();
+                inlineMsgState.msg = resp?.data ?? "create group success!"
             }
             else {
                 inlineMsgState.msg = resp?.data ?? "create group failed!";
@@ -34,18 +31,18 @@ function handleCreateGroup() {
 function handleLeaveGroup() {
     leaveGroup((resp:any) => {
         if (resp.status === 200) {
-            currentGroup.value= null;
+            inlineMsgState.msg = resp?.data ?? "leave group success!";
         }
         else {
             inlineMsgState.msg = resp?.data ?? "leave group failed!";
-            inlineMsgState.show = true;
         }
+        inlineMsgState.show = true;
     });
 }
 </script>
 
 <template>
-    <div id="groupContent">
+    <div id="groupViewContainer">
 
         <div v-if="isCurrentGroupLoading" class="groupDiv">
             <h2 class="groupDivH2">Loading Data...</h2>
@@ -86,7 +83,7 @@ function handleLeaveGroup() {
             <h2 class="groupDivH2">Group List</h2>
             <div>
                 <h3 v-if="isLoadingGroups">Fetching data...</h3>
-                <ul>
+                <ul v-else>
                     <GroupItem v-for="item in paginatedGroups?.data" :key="item.id" :name="item.name" :id="item.id"
                         :users="item.users"></GroupItem>
                 </ul>
@@ -97,7 +94,7 @@ function handleLeaveGroup() {
 </template>
 
 <style scoped>
-#groupContent {
+#groupViewContainer {
     display: flex;
     position: relative;
     flex-direction: row;

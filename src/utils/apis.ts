@@ -32,6 +32,7 @@ export const endpoints = {
   cases:{
     cases: "bmgt435/api/cases",
     casesPaginated: "bmgt435/api/cases/paginated",
+    run:"bmgt435/api/cases/run",
     caseRecords: "bmgt435/api/case-records",
     caseRecordsPaginated: "bmgt435/api/case-records/paginated",
   }

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { SignInForm, useSignIn, useCurrentUser } from '../../utils/userUtils';
+import { SignInForm, useSignIn } from '../../utils/userUtils';
 import InLineMsg from '@/components/InLineMsg.vue';
 import router, {routePaths} from '@/router';
 import { validateText } from '@/utils/formUtils'
 
 const { isLoading, signIn } = useSignIn()
-const {setCurrentUser} = useCurrentUser();
 const signInForm = reactive<SignInForm>({
     did: "",
     password: ""
@@ -27,7 +26,6 @@ function handleSignIn() {
         inlineMsgState.msg = "";
         signIn(signInForm, (resp) => {
             if (resp.status === 200) {
-                setCurrentUser(resp.data);
                 router.push({ name: routePaths.workbench})
             }
             else {

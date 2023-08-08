@@ -6,7 +6,7 @@ export type User = {
     first_name: string;
     last_name: string;
     group_id: number | null;
-    role_id: number | null;
+    role: number | null;
     tag_id: number | null;
   };
   

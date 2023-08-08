@@ -3,21 +3,23 @@ import { RouterView } from 'vue-router'
 import CustomTitle from './components/CustomTitle.vue';
 import router from './router';
 import NavigationBar from '@/components/NavigationBar.vue'
+import { useCurrentUser, formatUserName } from './utils/userUtils';
 import { watch, ref } from 'vue';
 
+const { currentUser } = useCurrentUser()
 const moduleTitle = ref<string>('')
 
 function setModuleTitle(newVal: any, oldVal: any) {
   if (newVal !== oldVal) {
     switch (newVal.name?.toString()) {
       case 'workbench':
-        moduleTitle.value = 'Workbench'
+        moduleTitle.value = `Welcome, ${formatUserName(currentUser.value)}!`
         break;
       case 'groups':
         moduleTitle.value = 'Groups'
         break;
       case 'records':
-        moduleTitle.value = 'Records'
+        moduleTitle.value = 'Case Records'
         break;
       case 'leader-board':
         moduleTitle.value = 'Leader Board'
@@ -52,7 +54,9 @@ watch(router.currentRoute, setModuleTitle, { immediate: true })
       </div>
 
       <div id="moduleContent">
+        <KeepAlive>
         <RouterView />
+      </KeepAlive>
       </div>
 
     </div>
@@ -78,6 +82,7 @@ watch(router.currentRoute, setModuleTitle, { immediate: true })
 
 #moduleContent {
   position: relative;
+  padding-right:300px;
   display: block;
 }
 </style>

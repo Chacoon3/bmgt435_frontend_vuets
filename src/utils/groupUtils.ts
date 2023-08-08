@@ -1,17 +1,35 @@
 import { useCurrentUser } from "./userUtils";
-import { httpGet, httpPost, usePaginatedGet } from "./requests";
+import { httpGet, httpPost, useCachedPaginatedGet } from "./requests";
 import { endpoints } from "./apis";
 import { ref, watch } from "vue";
 import { type Group } from "./ORMTypes";
+
+const { isLoading, data, pagerParams, getData: getPaginatedGroups, clearAll: clearPaginatedGroups } = useCachedPaginatedGet<Group[]>(endpoints.groups.groupsPaginated);
+export function usePaginatedGroups() {
+  getPaginatedGroups();
+  return { isLoading, data, pagerParams, getPaginatedGroups, clearPaginatedGroups }
+}
 
 const { currentUser } = useCurrentUser();
 const isCurrentGroupLoading = ref<boolean>(false);
 const currentGroup = ref<Group | null>(null);
 
-function getGroupById(groupId: number, callback: any = null) {
-  httpGet(endpoints.groups.groups, { id: groupId }, (resp: any) => {
-    callback?.(resp);
-  });
+function getCurrrentGroup() {
+  if (currentUser.value && currentUser.value.group_id !== null) {
+    isCurrentGroupLoading.value = true;
+    httpGet(endpoints.groups.groups, {id: currentUser.value.group_id}, (resp: any) => {
+      if (resp.status === 200) {
+        currentGroup.value = resp.data[0];
+      } else {
+        currentGroup.value = null;
+      }
+      isCurrentGroupLoading.value = false;
+    });
+  }
+  else {
+    currentGroup.value = null;
+    isCurrentGroupLoading.value = false;
+  }
 }
 
 watch(
@@ -25,26 +43,14 @@ watch(
       currentGroup.value = null;
       isCurrentGroupLoading.value = false;
     } else {
-      isCurrentGroupLoading.value = true;
-      getGroupById(newCurrenUser.group_id, (resp: any) => {
-        if (resp.status === 200) {
-          currentGroup.value = resp.data[0];
-        } else {
-          currentGroup.value = null;
-        }
-        isCurrentGroupLoading.value = false;
-      });
+      getCurrrentGroup();
     }
   },
   { immediate: true }
 );
 
 export function useCurrentGroup() {
-  return { isCurrentGroupLoading, currentGroup };
-}
-
-export function usePaginatedGroups() {
-  return usePaginatedGet<Group[]>(endpoints.groups.groupsPaginated);
+  return { isCurrentGroupLoading, currentGroup, getCurrrentGroup };
 }
 
 export function useCreateGroup() {
@@ -53,6 +59,16 @@ export function useCreateGroup() {
     isCreatingGroup.value = true;
     httpPost(endpoints.groups.groups, null, (resp: any) => {
       isCreatingGroup.value = false;
+      if (resp.status === 201) {
+        if (currentUser.value !== null) {
+          currentUser.value.group_id = resp.data.id;
+        }
+        currentGroup.value = resp.data;
+        clearPaginatedGroups();
+        getPaginatedGroups();
+      } else {
+        currentGroup.value = null;
+      }
       callback?.(resp);
     });
   }
@@ -66,6 +82,14 @@ export function useJoinGroup() {
     isJoiningGroup.value = true;
     httpPost(endpoints.groups.join, { group_id: groupId }, (resp: any) => {
       isJoiningGroup.value = false;
+      if (resp.status === 200) {
+        if (currentUser.value !== null) {
+          currentUser.value.group_id = resp.data.id;
+        }
+        currentGroup.value = resp.data;
+        clearPaginatedGroups();
+        getPaginatedGroups();
+      }
       callback?.(resp);
     });
   }
@@ -79,6 +103,14 @@ export function useLeaveGroup() {
     isLeavingGroup.value = true;
     httpPost(endpoints.groups.leave, null, (resp: any) => {
       isLeavingGroup.value = false;
+      if (resp.status === 200) {
+        if (currentUser.value !== null) {
+          currentUser.value.group_id = null;
+        }
+        currentGroup.value = null;
+        clearPaginatedGroups();
+        getPaginatedGroups();
+      }
       callback?.(resp);
     });
   }

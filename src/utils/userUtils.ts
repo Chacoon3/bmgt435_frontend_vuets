@@ -1,8 +1,38 @@
 import { endpoints } from "./apis";
-import { httpGet, httpPost } from "./requests";
+import { httpPost, useCachedHttpGet } from "./requests";
 import { type User } from "./ORMTypes";
 import { type AxiosResponse } from "axios";
 import { ref } from "vue";
+
+const { cachedHttpGet, clearAll } = useCachedHttpGet();
+const isCurrentUserLoading = ref<boolean>(false);
+const currentUser = ref<User | null>(null);
+function getCurrentUser(callback?: (resp: AxiosResponse) => void) {
+  isCurrentUserLoading.value = true;
+  cachedHttpGet(endpoints.users.me, null, (resp: AxiosResponse) => {
+    isCurrentUserLoading.value = false;
+    if (resp.status === 200) {
+      currentUser.value = resp.data;
+    } else {
+      currentUser.value = null;
+    }
+    callback?.(resp);
+  });
+}
+
+function setCurrentUser(user: User) {
+  currentUser.value = user;
+}
+
+export function useCurrentUser() {
+  return {
+    isCurrentUserLoading,
+    currentUser,
+    getCurrentUser,
+    setCurrentUser,
+    clearUserCache: clearAll,
+  };
+}
 
 export function useSignIn() {
   const isLoading = ref<boolean>(false);
@@ -10,6 +40,7 @@ export function useSignIn() {
     isLoading.value = true;
     httpPost<SignInForm>(endpoints.auth.signIn, data, (resp: AxiosResponse) => {
       isLoading.value = false;
+      setCurrentUser(resp.data);
       callback?.(resp);
     });
   }
@@ -28,29 +59,6 @@ export function useSignUp() {
   return { isLoading, signUp };
 }
 
-const isCurrentUserLoading = ref<boolean>(false);
-const currentUser = ref<User | null>(null);
-function httpGetUser(callback?: (resp: AxiosResponse) => void) {
-  isCurrentUserLoading.value = true;
-  httpGet(endpoints.users.me, null, (resp: AxiosResponse) => {
-    isCurrentUserLoading.value = false;
-    if (resp.status === 200) {
-      currentUser.value = resp.data;
-    } else {
-      currentUser.value = null;
-    }
-    callback?.(resp);
-  });
-}
-
-function setCurrentUser(user: User) {
-  currentUser.value = user;
-}
-
-export function useCurrentUser() {
-  return { isCurrentUserLoading, currentUser, httpGetUser, setCurrentUser };
-}
-
 export function useSignOut() {
   const isLoading = ref<boolean>(false);
   function signOut(callback?: (resp: AxiosResponse) => void) {
@@ -64,15 +72,17 @@ export function useSignOut() {
   return { isLoading, signOut };
 }
 
-export function formatUserName(user: User) {
-  if (user.first_name && user.last_name) {
+export function formatUserName(user: User | null) {
+  if (!user) {
+    return "Anonymous";
+  } else if (user.first_name && user.last_name) {
     return `${user.first_name} ${user.last_name}`;
   } else if (user.first_name) {
     return user.first_name;
   } else if (user.last_name) {
     return user.last_name;
   } else {
-    return "";
+    return "Anonymous";
   }
 }
 

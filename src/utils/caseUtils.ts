@@ -1,41 +1,31 @@
 import { type Case} from "@/utils/ORMTypes";
-import { ref, watch } from "vue";
-import { httpGet } from "./requests";
+import { ref } from "vue";
+import { useCachedHttpGet, useHttpPost } from "./requests";
 import { endpoints } from "./apis";
-import { useCurrentUser } from "./userUtils";
 
 
-const {currentUser} = useCurrentUser();
-const isCasesLoading = ref<boolean>(false);
+const {cachedHttpGet, clearAll: clearCachedCases} = useCachedHttpGet();
+
+const isCasesLoading = ref(false);
 const cases = ref<Case[]>([]);
-function getCasesByRole(roleId: number) {
+function getCases() {
     isCasesLoading.value = true;
-    httpGet(endpoints.cases.cases, { role_id: roleId}, (resp: any) => {
-        cases.value = resp.data;
-        isCasesLoading.value = false;
-    })
-}
-
-function getAllCases() {
-    isCasesLoading.value = true;
-    httpGet(endpoints.cases.cases, null, (resp: any) => {
-        cases.value = resp.data;
-        isCasesLoading.value = false;
-    })
-}
-
-watch<number | null | undefined>(() => currentUser.value?.role_id, (newRoleId, oldRoleId) => {
-    if (newRoleId !== oldRoleId) {
-        if (newRoleId !== undefined && newRoleId !== null ) {
-            getCasesByRole(newRoleId);
+    cachedHttpGet(endpoints.cases.cases, null, (resp: any) => {
+        console.log(resp);
+        if (resp.status == 200) {
+            cases.value = resp.data;
         }
-        else{
+        else {
             cases.value = [];
         }
-    }
-})
+        isCasesLoading.value = false;
+    });
+}
 
+export function useRunCase(caseId: number, data:any, callback:any) {
+    return useHttpPost(endpoints.cases.run, data, callback);
+}
 
-export function useCases() {
-    return { isCasesLoading, cases, getCasesByRole, getAllCases };
+export function useCases(){
+    return { isCasesLoading, cases, getCases, clearCachedCases };
 }

@@ -22,36 +22,28 @@ const navigationItemAdmin: NavigationItemConfig[] = [
 ]
 const naviItems = ref<NavigationItemConfig[]>(naviItemsBase);
 
-watch(isCurrentUserLoading, (newVal, oldVal) => {
-    if (newVal !== oldVal) {
-        if (newVal === true) {
-            naviItems.value = Array.from([1, 2, 3, 4, 5], () => {
-                return {
-                    url: '',
-                    imgSource: '/icons/navigationBar/exit.svg',
-                    text: 'Loading..'
-                }
-            })
+watch(currentUser, (newVal) => {
+    if (newVal !== null) {
+        if (newVal.role === 111) {
+            naviItems.value = navigationItemAdmin;
         }
         else {
-            if (currentUser.value?.role_id === 1) {
-                naviItems.value = navigationItemAdmin
-            }
-            else {
-                naviItems.value = naviItemsBase
-            }
+            naviItems.value = naviItemsBase
         }
     }
-});
+    else {
+        naviItems.value = naviItemsBase;
+    }
+}, { immediate: true });
 
 function tryNavigate(url: string) {
     if (isCurrentUserLoading.value === false)
-        router.push({ name: url })
+        router.push(url)
 }
 
 function handleSignOut() {
-    signOut();
     router.push({ name: routePaths.portal })
+    signOut();
 }
 
 type NavigationItemConfig = {
@@ -65,7 +57,7 @@ type NavigationItemConfig = {
 <template>
     <nav id="navigationBar">
 
-        <div v-for="item in naviItems" :key="item.text" :to="{ name: item.url }" class="navigationItemDiv"
+        <div v-for="(item, index) in naviItems" :key="index" :to="{ name: item.url }" class="navigationItemDiv"
             @click="tryNavigate(item.url)">
             <img v-bind:src="item.imgSource" class="naviImg">
             <span class="naviText">{{ item.text }}</span>
