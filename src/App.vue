@@ -7,7 +7,7 @@ import { watch, ref } from 'vue';
 
 const moduleTitle = ref<string>('')
 
-function getModuleTitle(newVal: any, oldVal: any) {
+function setModuleTitle(newVal: any, oldVal: any) {
   if (newVal !== oldVal) {
     switch (newVal.name?.toString()) {
       case 'workbench':
@@ -20,7 +20,7 @@ function getModuleTitle(newVal: any, oldVal: any) {
         moduleTitle.value = 'Records'
         break;
       case 'leader-board':
-        moduleTitle.value = 'LeaderBoard'
+        moduleTitle.value = 'Leader Board'
         break;
       case 'manage':
         moduleTitle.value = 'Manage'
@@ -35,7 +35,7 @@ function getModuleTitle(newVal: any, oldVal: any) {
   }
 }
 
-watch(router.currentRoute, getModuleTitle, { immediate: true })
+watch(router.currentRoute, setModuleTitle, { immediate: true })
 </script>
 
 <template>
@@ -66,14 +66,18 @@ watch(router.currentRoute, getModuleTitle, { immediate: true })
   flex-direction: row;
   min-height: var(--app-min-height);
   min-width: var(--app-min-width);
+  align-items: stretch;
 }
 
 #moduleContainer {
-  display: block;
   position: relative;
+  display: block;
   min-height: var(--app-min-height);
-  left: v-bind("router.currentRoute.value.meta.requireAuth === true ? '300px' : '0px'");
   flex: 1;
 }
 
+#moduleContent {
+  position: relative;
+  display: block;
+}
 </style>

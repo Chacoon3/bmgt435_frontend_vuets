@@ -59,3 +59,29 @@ export function useCreateGroup() {
 
   return { isCreatingGroup, createGroup };
 }
+
+export function useJoinGroup() {
+  const isJoiningGroup = ref<boolean>(false);
+  function joinGroup(groupId: number, callback: any = null) {
+    isJoiningGroup.value = true;
+    httpPost(endpoints.groups.join, { group_id: groupId }, (resp: any) => {
+      isJoiningGroup.value = false;
+      callback?.(resp);
+    });
+  }
+
+  return { isJoiningGroup, joinGroup };
+}
+
+export function useLeaveGroup() {
+  const isLeavingGroup = ref<boolean>(false);
+  function leaveGroup(callback: any = null) {
+    isLeavingGroup.value = true;
+    httpPost(endpoints.groups.leave, null, (resp: any) => {
+      isLeavingGroup.value = false;
+      callback?.(resp);
+    });
+  }
+
+  return { isLeavingGroup, leaveGroup };
+}

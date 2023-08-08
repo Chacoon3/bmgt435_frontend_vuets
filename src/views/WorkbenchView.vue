@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import CustomTitle from '@/components/CustomTitle.vue';
 import router, {routePaths} from '@/router';
 import { computed,ref } from 'vue';
 import { useCurrentUser, formatUserName } from '../utils/userUtils'
@@ -100,10 +99,10 @@ const titleText = computed(() => {
 
 
 <template>
-    <div class="moduleDiv">
+    <div id="workbenchContent">
 
         <div class="workbenchContent" v-if="currentUser && currentUser.group_id !== null">
-
+            <li v-for="item in 10" :key="item"></li>>
         </div>
 
         <div class="workbenchContent" v-else>

@@ -81,10 +81,9 @@ type NavigationItemConfig = {
 
 <style scoped>
 #navigationBar {
-  position: fixed;
-  height: 100%;
-  min-height: var(--app-min-height);
-  width:  220px;
+    min-height: var(--app-min-height);
+    width: 220px;
+    margin-right: 150px;
 }
 
 .navigationItemDiv {
@@ -94,9 +93,7 @@ type NavigationItemConfig = {
     align-items: center;
     justify-content: center;
     padding: 0 10px 0 10px;
-    height: calc(100vh / v-bind("naviItems.length + 1"));
-    margin: 0;
-    border: 0;
+    height: calc(max(100vh / v-bind("naviItems.length + 1"), 100px));
     background-color: var(--color-red-umd);
     transition: var(--transition-button);
 }

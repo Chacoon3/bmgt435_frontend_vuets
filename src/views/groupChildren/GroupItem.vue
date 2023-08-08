@@ -1,22 +1,35 @@
 <script setup lang="ts">
-import { type Group } from '../../utils/ORMTypes';
 import { ref } from 'vue';
+import { type Group } from '@/utils/ORMTypes';
+import { useJoinGroup } from '@/utils/groupUtils';
+import { useCurrentUser } from '@/utils/userUtils';
 
 const props = defineProps<Group>();
+const emits = defineEmits<{ (e: "joinGroupOutcome", id: number): void }>();
+const isExpand = ref<boolean>(false);
+const { isJoiningGroup, joinGroup } = useJoinGroup();
+const { httpGetUser, currentUser } = useCurrentUser();
 
-const buttonExpand = ref<boolean>(false);
-
-function handleExpand() {
-    buttonExpand.value = !buttonExpand.value;
+function handleJoinGroup() {
+    if (props.id === null) {
+        throw new Error("group id is null");
+    }
+    else {
+        isJoiningGroup.value = true;
+        joinGroup(props.id, () => {
+            emits("joinGroupOutcome", props.id);
+        });
+    }
 }
 </script>
 
 <template>
     <div id="groupItemContainer">
-        <span class="groupName">{{ props.name }}</span>
-        <button class="groupItem" @click="handleExpand">{{ buttonExpand ? "Collapse" : "Expand" }}</button>
-        <div v-if="buttonExpand === true">
-            <li class="groupUser" v-for="user in props.users" :key="user.id">
+        <span class="groupName">{{ $props.name }}</span>
+        <button class="groupItem" @click="() => isExpand = !isExpand">{{ isExpand ? "Collapse" : "Expand" }}</button>
+        <button class="groupItem" v-if="currentUser?.group_id === null" @click="handleJoinGroup" :disabled="isJoiningGroup === true">Join</button>
+        <div v-if="isExpand === true">
+            <li class="groupUser" v-for="user in $props.users" :key="user.id">
                 {{ user?.first_name }} {{ user?.last_name }}
             </li>
         </div>
@@ -24,15 +37,16 @@ function handleExpand() {
 </template>
 
 <style scoped>
-#groupItemContainer{
+#groupItemContainer {
     margin-bottom: 15px;
 }
+
 .groupName {
     display: inline-block;
     min-width: 140px;
 }
 
-.groupUser{
+.groupUser {
     list-style: none;
 }
 </style>

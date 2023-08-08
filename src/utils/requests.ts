@@ -1,6 +1,7 @@
 import useErrorUtil from "./errorUtils";
 import axios, { type AxiosResponse } from "axios";
 import { type Ref, type UnwrapRef, ref, watch, reactive } from "vue";
+import { useCache } from "./cacheUtils";
 
 const server = "http://127.0.0.1:8000/";
 axios.defaults.headers["Content-Type"] = "text/plain";
@@ -10,6 +11,7 @@ axios.defaults.validateStatus = (status) => status < 500;
 axios.defaults.timeout = 7000;
 
 const { setErrorContext } = useErrorUtil();
+const { createKey, set, get, clear, clearAll } = useCache<AxiosResponse>();
 
 function triggerRequestError<T>(
   error: Error,
@@ -26,14 +28,42 @@ function triggerRequestError<T>(
 
 export function httpGet(url: string, params: any, onCompleted: any): void {
   try {
-    axios
+    const resp = get(createKey(url, params));
+    if (resp !== null) {
+      onCompleted(resp);
+      return;
+    }
+    else {
+      axios
       .get(url, { params: params })
       .then(onCompleted)
       .catch((err: Error) => triggerRequestError(err, url, params));
+    }
   } catch (err: any) {
     triggerRequestError(err, url, params);
   }
 }
+
+export function httpGetWithCache(url: string, params: any, onCompleted: any): void {
+  try {
+    const cachedResp = get(createKey(url, params));
+    if (cachedResp !== null) {
+      onCompleted(cachedResp);
+    }
+    else {
+      axios
+      .get(url, { params: params })
+      .then((resp) => {
+        set(createKey(url, params), resp);
+        onCompleted?.(resp);
+      })
+      .catch((err: Error) => triggerRequestError(err, url, params));
+    }
+  } catch (err: any) {
+    triggerRequestError(err, url, params);
+  }
+}
+
 
 export function httpPost<TData>(
   url: string,
@@ -76,7 +106,7 @@ export function httpDelete(url: string, params: any, onCompleted: any): void {
   }
 }
 
-export function useGet<TData>(
+export function useHttpGet<TData>(
   endpoint: string,
   params: any,
   onCompleted: any
@@ -96,7 +126,7 @@ export function useGet<TData>(
   return { isLoading, data, httpGetter };
 }
 
-export function usePost<TData>(
+export function useHttpPost<TData>(
   endpoint: string,
   data: TData,
   onCompleted: any
@@ -130,7 +160,7 @@ export function usePaginatedGet<TData>(endpoint: string) {
 
   function fetchData(params: any = pagerParams) {
     isLoading.value = true;
-    httpGet(
+    httpGetWithCache(
       endpoint,
       {
         page: params.page,
@@ -149,7 +179,7 @@ export function usePaginatedGet<TData>(endpoint: string) {
 
   fetchData();
 
-  return { isLoading, data, pagerParams, fetchData };
+  return { isLoading, data, pagerParams, fetchData, clearCache: clearAll };
 }
 
 export type PaginatedParams = {

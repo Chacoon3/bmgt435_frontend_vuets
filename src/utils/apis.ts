@@ -15,6 +15,8 @@ export const endpoints = {
   groups: {
     groups: "bmgt435/api/groups",
     groupsPaginated: "bmgt435/api/groups/paginated",
+    join:"bmgt435/api/groups/join",
+    leave:"bmgt435/api/groups/leave",
   },
 
   tags:{
