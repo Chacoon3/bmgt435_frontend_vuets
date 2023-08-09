@@ -20,7 +20,7 @@ function handleJoinGroup() {
 <template>
     <div id="groupItemContainer">
         <span class="groupName">{{ $props.name }}</span>
-        <button class="groupItem" v-if="currentUser && currentUser.group_id === null" @click="handleJoinGroup" :disabled="isJoiningGroup === true">
+        <button class="normalButton" v-if="currentUser && currentUser.group_id === null" @click="handleJoinGroup" :disabled="isJoiningGroup === true">
             {{ isJoiningGroup === true ? "Joining..." : "Join" }}
         </button>
         <div>

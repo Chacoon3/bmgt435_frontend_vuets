@@ -29,7 +29,7 @@ function handleCreateGroup() {
 }
 
 function handleLeaveGroup() {
-    leaveGroup((resp:any) => {
+    leaveGroup((resp: any) => {
         if (resp.status === 200) {
             inlineMsgState.msg = resp?.data ?? "leave group success!";
         }
@@ -56,7 +56,7 @@ function handleLeaveGroup() {
                         <InLineMsg :show="inlineMsgState.show" :content="inlineMsgState.msg"></InLineMsg>
                     </div>
                     <div class="createGroupEle">
-                        <input id="createGroupButton" type="submit" :value="isCreatingGroup ? 'Creating...' : 'Create!'"
+                        <input type="submit" :value="isCreatingGroup ? 'Creating...' : 'Create!'"
                             :disabled="isCreatingGroup">
                     </div>
                 </form>
@@ -72,7 +72,8 @@ function handleLeaveGroup() {
                     </li>
                 </ul>
 
-                <button :disabled="isLeavingGroup" @click="handleLeaveGroup"> Leave Group </button>
+                <input type="submit" :value="isLeavingGroup ? 'Leaving...' : 'Leave group'" :disabled="isLeavingGroup"
+                    @click="handleLeaveGroup()">
             </div>
         </div>
 

@@ -1,11 +1,22 @@
 <script setup lang="ts">
+import { useCaseRecords } from '@/utils/caseRecordsUtils'
 
+const { records, isLoading, clearData, getData } = useCaseRecords()
 </script>
 
 <template>
+    <div>
+        <div v-if="isLoading === true">Fetching Data..</div>
+        <div v-else-if="records && records.length > 0">
+            <div v-for="(record, index) in records" :key="index">
+                <div>{{ record.id }}</div>
+                <div>{{ record.group_id }}</div>
+            </div>
 
-<div>
-    
-</div>
-
+            <div>
+                <button @click="getData()">View more</button>
+            </div>
+        </div>
+        <div v-else>No records available</div>
+    </div>
 </template>>

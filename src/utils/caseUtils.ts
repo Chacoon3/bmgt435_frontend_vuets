@@ -22,7 +22,7 @@ function getCases() {
     });
 }
 
-export function useRunCase(caseId: number, data:any, callback:any) {
+export function useRunCase(data:any, callback:any) {
     return useHttpPost(endpoints.cases.run, data, callback);
 }
 

@@ -82,7 +82,3 @@ function handleSignUp() {
         </form>
     </div>
 </template>
-
-<style scoped>
-@import url(./portalChildrenStyle.css);
-</style>

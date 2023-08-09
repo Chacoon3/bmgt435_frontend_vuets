@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
-import CustomTitle from './components/CustomTitle.vue';
-import router from './router';
-import NavigationBar from '@/components/NavigationBar.vue'
-import { useCurrentUser, formatUserName } from './utils/userUtils';
 import { watch, ref } from 'vue';
+import { RouterView } from 'vue-router'
+import router from './router';
+
+import { useCurrentUser, formatUserName } from './utils/userUtils';
+
+import CustomTitle from './components/CustomTitle.vue';
+import NavigationBar from '@/components/NavigationBar.vue'
 
 const { currentUser } = useCurrentUser()
 const moduleTitle = ref<string>('')
@@ -42,7 +44,6 @@ watch(router.currentRoute, setModuleTitle, { immediate: true })
 
 <template>
   <body id="appContainer">
-
     <KeepAlive>
       <NavigationBar v-if="router.currentRoute.value.meta.requireAuth === true"></NavigationBar>
     </KeepAlive>
@@ -58,31 +59,7 @@ watch(router.currentRoute, setModuleTitle, { immediate: true })
         <RouterView />
       </KeepAlive>
       </div>
-
     </div>
-
+    <ThemeSetting></ThemeSetting>
   </body>
 </template>
-
-<style scoped>
-#appContainer {
-  display: flex;
-  flex-direction: row;
-  min-height: var(--app-min-height);
-  min-width: var(--app-min-width);
-  align-items: stretch;
-}
-
-#moduleContainer {
-  position: relative;
-  display: block;
-  min-height: var(--app-min-height);
-  flex: 1;
-}
-
-#moduleContent {
-  position: relative;
-  padding-right:300px;
-  display: block;
-}
-</style>

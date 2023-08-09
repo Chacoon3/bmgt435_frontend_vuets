@@ -3,20 +3,19 @@ import { useCurrentUser, useSignOut } from '@/utils/userUtils';
 import { watch, ref } from 'vue';
 import router, { routePaths } from '@/router';
 
-
 const { isCurrentUserLoading, currentUser } = useCurrentUser();
 const { signOut } = useSignOut();
 const naviItemsBase: NavigationItemConfig[] = [
     { url: routePaths.workbench, imgSource: '/icons/navigationBar/workbench.svg', text: 'Workbench' },
     { url: routePaths.grouping, imgSource: '/icons/navigationBar/groups.svg', text: 'Groups' },
-    { url: routePaths.records, imgSource: '/icons/navigationBar/records.svg', text: 'Records' },
+    { url: routePaths.records, imgSource: '/icons/navigationBar/records.svg', text: 'Case Records' },
     { url: routePaths.leaderBoard, imgSource: '/icons/navigationBar/leaderBoard.svg', text: 'Leader  Board' },
 ]
 
 const navigationItemAdmin: NavigationItemConfig[] = [
     { url: routePaths.workbench, imgSource: '/icons/navigationBar/workbench.svg', text: 'Workbench' },
     { url: routePaths.grouping, imgSource: '/icons/navigationBar/groups.svg', text: 'Groups' },
-    { url: routePaths.records, imgSource: '/icons/navigationBar/records.svg', text: 'Records' },
+    { url: routePaths.records, imgSource: '/icons/navigationBar/records.svg', text: 'Case Records' },
     { url: routePaths.leaderBoard, imgSource: '/icons/navigationBar/leaderBoard.svg', text: 'Leader  Board' },
     { url: routePaths.manage, imgSource: '/icons/navigationBar/manage.svg', text: 'Manage' },
 ]
@@ -57,29 +56,34 @@ type NavigationItemConfig = {
 <template>
     <nav id="navigationBar">
 
-        <div v-for="(item, index) in naviItems" :key="index" :to="{ name: item.url }" class="navigationItemDiv"
-            @click="tryNavigate(item.url)">
-            <img v-bind:src="item.imgSource" class="naviImg">
-            <span class="naviText">{{ item.text }}</span>
-        </div>
+        <div id="naviWrapper">
+            <div v-for="(item, index) in naviItems" :key="index" :to="{ name: item.url }" class="navigationItemDiv"
+                @click="tryNavigate(item.url)">
+                <img v-bind:src="item.imgSource" class="naviImg">
+                <span class="naviText">{{ item.text }}</span>
+            </div>
 
-        <div class="navigationItemDiv" @click="handleSignOut()">
-            <img v-bind:src="'/icons/navigationBar/exit.svg'" class="naviImg">
-            <span class="naviText">Sign Out</span>
+            <div class="navigationItemDiv" @click="handleSignOut()">
+                <img v-bind:src="'/icons/navigationBar/exit.svg'" class="naviImg">
+                <span class="naviText">Sign Out</span>
+            </div>
         </div>
-
     </nav>
 </template>
 
 <style scoped>
 #navigationBar {
-    min-height: var(--app-min-height);
     width: 220px;
-    margin-right: 150px;
+    padding-right: 150px;
+}
+
+#naviWrapper {
+    position: sticky;
+    width: 220px;
+    top: 0%;
 }
 
 .navigationItemDiv {
-    position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -92,6 +96,7 @@ type NavigationItemConfig = {
 
 .navigationItemDiv:hover {
     background-color: palevioletred;
+    cursor: pointer;
 }
 
 img.naviImg {

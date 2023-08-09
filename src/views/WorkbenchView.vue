@@ -5,41 +5,40 @@ import { useCurrentUser } from '../utils/userUtils'
 import { useCases } from '../utils/caseUtils'
 import FoodCenter from './workbenchChildren/FoodCenter.vue'
 
-
-const { currentUser } = useCurrentUser()
-const { isCasesLoading, cases, getCases } = useCases()
-getCases();
 const caseSelection = ref<number | null>(null);
+const { currentUser } = useCurrentUser();
+const { isCasesLoading, cases, getCases } = useCases();
+getCases();
+
 </script>
 
 
 <template>
     <div id="workbenchContainer">
-
-        <div class="workbenchContent" v-if="currentUser && currentUser.group_id !== null">
-            <div v-if="caseSelection === null">
+        <div v-if="caseSelection === null">
+            <div class="workbenchContent" v-if="currentUser && currentUser.group_id !== null">
                 <div v-if="isCasesLoading === true">
                     Fetching Data...
                 </div>
                 <div v-else-if="cases.length > 0">
-                    <h3>Your Cases</h3>
-                    <div v-for="item in cases" :key="item.id">
-                        <button class="caseButton" @click="() => caseSelection = item.id">{{ item.name }}</button>
+                    <h3>Your Case : {{ cases[0].name }}</h3>
+                    <div>
+                        <button class="normalButton" @click="() => caseSelection = cases[0].id">Click to enter
+                            simulation</button>
                     </div>
                 </div>
                 <div v-else>
-                    <h3>No cases currently available to you!</h3>
+                    <h3>No case currently available to you!</h3>
                 </div>
             </div>
-            
-            <FoodCenter v-else-if="caseSelection === 1"></FoodCenter>
 
+            <div class="workbenchContent" v-else>
+                <h2>It appears you are not in a group yet. Please join or create a group first.</h2>
+                <button class="normalButton" @click="router.push({ name: routePaths.grouping })">Okay!</button>
+            </div>
         </div>
 
-        <div class="workbenchContent" v-else>
-            <h2>It appears you are not in a group yet. Please join or create a group first.</h2>
-            <button id="okayButton" type="button" @click="router.push({ name: routePaths.grouping })">Okay!</button>
-        </div>
+        <FoodCenter v-else-if="caseSelection === 1"></FoodCenter>
 
     </div>
 </template>
@@ -47,11 +46,12 @@ const caseSelection = ref<number | null>(null);
 
 <style scoped>
 #workbenchContainer {
+    padding-right: 300px;
     text-align: center;
 }
 
-.caseButton {
+.normalButton {
     width: 200px;
-    height: 80px;
+    height: 50px;
 }
 </style>

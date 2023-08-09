@@ -41,14 +41,15 @@ export function useCachedHttpGet() {
 
   function cachedHttpGet(url: string, params: any, onCompleted: any): void {
     try {
-      const cachedResp = get(createKey(url, params));
-      if (cachedResp !== null) {
+      const key = createKey(url, params);
+      const cachedResp = get(key);
+      if (cachedResp) {
         onCompleted(cachedResp);
       } else {
         axios
           .get(url, { params: params })
           .then((resp) => {
-            set(createKey(url, params), resp);
+            set(key, resp);
             onCompleted?.(resp);
           })
           .catch((err: Error) => triggerRequestError(err, url, params));
@@ -123,7 +124,7 @@ export function useHttpGet<TData>(
 
 export function useHttpPost<TData>(
   endpoint: string,
-  data:TData,
+  data: TData,
   onCompleted: any
 ): PostDataResult<TData> {
   const isLoading = ref<boolean>(true);
@@ -177,7 +178,7 @@ export function usePaginatedGet<TData>(endpoint: string) {
 }
 
 export function useCachedPaginatedGet<TData>(endpoint: string) {
-  const { cachedHttpGet,clearAll, clearCacheByKey } = useCachedHttpGet();
+  const { cachedHttpGet, clearAll, clearCacheByKey } = useCachedHttpGet();
   const pagerParams = reactive<PaginatedParams>({
     page: 1,
     size: 5,
@@ -206,9 +207,63 @@ export function useCachedPaginatedGet<TData>(endpoint: string) {
     );
   }
 
-  watch<PaginatedParams>(pagerParams, getData, { deep: true});
+  watch<PaginatedParams>(pagerParams, getData, { deep: true });
 
   return { isLoading, data, pagerParams, getData, clearAll, clearCacheByKey };
+}
+
+export function useCachedCumulativeGet<TData extends object[]>(
+  endpoint: string, batchSize:number = 5, order?: string,
+) {
+  const isLoading = ref<boolean>(false);
+  const data = ref<TData>();
+  const hasMore = ref<boolean>(true);
+  const pagerParams = reactive<PaginatedParams>({
+    page: 0,
+    size: batchSize,
+    asc: 1,
+    order: order?? "id",
+  });
+  const { cachedHttpGet, clearAll: clearCache } = useCachedHttpGet();
+
+  function getData()  {
+    if (isLoading.value === true) {
+      return;
+    }
+
+    isLoading.value = true;
+    pagerParams.page++;
+    cachedHttpGet(
+      endpoint, {
+        page: pagerParams.page,
+        size: pagerParams.size,
+        asc: pagerParams.asc,
+        order: pagerParams.order,
+      },
+      (resp: AxiosResponse<PaginatedResponse<TData>>) => {
+        if (resp.status === 200) {
+          if (data.value) {
+            data.value.concat(resp.data.data);
+          } else {
+            data.value = resp.data.data;
+          }
+          hasMore.value = resp.data.page < resp.data.totalPage;
+        }
+        else {
+          pagerParams.page--;
+          hasMore.value = false;
+        }
+        isLoading.value = false;
+      }
+  )}
+
+  function clearData() {
+    pagerParams.page = 0;
+    data.value?.slice(0, 0);
+    clearCache();
+  }
+
+  return { isLoading, data, getData, clearData };
 }
 
 export type PaginatedParams = {

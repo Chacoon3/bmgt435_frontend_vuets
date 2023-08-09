@@ -30,9 +30,8 @@ const { portalState, setPortalState } = usePortalState();
             <SignUpView v-else-if="portalState === 'signUp'"></SignUpView>
             <ForgetPasswordView v-else-if="portalState === 'passwordReset'"></ForgetPasswordView>
         </div>
+        <div class="streak" loc="bottom"></div>
     </div>
-
-    <div class="streak" loc="bottom"></div>
 </template>
 
 <style scoped>
@@ -46,6 +45,8 @@ div[loc=bottom] {
     position: fixed;
     bottom: 0;
 }
+
+#portalNav {}
 
 h1,
 h2 {
