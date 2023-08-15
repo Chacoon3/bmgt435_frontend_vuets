@@ -1,14 +1,9 @@
 import { useCurrentUser } from "./userUtils";
-import { httpGet, httpPost, useCachedPaginatedGet } from "./requests";
+import { httpGet, httpPost, useCachedPaginatedGet, useCachedCumulatedGet, clearCacheByEndpoint } from "./requests";
 import { endpoints } from "./apis";
 import { ref, watch } from "vue";
 import { type Group } from "./ORMTypes";
 
-const { isLoading, data, pagerParams, getData: getPaginatedGroups, clearAll: clearPaginatedGroups } = useCachedPaginatedGet<Group[]>(endpoints.groups.groupsPaginated);
-export function usePaginatedGroups() {
-  getPaginatedGroups();
-  return { isLoading, data, pagerParams, getPaginatedGroups, clearPaginatedGroups }
-}
 
 const { currentUser } = useCurrentUser();
 const isCurrentGroupLoading = ref<boolean>(false);
@@ -53,19 +48,38 @@ export function useCurrentGroup() {
   return { isCurrentGroupLoading, currentGroup, getCurrrentGroup };
 }
 
+export function useCachedPaginatedGroups() {
+  const { isLoading, data, getData, clearCache} = useCachedPaginatedGet<Group[]>(endpoints.groups.groupsPaginated);
+  watch(currentGroup, () => {
+    clearCache();
+    getData();
+  });
+
+  return { isLoading, data, getData };
+}
+
+export function useCachedCumulatedGroups() {
+  const { isLoading, data, getData, clearCache } = useCachedCumulatedGet<Group>(endpoints.groups.groupsPaginated);
+  watch(currentGroup, () => {
+    clearCache();
+    getData();
+  });
+
+  return { isLoading, data, getData };
+}
+
 export function useCreateGroup() {
   const isCreatingGroup = ref<boolean>(false);
   function createGroup(callback: any = null) {
     isCreatingGroup.value = true;
-    httpPost(endpoints.groups.groups, null, (resp: any) => {
+    httpPost(endpoints.groups.create, null, (resp: any) => {
       isCreatingGroup.value = false;
       if (resp.status === 201) {
         if (currentUser.value !== null) {
           currentUser.value.group_id = resp.data.id;
         }
         currentGroup.value = resp.data;
-        clearPaginatedGroups();
-        getPaginatedGroups();
+        clearCacheByEndpoint(endpoints.groups.groupsPaginated);
       } else {
         currentGroup.value = null;
       }
@@ -87,8 +101,7 @@ export function useJoinGroup() {
           currentUser.value.group_id = resp.data.id;
         }
         currentGroup.value = resp.data;
-        clearPaginatedGroups();
-        getPaginatedGroups();
+        clearCacheByEndpoint(endpoints.groups.groupsPaginated);
       }
       callback?.(resp);
     });
@@ -108,8 +121,7 @@ export function useLeaveGroup() {
           currentUser.value.group_id = null;
         }
         currentGroup.value = null;
-        clearPaginatedGroups();
-        getPaginatedGroups();
+        clearCacheByEndpoint(endpoints.groups.groupsPaginated);
       }
       callback?.(resp);
     });

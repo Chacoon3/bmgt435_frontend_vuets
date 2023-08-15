@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { watch, ref } from 'vue';
 import { RouterView } from 'vue-router'
-import router from './router';
-
+import router, { routePaths } from './router';
 import { useCurrentUser, formatUserName } from './utils/userUtils';
-
 import CustomTitle from './components/CustomTitle.vue';
 import NavigationBar from '@/components/NavigationBar.vue'
+import { type NavigationConfig } from './components/types';
 
-const { currentUser } = useCurrentUser()
+const { currentUser, isAdmin } = useCurrentUser()
 const moduleTitle = ref<string>('')
 
 function setModuleTitle(newVal: any, oldVal: any) {
@@ -40,12 +39,44 @@ function setModuleTitle(newVal: any, oldVal: any) {
 }
 
 watch(router.currentRoute, setModuleTitle, { immediate: true })
+
+const naviItemsBase: NavigationConfig = {
+  items: [
+    { url: routePaths.workbench, imgSource: '/icons/navigationBar/workbench.svg', text: 'Workbench' },
+    { url: routePaths.grouping, imgSource: '/icons/navigationBar/groups.svg', text: 'Groups' },
+    { url: routePaths.records, imgSource: '/icons/navigationBar/records.svg', text: 'Case Records' },
+    { url: routePaths.leaderBoard, imgSource: '/icons/navigationBar/leaderBoard.svg', text: 'Leader  Board' },
+  ]
+}
+const navigationItemAdmin: NavigationConfig = {
+  items: [
+    { url: routePaths.workbench, imgSource: '/icons/navigationBar/workbench.svg', text: 'Workbench' },
+    { url: routePaths.grouping, imgSource: '/icons/navigationBar/groups.svg', text: 'Groups' },
+    { url: routePaths.records, imgSource: '/icons/navigationBar/records.svg', text: 'Case Records' },
+    { url: routePaths.leaderBoard, imgSource: '/icons/navigationBar/leaderBoard.svg', text: 'Leader  Board' },
+    { url: routePaths.manage, imgSource: '/icons/navigationBar/manage.svg', text: 'Manage' },]
+}
+const naviItems = ref<NavigationConfig>(naviItemsBase);
+
+watch(currentUser, (user) => {
+  if (user !== null) {
+    if (isAdmin() === true) {
+      naviItems.value = navigationItemAdmin;
+    }
+    else {
+      naviItems.value = naviItemsBase
+    }
+  }
+  else {
+    naviItems.value = naviItemsBase;
+  }
+}, { immediate: true });
 </script>
 
 <template>
   <body id="appContainer">
     <KeepAlive>
-      <NavigationBar v-if="router.currentRoute.value.meta.requireAuth === true"></NavigationBar>
+      <NavigationBar v-if="router.currentRoute.value.meta.requireAuth === true" :items="naviItems.items"></NavigationBar>
     </KeepAlive>
 
     <div id="moduleContainer">
@@ -56,8 +87,8 @@ watch(router.currentRoute, setModuleTitle, { immediate: true })
 
       <div id="moduleContent">
         <KeepAlive>
-        <RouterView />
-      </KeepAlive>
+          <RouterView />
+        </KeepAlive>
       </div>
     </div>
     <ThemeSetting></ThemeSetting>

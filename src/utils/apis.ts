@@ -9,13 +9,13 @@ export const endpoints = {
   users:{
     me: "bmgt435/api/users/me",
     users: "bmgt435/api/users",
-    usersPaginated: "bmgt435/api/users/paginated",
   },
 
   groups: {
     groups: "bmgt435/api/groups",
     groupsPaginated: "bmgt435/api/groups/paginated",
     join:"bmgt435/api/groups/join",
+    create:"bmgt435/api/groups/create",
     leave:"bmgt435/api/groups/leave",
   },
 
@@ -33,8 +33,14 @@ export const endpoints = {
     cases: "bmgt435/api/cases",
     casesPaginated: "bmgt435/api/cases/paginated",
     run:"bmgt435/api/cases/run",
+    submit:"bmgt435/api/cases/submit",
     caseRecords: "bmgt435/api/case-records",
     caseRecordsPaginated: "bmgt435/api/case-records/paginated",
+  },
+
+  manage: {
+    importUsers: "bmgt435/api/manage/import-users",
+    viewUsers: "bmgt435/api/manage/view-users",
   }
 
 };

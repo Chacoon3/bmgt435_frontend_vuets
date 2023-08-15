@@ -21,12 +21,15 @@
 
   --color-red-umd: rgba(226, 24, 51, 1);
   --color-red-umd-dark: rgb(174, 19, 40, 1);
+  --color-red-umd-slight-light: rgba(226, 24, 51, 0.7);
   --color-red-umd-light: rgba(226, 24, 51, 0.2);
   --color-light-div-background:white;
   --color-dark-div-background: lightgray;
   --color-green:hsla(160, 100%, 37%, 1);
   --color-green-light:hsla(160, 100%, 37%, 0.7);
   --color-green-dark:rgb(0, 165, 110);
+
+  --width-whitespace-right: 18vw;
 
   --transition-button: 0.1s;
 
@@ -96,21 +99,7 @@ body {
 
 #moduleContent {
   position: relative;
-  display: block;
-}
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
+  display: block;}
 
 .formDiv {
   display: block;
@@ -159,16 +148,25 @@ input[type="number"] {
     -moz-appearance: textfield;
     width: 150px;
     height: 25px;
+    margin-bottom: 10px;
     text-align: left;
+}
+
+input[type=file] {
+  transition: var(--transition-button);
+  width: 250px;
+  height: 25px;
+  text-align: left;
 }
 
 
 .normalButton {
   transition: var(--transition-button);
-  margin-top: 1em;
-  margin-bottom: 1em;
-  height: 2em;
-  width: 7em;
+  /* margin-top: 1em;
+  margin-bottom: 1em; */
+  margin: 1em;
+  min-height: 2em;
+  min-width: 7em;
   white-space:nowrap; 
   overflow-x: visible;
   color: white;
@@ -177,6 +175,7 @@ input[type="number"] {
   border-radius: 5px;
   box-shadow: 0px 0px 0.2em rgba(1,1,1);
 }
+
 
 .normalButton:hover {
   background: var(--color-red-umd-dark);
@@ -187,7 +186,31 @@ input[type="number"] {
   background: var(--color-red-umd-light)
 }
 
+h1{
+  font-weight: 600;
+}
+
 h2 {
   font: 1.5em Segoe UI;
+  font-weight: 600;
   margin: 1em 0 1em 0;
 }
+
+h3 {
+  font: 1.2em Segoe UI;
+  font-weight: 500;
+  margin: 1em 0 1em 0;
+}
+
+h4{
+  font-weight: 400;
+}
+
+p {
+  text-align: justify;
+}
+
+hr.lv2Hr {
+  width: 95%;
+}
+

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import GroupItem from './groupChildren/GroupItem.vue';
-import { useCurrentGroup, usePaginatedGroups, useCreateGroup, useLeaveGroup } from '@/utils/groupUtils';
+import { useCurrentGroup, useCachedPaginatedGroups, useCreateGroup, useLeaveGroup } from '@/utils/groupUtils';
 import { reactive } from 'vue';
 import InLineMsg from '@/components/InLineMsg.vue';
 
@@ -12,7 +12,8 @@ const inlineMsgState = reactive({
 const { isCreatingGroup, createGroup } = useCreateGroup();
 const { isCurrentGroupLoading, currentGroup } = useCurrentGroup();
 const { isLeavingGroup, leaveGroup } = useLeaveGroup();
-const { isLoading: isLoadingGroups, data: paginatedGroups, getPaginatedGroups } = usePaginatedGroups();
+const { isLoading: isLoadingGroups, data: paginatedGroups, getData: getPaginatedData } = useCachedPaginatedGroups();
+getPaginatedData();
 
 function handleCreateGroup() {
     inlineMsgState.show = false;
@@ -66,15 +67,21 @@ function handleLeaveGroup() {
         <div v-else class="groupDiv">
             <h2 class="groupDivH2">Your Group</h2>
             <div>
+                <h3> {{ currentGroup.name }}</h3>
+            </div>
+            <div>
+               <h3>Members:</h3>
+            </div>
+            <div>
                 <ul id="userGroupInfo">
                     <li v-for="item in currentGroup.users" :key="item.id">
                         <span>{{ item.first_name + ' ' + item.last_name }}</span>
                     </li>
                 </ul>
 
+            </div>
                 <input type="submit" :value="isLeavingGroup ? 'Leaving...' : 'Leave group'" :disabled="isLeavingGroup"
                     @click="handleLeaveGroup()">
-            </div>
         </div>
 
 

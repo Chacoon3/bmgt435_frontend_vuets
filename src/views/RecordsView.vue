@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useCaseRecords } from '@/utils/caseRecordsUtils'
+import { useCumulatedCaseRecords } from '@/utils/caseRecordsUtils'
 
-const { records, isLoading, clearData, getData } = useCaseRecords()
+const { records, isLoading, clearCachedRecords, getData } = useCumulatedCaseRecords()
 </script>
 
 <template>

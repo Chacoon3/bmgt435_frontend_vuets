@@ -1,12 +1,18 @@
 import { endpoints } from "./apis";
-import { httpPost, useCachedHttpGet } from "./requests";
+import { httpPost, cachedHttpGet, clearCacheByEndpoint, clearAllCache } from "./requests";
 import { type User } from "./ORMTypes";
 import { type AxiosResponse } from "axios";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
-const { cachedHttpGet, clearAll } = useCachedHttpGet();
 const isCurrentUserLoading = ref<boolean>(false);
 const currentUser = ref<User | null>(null);
+
+watch(currentUser, (newUser) => {
+  if (newUser === null) {
+    clearAllCache();
+  }
+}, { immediate: true });
+
 function getCurrentUser(callback?: (resp: AxiosResponse) => void) {
   isCurrentUserLoading.value = true;
   cachedHttpGet(endpoints.users.me, null, (resp: AxiosResponse) => {
@@ -24,13 +30,22 @@ function setCurrentUser(user: User) {
   currentUser.value = user;
 }
 
+function isAdmin() {
+  if (currentUser.value === null) {
+    return false;
+  } else {
+    return currentUser.value.role === "admin";
+  }
+}
+
 export function useCurrentUser() {
   return {
     isCurrentUserLoading,
     currentUser,
     getCurrentUser,
     setCurrentUser,
-    clearUserCache: clearAll,
+    isAdmin,
+    clearUserCache: () => clearCacheByEndpoint(endpoints.users.me),
   };
 }
 

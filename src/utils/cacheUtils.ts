@@ -1,26 +1,38 @@
 import { reactive } from "vue";
 
 export function useCache<TData>() {
-  const cacheDict = reactive<Map<string, TData>>(new Map<string, TData>());
-  function set(cacheId: string, data: TData):void {
-    cacheDict.set(cacheId, data);
+  const cacheDict = reactive<Map<string, Map<string, TData>>>(
+    new Map<string, Map<string, TData>>()
+  );
+
+  function createKey(params?: any): string {
+    return `${params ? `@${JSON.stringify(params)}` : ""}`;
   }
 
-  function get(key: string): TData | null {
-    return cacheDict.get(key) ?? null;
+  function set(endpoint: string, param: any, data: TData): void {
+    if (cacheDict.get(endpoint) == undefined) {
+      cacheDict.set(endpoint, new Map<string, TData>());
+    }
+    cacheDict.get(endpoint)?.set(createKey(param), data);
   }
 
-  function clear(key: string): void {
-    cacheDict.delete(key);
+  function get(endpoint: string, param: any): TData | null {
+    if (cacheDict.get(endpoint) == undefined) {
+      return null;
+    }
+    return cacheDict.get(endpoint)?.get(createKey(param)) || null;
   }
 
-  function clearAll(): void {
+  function clearCacheByEndpoint(endpoint: string): void {
+    if (cacheDict.get(endpoint) == undefined) {
+      return;
+    }
+    cacheDict.get(endpoint)?.clear();
+  }
+
+  function clearAllCache(): void {
     cacheDict.clear();
   }
 
-  function createKey(endpoint: string, params?: any): string {
-    return `${endpoint}${params ? `@${JSON.stringify(params)}` : ""}`;
-  }
-
-  return { createKey, set, get, clear, clearAll };
+  return { createKey, set, get, clearCacheByEndpoint, clearAllCache };
 }
