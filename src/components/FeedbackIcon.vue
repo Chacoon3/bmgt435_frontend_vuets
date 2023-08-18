@@ -4,12 +4,12 @@ import { useModal } from '@/utils/modalUtils';
 const { showModal, closeModal } = useModal();
 
 function handleClick() {
-    showModal({
-        title: 'Send your feedback',
-        message: 'Please send your feedback',
-        onConfirm: closeModal,
-        onCancel: closeModal,
-    });
+    // showModal({
+    //     title: 'Send your feedback',
+    //     message: 'Please send your feedback',
+    //     onConfirm: closeModal,
+    //     onCancel: closeModal,
+    // });
 
 }
 </script>

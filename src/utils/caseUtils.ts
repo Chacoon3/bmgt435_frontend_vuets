@@ -1,13 +1,13 @@
 import { ref } from "vue";
-import {type  CaseRecord, type Case } from "./backendTypes";
+import { type CaseRecord, type Case } from "./backendTypes";
 import { httpGet, httpPost, useCachedCumulatedGet } from "./requests";
 import { endpoints } from "./apis";
 import { type AxiosResponse } from "axios";
+import { useCumulatedCaseRecords } from "./caseRecordsUtils";
 
-
+const { clearCache: clearCachedCaseRecords } = useCumulatedCaseRecords();
 export function useFoodcenter() {
   const isSubmitting = ref(false);
-  const submissionResult = ref<FoodcenterResult | null>(null);
 
   function convertUserInput(
     userInput: FoodcenterCenterState[]
@@ -25,26 +25,26 @@ export function useFoodcenter() {
     return { case_id: 1, case_params: { centers, policies }};
   }
 
-  function tryGetSubmissionResult(
-    caseRecordId: number,
-    callback: (resp: AxiosResponse) => void
-  ) {
-    httpGet(
-      endpoints.cases.caseRecords,
-      { id: caseRecordId },
-      (resp: AxiosResponse) => {
-        if (resp.status === 200) {
-          isSubmitting.value = false;
-          submissionResult.value = resp.data;
-          callback?.(resp);
-        } else {
-          setTimeout(() => {
-            tryGetSubmissionResult(caseRecordId, callback);
-          }, 10000);
-        }
-      }
-    );
-  }
+  // function tryGetSubmissionResult(
+  //   caseRecordId: number,
+  //   callback: (resp: AxiosResponse) => void
+  // ) {
+  //   httpGet(
+  //     endpoints.cases.caseRecords,
+  //     { id: caseRecordId },
+  //     (resp: AxiosResponse) => {
+  //       if (resp.status === 200) {
+  //         isSubmitting.value = false;
+  //         submissionResult.value = resp.data;
+  //         callback?.(resp);
+  //       } else {
+  //         setTimeout(() => {
+  //           tryGetSubmissionResult(caseRecordId, callback);
+  //         }, 10000);
+  //       }
+  //     }
+  //   );
+  // }
 
   function submitCase(
     userInput: FoodcenterCenterState[],
@@ -57,18 +57,13 @@ export function useFoodcenter() {
       convertUserInput(userInput),
       (resp: AxiosResponse) => {
         isSubmitting.value = false;
-        if (resp.status == 200) {
-          // const caseRecord: CaseRecord = resp.data;
-          // tryGetSubmissionResult(caseRecord.id, callback);
-        } else {
-          //
-        }
+        clearCachedCaseRecords();
         callback?.(resp);
       }
     );
   }
 
-  return { isSubmitting, submissionResult, submitCase };
+  return { isSubmitting, submitCase };
 }
 
 export function useCumulatedCases() {

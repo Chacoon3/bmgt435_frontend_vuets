@@ -5,6 +5,7 @@ import CenterConfigPanel from './CenterConfigPanel.vue';
 import { type FoodcenterCenterState, useFoodcenter } from '@/utils/caseUtils'
 import { type AxiosResponse } from 'axios';
 import InLineMsg from '@/components/InLineMsg.vue';
+import FoodcenterResult from './FoodcenterResult.vue';
 
 
 const inlineMsgState = reactive({ show: false, content: '', });
@@ -13,13 +14,17 @@ const paramState = ref<FoodcenterCenterState[]>(
     Array.from([1, 2, 3, 4, 5, 6],
         (index: number) => ({ isOn: false, smallS: 0, bigS: 0, name: `Center ${index}` }))
 );
-const { isSubmitting, submissionResult: FCResult, submitCase: submitFC, } = useFoodcenter();
-
+const { isSubmitting, submitCase: submitFoodCenter, } = useFoodcenter();
+const resultState = ref<boolean>(false);
 function handleSubmit() {
     if (isSubmitting.value === true) {
         return;
     }
-    submitFC(paramState.value, (resp: AxiosResponse) => {
+
+    inlineMsgState.content = '';
+    inlineMsgState.show = false;
+    submitFoodCenter(paramState.value, (resp: AxiosResponse) => {
+        resultState.value = resp.status === 200
         if (resp.status !== 200) {
             //
             inlineMsgState.content = resp.data ?? "Failed to submit simulation!";
@@ -27,7 +32,8 @@ function handleSubmit() {
         }
         else {
             // submission success logic
-
+            inlineMsgState.content = "Simulation submitted successfully!";
+            inlineMsgState.show = true;
         }
     });
 }
@@ -135,7 +141,7 @@ function handleSubmit() {
 
         <h2>Simulation</h2>
         <hr>
-
+        <FoodcenterResult v-if="resultState === true"></FoodcenterResult>
         
 
     </div>
