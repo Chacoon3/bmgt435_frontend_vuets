@@ -23,7 +23,7 @@ function handleClick() {
 </template>
 
 <style scoped>
-#feedbackDiv {
+.feedbackDiv {
     position: fixed;
     bottom: 10px;
     right: 10px;
