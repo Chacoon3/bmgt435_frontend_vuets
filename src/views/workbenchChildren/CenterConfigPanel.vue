@@ -4,35 +4,24 @@ import { type FoodcenterCenterState } from '@/utils/caseUtils'
 
 const props = defineProps<FoodcenterCenterState>()
 defineEmits<{
-     (event: 'update:isOn', data: boolean): void ,
-     (event: 'update:smallS', data: number): void 
-     (event: 'update:bigS', data: number): void 
+    (event: 'update:isOn', data: boolean): void,
+    (event: 'update:smallS', data: number): void
+    (event: 'update:bigS', data: number): void
 }>()
 
 const buttonColor = computed(() => {
     return props.isOn ? "green" : "red";
 });
-
-
-function validatePolicy() {
-    if (props.smallS > props.bigS) {
-        return false;
-    }
-    else {
-
-        return true;
-    }
-}
 </script>
 
-<template>  
+<template>
     <div class="centerConfigPanel">
         <div class="foodcenterCenterName">
-            {{ $props.name ?? "Unnamed" }}
+            {{ name ?? "Unnamed" }}
         </div>
         <div>
-            <button class="normalButton" :buttonColor=buttonColor @click="() => { $emit('update:isOn', !props.isOn) }">
-                {{ props.isOn ? "Selected" : "Deselected" }}
+            <button class="normalButton" :buttonColor=buttonColor @click="() => { $emit('update:isOn', !isOn) }">
+                {{ isOn ? "Selected" : "Deselected" }}
             </button>
         </div>
 
@@ -40,15 +29,15 @@ function validatePolicy() {
             <label>
                 s
             </label>
-                <input class="foodcenterInputNumber" type="number" :v-model="props.smallS" :disabled="props.isOn === false"
-                    :onInput="() => {validatePolicy(); $emit('update:smallS', props.smallS);}">
+            <input class="foodcenterInputNumber" type="number" :value="smallS" :disabled="isOn === false"
+                @input="$emit('update:smallS', Number.parseInt($event.target?.value))">
         </div>
         <div>
             <label>
                 S
             </label>
-                <input class="foodcenterInputNumber" type="number" :v-model="props.bigS" :disabled="props.isOn === false"
-                :onInput="() => {validatePolicy(); $emit('update:bigS', props.bigS);}">
+            <input class="foodcenterInputNumber" type="number" :value="bigS" :disabled="isOn === false"
+                @input="$emit('update:bigS', Number.parseInt($event.target?.value))">
         </div>
 
     </div>
@@ -58,6 +47,7 @@ function validatePolicy() {
 .foodcenterCenterName {
     margin-top: 1em;
 }
+
 .centerConfigPanel {
     border-style: solid;
     border-width: 1px;

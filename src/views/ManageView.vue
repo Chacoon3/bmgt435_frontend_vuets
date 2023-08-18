@@ -2,10 +2,11 @@
 import { computed, ref } from 'vue';
 import { type CustomSelectConfig } from '@/components/types';
 import CustomSelect from '@/components/CustomSelect.vue';
-import CaseMgnt from './manageChildren/CaseMgnt.vue'
+import FoodcenterConfig from './manageChildren/FoodcenterConfig.vue'
 import ImportUser from './manageChildren/ImportUser.vue'
 import ViewUser from './manageChildren/ViewUser.vue';
 import { useCumulatedCases } from '@/utils/caseUtils';
+import { type Case } from '@/utils/backendTypes';
 
 const { isLoading: isCasesLoading, data: cases, hasMore: hasMoreCases, getData: getCases } = useCumulatedCases();
 getCases();
@@ -13,7 +14,7 @@ const caseOptions = computed<string[]>(() => {
     if (isCasesLoading.value === true) {
         return ["Loading..."];
     } else {
-        return cases.value.map((caseItem) => {
+        return cases.value.map((caseItem: Case) => {
             return caseItem.name;
         })
     }
@@ -41,7 +42,7 @@ const moduleState = ref<string>("")
     <div id="manageViewContainer">
         <div id="manageButtonContainer">
             <CustomSelect v-for="(item, index) in selectState" :key="index" :name="item.name" v-model:options="item.options"
-                @input="(val: string) => { moduleState = val; }"></CustomSelect>
+                @input="(newVal: string) => { moduleState = newVal; }"></CustomSelect>
         </div>
         <hr class="lv2Hr">
 
@@ -49,7 +50,7 @@ const moduleState = ref<string>("")
             <KeepAlive>
                 <ImportUser v-if="moduleState === 'Import Users'"></ImportUser>
                 <ViewUser v-else-if="moduleState === 'View Users'"></ViewUser>
-                <CaseMgnt v-else-if="moduleState === 'Config Cases'"></CaseMgnt>
+                <FoodcenterConfig v-else-if="moduleState === 'Food center'"></FoodcenterConfig>
             </KeepAlive>
         </div>
     </div>

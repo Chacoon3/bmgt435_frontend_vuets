@@ -46,8 +46,6 @@ div[loc=bottom] {
     bottom: 0;
 }
 
-#portalNav {}
-
 h1,
 h2 {
     position: relative;
@@ -72,6 +70,7 @@ button {
 
 button:hover {
     color: lightcoral;
+    cursor: pointer;
 }
 
 button:disabled {

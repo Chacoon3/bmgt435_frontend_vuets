@@ -1,11 +1,8 @@
 import { useCachedCumulatedGet } from '@/utils/requests';
 import { endpoints } from '@/utils/apis';
-import { type CaseRecord} from '@/utils/ORMTypes';
-
-
-const { isLoading, data: records, clearCache: clearCachedRecords, getData } = useCachedCumulatedGet<CaseRecord>(endpoints.cases.caseRecordsPaginated, 5, "create_time");
+import { type CaseRecord} from '@/utils/backendTypes';
 
 
 export function useCumulatedCaseRecords() {
-    return { isLoading, records, clearCachedRecords, getData };
+    return useCachedCumulatedGet<CaseRecord>(endpoints.cases.caseRecordsPaginated, 5, "create_time");
 }

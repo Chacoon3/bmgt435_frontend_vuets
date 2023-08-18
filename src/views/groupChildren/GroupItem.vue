@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Group } from '@/utils/ORMTypes';
+import { type Group } from '@/utils/backendTypes';
 import { useJoinGroup } from '@/utils/groupUtils';
 import { useCurrentUser } from '@/utils/userUtils';
 

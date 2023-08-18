@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { InLineMsgConfig } from './types';
+import { type InLineMsgConfig } from './types';
 
 const props = withDefaults(defineProps<InLineMsgConfig>(),
     {
@@ -21,7 +21,8 @@ const props = withDefaults(defineProps<InLineMsgConfig>(),
 <style scoped>
 .inLineMsg {
     display: block;
-    color: red;
+    /* color: red; */
+    color: var(--color-red-umd);
     text-align: center;
     margin: 1em;
 }

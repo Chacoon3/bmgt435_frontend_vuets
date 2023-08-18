@@ -145,7 +145,7 @@ input[type="number"]::-webkit-inner-spin-button {
     margin: 0;
 }
 input[type="number"] {
-    -moz-appearance: textfield;
+    /* -moz-appearance: textfield; */
     width: 150px;
     height: 25px;
     margin-bottom: 10px;
@@ -158,7 +158,6 @@ input[type=file] {
   height: 25px;
   text-align: left;
 }
-
 
 .normalButton {
   transition: var(--transition-button);

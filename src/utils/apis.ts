@@ -12,7 +12,7 @@ export const endpoints = {
   },
 
   groups: {
-    groups: "bmgt435/api/groups",
+    get: "bmgt435/api/groups/get",
     groupsPaginated: "bmgt435/api/groups/paginated",
     join:"bmgt435/api/groups/join",
     create:"bmgt435/api/groups/create",
@@ -30,7 +30,7 @@ export const endpoints = {
   },
 
   cases:{
-    cases: "bmgt435/api/cases",
+    get: "bmgt435/api/cases/get",
     casesPaginated: "bmgt435/api/cases/paginated",
     run:"bmgt435/api/cases/run",
     submit:"bmgt435/api/cases/submit",

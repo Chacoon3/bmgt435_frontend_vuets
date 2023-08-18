@@ -1,9 +1,4 @@
-export type MessagePopConfig = {
-    show: boolean,
-    header: string,
-    content: string,
-    onClick: () => void
-};
+import { type ComputedRef } from "vue";
 
 export type InLineMsgConfig = {
     show: boolean,
@@ -50,8 +45,14 @@ export interface TableItemConfig  {
     onClick?: () => void,
 }
 
-export interface TableConfig {
+export type TableConfig = {
     title?: string,
     headers?: string[],
     rows: TableItemConfig[][],
+}
+
+export interface ButtonConfig {
+    text: string | ComputedRef<string>,
+    onClick: () => void,
+    disabled?: boolean,
 }

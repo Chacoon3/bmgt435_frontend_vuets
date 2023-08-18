@@ -2,7 +2,7 @@ import { useCurrentUser } from "./userUtils";
 import { httpGet, httpPost, useCachedPaginatedGet, useCachedCumulatedGet, clearCacheByEndpoint } from "./requests";
 import { endpoints } from "./apis";
 import { ref, watch } from "vue";
-import { type Group } from "./ORMTypes";
+import { type Group } from "./backendTypes";
 
 
 const { currentUser } = useCurrentUser();
@@ -12,9 +12,9 @@ const currentGroup = ref<Group | null>(null);
 function getCurrrentGroup() {
   if (currentUser.value && currentUser.value.group_id !== null) {
     isCurrentGroupLoading.value = true;
-    httpGet(endpoints.groups.groups, {id: currentUser.value.group_id}, (resp: any) => {
+    httpGet(endpoints.groups.get, {id: currentUser.value.group_id}, (resp: any) => {
       if (resp.status === 200) {
-        currentGroup.value = resp.data[0];
+        currentGroup.value = resp.data;
       } else {
         currentGroup.value = null;
       }

@@ -1,16 +1,18 @@
 import { ref } from "vue";
-import { type Case } from "./ORMTypes";
+import {type  CaseRecord, type Case } from "./backendTypes";
 import { httpGet, httpPost, useCachedCumulatedGet } from "./requests";
 import { endpoints } from "./apis";
 import { type AxiosResponse } from "axios";
 
+
 export function useFoodcenter() {
-  const isLoading = ref(false);
-  const result = ref<FoodcenterResult | null>(null);
+  const isSubmitting = ref(false);
+  const submissionResult = ref<FoodcenterResult | null>(null);
 
   function convertUserInput(
     userInput: FoodcenterCenterState[]
-  ): FoodcenterParams {
+  ): CaseSubmissionParams<FoodcenterParams> {
+
     const centers: string[] = [];
     const policies: number[][] = [];
     for (let i = 0; i < userInput.length; i++) {
@@ -20,10 +22,10 @@ export function useFoodcenter() {
         policies.push([center.smallS, center.bigS]);
       }
     }
-    return { centers, policies };
+    return { case_id: 1, case_params: { centers, policies }};
   }
 
-  function tryGetResult(
+  function tryGetSubmissionResult(
     caseRecordId: number,
     callback: (resp: AxiosResponse) => void
   ) {
@@ -32,13 +34,13 @@ export function useFoodcenter() {
       { id: caseRecordId },
       (resp: AxiosResponse) => {
         if (resp.status === 200) {
-          isLoading.value = false;
-          result.value = resp.data;
+          isSubmitting.value = false;
+          submissionResult.value = resp.data;
           callback?.(resp);
         } else {
           setTimeout(() => {
-            tryGetResult(caseRecordId, callback);
-          }, 1000);
+            tryGetSubmissionResult(caseRecordId, callback);
+          }, 10000);
         }
       }
     );
@@ -48,37 +50,25 @@ export function useFoodcenter() {
     userInput: FoodcenterCenterState[],
     callback: (resp: AxiosResponse) => void
   ) {
-    isLoading.value = true;
+    isSubmitting.value = true;
 
     httpPost<FoodcenterResult>(
       endpoints.cases.submit,
       convertUserInput(userInput),
       (resp: AxiosResponse) => {
+        isSubmitting.value = false;
         if (resp.status == 200) {
-          tryGetResult(resp.data.case_id, callback);
+          // const caseRecord: CaseRecord = resp.data;
+          // tryGetSubmissionResult(caseRecord.id, callback);
         } else {
-          isLoading.value = false;
-          callback?.(resp);
+          //
         }
-      }
-    );
-  }
-
-  function runCase(
-    userInput: FoodcenterCenterState[],
-    callback: (resp: AxiosResponse) => void
-  ) {
-    httpPost<FoodcenterResult>(
-      endpoints.cases.run,
-      convertUserInput(userInput),
-      (resp: AxiosResponse) => {
-        isLoading.value = false;
         callback?.(resp);
       }
     );
   }
 
-  return { isLoading, result, runCase, submitCase };
+  return { isSubmitting, submissionResult, submitCase };
 }
 
 export function useCumulatedCases() {
@@ -97,10 +87,9 @@ export type FoodcenterCenterState = {
   bigS: number;
 };
 
-export type RunCaseParams<CaseParams> = {
+export type CaseSubmissionParams<CaseParams> = {
   case_id: number;
-  gruop_id: number;
-  caseParams: CaseParams;
+  case_params: CaseParams;
 };
 
 export type FoodcenterResult = {};

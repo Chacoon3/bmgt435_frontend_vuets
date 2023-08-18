@@ -1,32 +1,28 @@
 <script setup lang="ts">
-import { type MessagePopConfig } from './types';
+import { type ModalConfig} from '@/utils/modalUtils';
 
-const props = withDefaults(defineProps<MessagePopConfig>(),
-    {
-        show: false,
-        header: "",
-        content: "",
-        onClick: () => { }
-    }
-);
+defineProps<{modalConfig: ModalConfig}>();
 </script>
 
 <template>
     <Transition name="modal">
-        <div v-if="show" class="modal-mask">
+        <div class="modal-mask">
             <div class="modal-container">
                 <div class="modal-header">
-                    <span>{{ props.header }}</span>
+                    <span>{{ $props.modalConfig.title }}</span>
                 </div>
 
                 <div class="modal-body">
-                    <span> {{ props.content }}</span>
+                    <span> {{ $props.modalConfig.message }}</span>
                 </div>
 
                 <div class="modal-footer">
-                    <span>
-                        <button class="modal-default-button" @click="onClick()">OK</button>
-                    </span>
+                    <div>
+                       <button class="normalButton" @click="$props.modalConfig.onConfirm">{{ $props.modalConfig.confirmText ?? "OK"}}</button>
+                    </div>
+                    <div v-if="$props.modalConfig.onCancel || $props.modalConfig.cancelText">
+                          <button class="normalButton" @click="$props.modalConfig.onCancel?.()">{{ $props.modalConfig.cancelText ?? "Cancel" }}</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -41,12 +37,17 @@ const props = withDefaults(defineProps<MessagePopConfig>(),
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.4);
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     transition: opacity 0.3s ease;
 }
 
 .modal-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     width: 300px;
     margin: auto;
     padding: 20px 30px;
@@ -65,9 +66,12 @@ const props = withDefaults(defineProps<MessagePopConfig>(),
     margin: 20px 0;
 }
 
-.modal-default-button {
-    float: right;
+.modal-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }
+
 
 /*
  * 对于 transition="modal" 的元素来说
@@ -86,9 +90,9 @@ const props = withDefaults(defineProps<MessagePopConfig>(),
     opacity: 0;
 }
 
-.modal-enter-from .modal-container,
+/* .modal-enter-from .modal-container,
 .modal-leave-to .modal-container {
     -webkit-transform: scale(1.1);
     transform: scale(1.1);
-}
+} */
 </style>.

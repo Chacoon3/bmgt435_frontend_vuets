@@ -1,6 +1,6 @@
 import { endpoints } from "./apis";
 import { httpPost, cachedHttpGet, clearCacheByEndpoint, clearAllCache } from "./requests";
-import { type User } from "./ORMTypes";
+import { type User } from "./backendTypes";
 import { type AxiosResponse } from "axios";
 import { ref, watch } from "vue";
 

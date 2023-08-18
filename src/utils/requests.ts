@@ -1,5 +1,5 @@
 import useErrorUtil from "./errorUtils";
-import axios, { type AxiosResponse } from "axios";
+import axios, { AxiosError, type AxiosResponse } from "axios";
 import { type Ref, type UnwrapRef, ref, watch, reactive } from "vue";
 import { useCache } from "./cacheUtils";
 
@@ -13,11 +13,11 @@ axios.defaults.timeout = 10000;
 const { setErrorContext } = useErrorUtil();
 
 function triggerRequestError<T>(
-  error: Error,
+  error: AxiosError,
   endpoint: string,
   dataOrParams: T
 ) {
-  setErrorContext(error, ` A request has failed with error: ${error.message}`);
+  setErrorContext(error, ` A request has failed with error: ${error.response?.data}`);
   console.log(
     `Request to ${endpoint} failed with error: ${error.message ?? error}`
   );
@@ -30,7 +30,7 @@ export function httpGet(url: string, params: any, onCompleted: any): void {
     axios
       .get(url, { params: params })
       .then(onCompleted)
-      .catch((err: Error) => triggerRequestError(err, url, params));
+      .catch((err: AxiosError) => triggerRequestError(err, url, params));
   } catch (err: any) {
     triggerRequestError(err, url, params);
   }
@@ -50,7 +50,7 @@ export function cachedHttpGet(endpoint: string, params: any, onCompleted: any): 
           set(endpoint, key, resp);
           onCompleted?.(resp);
         })
-        .catch((err: Error) => triggerRequestError(err, endpoint, params));
+        .catch((err: AxiosError) => triggerRequestError(err, endpoint, params));
     }
   } catch (err: any) {
     triggerRequestError(err, endpoint, params);
@@ -66,7 +66,7 @@ export function httpPost<TData>(
     axios
       .post(url, data)
       .then(onCompleted)
-      .catch((err: Error) => triggerRequestError(err, url, data));
+      .catch((err: AxiosError) => triggerRequestError(err, url, data));
   } catch (err: any) {
     triggerRequestError(err, url, data);
   }
@@ -81,7 +81,7 @@ export function httpPut<TData>(
     axios
       .put(url, data)
       .then(onCompleted)
-      .catch((err: Error) => triggerRequestError(err, url, data));
+      .catch((err: AxiosError) => triggerRequestError(err, url, data));
   } catch (err: any) {
     triggerRequestError(err, url, data);
   }
@@ -92,7 +92,7 @@ export function httpDelete(url: string, params: any, onCompleted: any): void {
     axios
       .delete(url, { params: params })
       .then(onCompleted)
-      .catch((err: Error) => triggerRequestError(err, url, params));
+      .catch((err: AxiosError) => triggerRequestError(err, url, params));
   } catch (err: any) {
     triggerRequestError(err, url, params);
   }

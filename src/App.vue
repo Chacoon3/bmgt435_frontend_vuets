@@ -6,10 +6,13 @@ import { useCurrentUser, formatUserName } from './utils/userUtils';
 import CustomTitle from './components/CustomTitle.vue';
 import NavigationBar from '@/components/NavigationBar.vue'
 import { type NavigationConfig } from './components/types';
+import FeedbackIcon from './components/FeedbackIcon.vue';
+import { useModal } from './utils/modalUtils';
+import ModalBox from './components/ModalBox.vue';
 
 const { currentUser, isAdmin } = useCurrentUser()
 const moduleTitle = ref<string>('')
-
+const { getModalStack } = useModal();
 function setModuleTitle(newVal: any, oldVal: any) {
   if (newVal !== oldVal) {
     switch (newVal.name?.toString()) {
@@ -86,11 +89,12 @@ watch(currentUser, (user) => {
       </div>
 
       <div id="moduleContent">
-        <KeepAlive>
+        <!-- <KeepAlive> -->
           <RouterView />
-        </KeepAlive>
+        <!-- </KeepAlive> -->
       </div>
     </div>
-    <ThemeSetting></ThemeSetting>
+    <!-- <FeedbackIcon></FeedbackIcon>
+    <ModalBox v-for="(modal, index) in getModalStack" :key="index" :modal-config="modal"></ModalBox> -->
   </body>
 </template>

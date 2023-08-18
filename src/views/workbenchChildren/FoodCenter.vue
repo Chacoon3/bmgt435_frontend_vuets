@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import TextSection from '@/components/textual/TextSection.vue'
 import CenterConfigPanel from './CenterConfigPanel.vue';
 import { type FoodcenterCenterState, useFoodcenter } from '@/utils/caseUtils'
-import { AxiosResponse } from 'axios';
+import { type AxiosResponse } from 'axios';
+import InLineMsg from '@/components/InLineMsg.vue';
 
 
+const inlineMsgState = reactive({ show: false, content: '', });
 const showBrief = ref<boolean>(true);
-const paramState = ref<FoodcenterCenterState[]>(Array.from([1, 2, 3, 4, 5, 6],
-    (index: number) => ({ isOn: true, smallS: 0, bigS: 0, name: `Center ${index}` })));
-const { isLoading, result: foodcenterResult, submitCase: runFoodcenter } = useFoodcenter();
-function handleRunOnce() {
-    if (isLoading.value === true) {
-        return;
-    }
-    runFoodcenter(paramState.value, (resp: AxiosResponse) => {
-        if (resp.status !== 200) {
-            //
-        }
-    });
-}
+const paramState = ref<FoodcenterCenterState[]>(
+    Array.from([1, 2, 3, 4, 5, 6],
+        (index: number) => ({ isOn: false, smallS: 0, bigS: 0, name: `Center ${index}` }))
+);
+const { isSubmitting, submissionResult: FCResult, submitCase: submitFC, } = useFoodcenter();
 
 function handleSubmit() {
-    if (isLoading.value === true) {
+    if (isSubmitting.value === true) {
         return;
     }
-    runFoodcenter(paramState.value, (resp: AxiosResponse) => {
+    submitFC(paramState.value, (resp: AxiosResponse) => {
         if (resp.status !== 200) {
             //
+            inlineMsgState.content = resp.data ?? "Failed to submit simulation!";
+            inlineMsgState.show = true;
+        }
+        else {
+            // submission success logic
+
         }
     });
 }
@@ -93,18 +93,24 @@ function handleSubmit() {
                     The value of all the uncovered orders will be deducted from the revenue as a measure of penalty.
                 </li>
                 <br />
-                <li>
+                <!-- <li>
                     <b>Performance metric:</b>
                     <br />
                     Total profit = Total revenue - Total cost
                 </li>
-                <br />
+                <br /> -->
             </ul>
             <b>Your goals:</b>
             <br />
-            Find the best location(s) to expand.
-            <br />
-            Determine the optimal inventory policy for each selected location.
+            <ul>
+                <li>
+                    Find the best location(s) to expand.
+                </li>
+                <li>
+                    Determine the optimal inventory policy for each selected location.
+                </li>
+                <br />
+            </ul>
             </p>
         </div>
         <button class="normalButton" @click="showBrief = !showBrief">{{ showBrief === true ? "Hide introduction" :
@@ -114,17 +120,23 @@ function handleSubmit() {
         <hr>
         <div class="foodcenterParamDiv">
             <CenterConfigPanel v-for="(item, index) in paramState" :key="index" v-model:isOn="item.isOn"
-                v-model:smallS="item.smallS" v-model:bigS="item.bigS" v-model:name="item.name"></CenterConfigPanel>
+                v-model:smallS="item.smallS" v-model:bigS="item.bigS" v-model:name="item.name"
+
+                ></CenterConfigPanel>
         </div>
 
+        <InLineMsg :show="inlineMsgState.show" :content="inlineMsgState.content"></InLineMsg>
+
         <div>
-            <button class="normalButton" btnFeature="simulation">Run one iteration</button>
-            |
-            <button class="normalButton" btnFeature="simulation">Run and submit as final</button>
+            <button class="normalButton" btnFeature="simulation" @click="handleSubmit" :disabled="isSubmitting === true">
+                {{ isSubmitting ? "Submitting..." : "Submit!" }}
+            </button>
         </div>
 
         <h2>Simulation</h2>
         <hr>
+
+        
 
     </div>
 </template>

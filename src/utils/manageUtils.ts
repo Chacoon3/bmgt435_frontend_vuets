@@ -1,7 +1,7 @@
 import { httpPost, useCachedCumulatedGet } from "./requests";
 import { endpoints } from "./apis";
 import { ref } from "vue";
-import { type User } from "./ORMTypes";
+import { type User } from "./backendTypes";
 
 export function useImportUsers() {
     const isLoading = ref<boolean>(false);

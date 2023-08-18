@@ -24,6 +24,7 @@ export type CaseRecord = {
   case_name: string;
   group_id: number;
   group_name: string;
+  state: string;
   score: number;
   detail_json: object;
 };
