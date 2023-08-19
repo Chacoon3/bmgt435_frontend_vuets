@@ -13,7 +13,7 @@ export const endpoints = {
 
   groups: {
     get: "bmgt435/api/groups/get",
-    groupsPaginated: "bmgt435/api/groups/paginated",
+    paginated: "bmgt435/api/groups/paginated",
     join:"bmgt435/api/groups/join",
     create:"bmgt435/api/groups/create",
     leave:"bmgt435/api/groups/leave",
@@ -21,21 +21,24 @@ export const endpoints = {
 
   tags:{
     tags: "bmgt435/api/tags",
-    tagsPaginated: "bmgt435/api/tags/paginated",
+    paginated: "bmgt435/api/tags/paginated",
   },
 
   roles:{
     roles: "bmgt435/api/roles",
-    rolesPaginated: "bmgt435/api/roles/paginated",
+    paginated: "bmgt435/api/roles/paginated",
   },
 
   cases:{
     get: "bmgt435/api/cases/get",
-    casesPaginated: "bmgt435/api/cases/paginated",
+    paginated: "bmgt435/api/cases/paginated",
     run:"bmgt435/api/cases/run",
     submit:"bmgt435/api/cases/submit",
-    caseRecords: "bmgt435/api/case-records",
-    caseRecordsPaginated: "bmgt435/api/case-records/paginated",
+  },
+
+  caseRecords: {
+    get: "bmgt435/api/case-records/get",
+    paginated: "bmgt435/api/case-records/paginated",
   },
 
   manage: {

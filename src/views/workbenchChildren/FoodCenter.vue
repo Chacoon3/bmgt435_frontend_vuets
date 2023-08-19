@@ -2,13 +2,14 @@
 import { reactive, ref } from 'vue';
 import TextSection from '@/components/textual/TextSection.vue'
 import CenterConfigPanel from './CenterConfigPanel.vue';
-import { type FoodcenterCenterState, useFoodcenter } from '@/utils/caseUtils'
+import { type FoodcenterCenterState, type SubmissionResult, type FoodCenterSummary,  useFoodcenter } from '@/utils/caseUtils'
 import { type AxiosResponse } from 'axios';
 import InLineMsg from '@/components/InLineMsg.vue';
-import FoodcenterResult from './FoodcenterResult.vue';
+import FoodcenterResultPanel from './FoodcenterResultPanel.vue';
 
 
 const inlineMsgState = reactive({ show: false, content: '', });
+const fcResult = ref<SubmissionResult<FoodCenterSummary> | null>(null);
 const showBrief = ref<boolean>(true);
 const paramState = ref<FoodcenterCenterState[]>(
     Array.from([1, 2, 3, 4, 5, 6],
@@ -26,14 +27,13 @@ function handleSubmit() {
     submitFoodCenter(paramState.value, (resp: AxiosResponse) => {
         resultState.value = resp.status === 200
         if (resp.status !== 200) {
-            //
             inlineMsgState.content = resp.data ?? "Failed to submit simulation!";
             inlineMsgState.show = true;
         }
         else {
-            // submission success logic
             inlineMsgState.content = "Simulation submitted successfully!";
             inlineMsgState.show = true;
+            fcResult.value = resp.data;
         }
     });
 }
@@ -139,11 +139,10 @@ function handleSubmit() {
             </button>
         </div>
 
-        <h2>Simulation</h2>
+        <h2>Simulation Result</h2>
         <hr>
-        <FoodcenterResult v-if="resultState === true"></FoodcenterResult>
+        <FoodcenterResultPanel :result="fcResult" :caseRecordId="1"></FoodcenterResultPanel>
         
-
     </div>
 </template>
 

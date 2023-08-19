@@ -47,7 +47,7 @@ getCases();
 <style scoped>
 #workbenchContainer {
     text-align: center;
-    padding-right: var(--width-whitespace-right);  /* white space for mudule page at the right side */
+    padding-right: var(--width-whitespace-right);
 }
 
 .normalButton {

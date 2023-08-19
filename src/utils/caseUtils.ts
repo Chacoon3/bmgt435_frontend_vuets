@@ -52,7 +52,7 @@ export function useFoodcenter() {
   ) {
     isSubmitting.value = true;
 
-    httpPost<FoodcenterResult>(
+    httpPost<CaseSubmissionParams<FoodcenterParams>>(
       endpoints.cases.submit,
       convertUserInput(userInput),
       (resp: AxiosResponse) => {
@@ -67,7 +67,7 @@ export function useFoodcenter() {
 }
 
 export function useCumulatedCases() {
-  return useCachedCumulatedGet<Case>(endpoints.cases.casesPaginated);
+  return useCachedCumulatedGet<Case>(endpoints.cases.paginated);
 }
 
 export type FoodcenterParams = {
@@ -87,4 +87,16 @@ export type CaseSubmissionParams<CaseParams> = {
   case_params: CaseParams;
 };
 
-export type FoodcenterResult = {};
+export type FoodCenterSummary = {
+  perf_metric: number;
+  total_revenue: number;
+  total_shortage_count: number;
+  total_shortage_amount: number;
+  total_holding_cost: number;
+  total_fixed_cost: number;
+}
+
+export type SubmissionResult<TSummary> = {
+  case_record_id: number;
+  summary:TSummary;
+};

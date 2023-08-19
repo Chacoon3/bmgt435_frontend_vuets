@@ -20,7 +20,7 @@ const userTableState = computed<TableConfig>(():TableConfig => {
                 value: user.did,
             }, {
                 type:"text",
-                value: user.group_name ?? "No roup",
+                value: user.group_name ?? "",
             }, {
                 type:"text",
                 value: user.role,

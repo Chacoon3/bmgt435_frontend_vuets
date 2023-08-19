@@ -27,6 +27,8 @@ function handleClick() {
     position: fixed;
     bottom: 10px;
     right: 10px;
+    padding: 0;
+    margin: 0;
 }
 
 .feedbackButton{
@@ -42,6 +44,7 @@ function handleClick() {
     margin: 0;
     padding: 10px;
     background-color: var(--color-red-umd);
+    box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.8);
 }
 
 .feedbackImg:hover {

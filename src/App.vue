@@ -94,7 +94,7 @@ watch(currentUser, (user) => {
         <!-- </KeepAlive> -->
       </div>
     </div>
-    <FeedbackIcon></FeedbackIcon>
+    <FeedbackIcon v-if="router.currentRoute.value.meta.requireAuth === true"></FeedbackIcon>
     <ModalBox v-for="(modal, index) in getModalStack" :key="index" :modal-config="modal"></ModalBox>
   </body>
 </template>

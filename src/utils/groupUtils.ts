@@ -49,7 +49,7 @@ export function useCurrentGroup() {
 }
 
 export function useCachedPaginatedGroups() {
-  const { isLoading, data, getData, clearCache} = useCachedPaginatedGet<Group[]>(endpoints.groups.groupsPaginated);
+  const { isLoading, data, getData, clearCache} = useCachedPaginatedGet<Group[]>(endpoints.groups.paginated);
   watch(currentGroup, () => {
     clearCache();
     getData();
@@ -59,7 +59,7 @@ export function useCachedPaginatedGroups() {
 }
 
 export function useCachedCumulatedGroups() {
-  const { isLoading, data, getData, clearCache } = useCachedCumulatedGet<Group>(endpoints.groups.groupsPaginated);
+  const { isLoading, data, getData, clearCache } = useCachedCumulatedGet<Group>(endpoints.groups.paginated);
   watch(currentGroup, () => {
     clearCache();
     getData();
@@ -79,7 +79,7 @@ export function useCreateGroup() {
           currentUser.value.group_id = resp.data.id;
         }
         currentGroup.value = resp.data;
-        clearCacheByEndpoint(endpoints.groups.groupsPaginated);
+        clearCacheByEndpoint(endpoints.groups.paginated);
       } else {
         currentGroup.value = null;
       }
@@ -101,7 +101,7 @@ export function useJoinGroup() {
           currentUser.value.group_id = resp.data.id;
         }
         currentGroup.value = resp.data;
-        clearCacheByEndpoint(endpoints.groups.groupsPaginated);
+        clearCacheByEndpoint(endpoints.groups.paginated);
       }
       callback?.(resp);
     });
@@ -121,7 +121,7 @@ export function useLeaveGroup() {
           currentUser.value.group_id = null;
         }
         currentGroup.value = null;
-        clearCacheByEndpoint(endpoints.groups.groupsPaginated);
+        clearCacheByEndpoint(endpoints.groups.paginated);
       }
       callback?.(resp);
     });

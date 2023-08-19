@@ -20,6 +20,8 @@ export type Case = {
 export type CaseRecord = {
   id: number;
   create_time: string;
+  user_id: number;
+  user_name: string;
   case_id: number;
   case_name: string;
   group_id: number;

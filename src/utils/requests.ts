@@ -1,5 +1,5 @@
 import useErrorUtil from "./errorUtils";
-import axios, { AxiosError, type AxiosResponse } from "axios";
+import axios, { type AxiosError, type AxiosResponse } from "axios";
 import { type Ref, type UnwrapRef, ref, watch, reactive } from "vue";
 import { useCache } from "./cacheUtils";
 
@@ -25,7 +25,7 @@ function triggerRequestError<T>(
   console.log("logger ends -- -- -- -- -- -- -- --");
 }
 
-export function httpGet(url: string, params: any, onCompleted: any): void {
+export function httpGet(url: string,  params:any, onCompleted: any): void {
   try {
     axios
       .get(url, { params: params })
@@ -51,6 +51,23 @@ export function cachedHttpGet(endpoint: string, params: any, onCompleted: any): 
           onCompleted?.(resp);
         })
         .catch((err: AxiosError) => triggerRequestError(err, endpoint, params));
+    }
+  } catch (err: any) {
+    triggerRequestError(err, endpoint, params);
+  }
+}
+
+export function cachedHttpDownload(endpoint:string, params:any, onCompleted:any) {
+  try {
+    const key = createKey(params);
+    const cachedResp = get(endpoint, key);
+    if (cachedResp) {
+      onCompleted(cachedResp);
+    } else {
+    axios
+      .get(endpoint, { params: params, responseType: "stream" })
+      .then(onCompleted)
+      .catch((err: AxiosError) => triggerRequestError(err, endpoint, params));
     }
   } catch (err: any) {
     triggerRequestError(err, endpoint, params);

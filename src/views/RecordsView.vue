@@ -17,7 +17,7 @@ const viewMoreButtonText = computed(() => {
 const { data: records, isLoading, clearCache: clearCachedRecords, getData: getRecords, hasMore: hasMoreRecords } = useCumulatedCaseRecords()
 const recordTableConfig = computed<TableConfig>(() => {
     return {
-        headers: ["Case Name",  "Time", "Score"],
+        headers: ["Case Name", "Submitted by", "Time", "Score"],
         rows: Array.from(records.value, (record) => {
             return toTableRow(record);
         })
@@ -30,6 +30,10 @@ function toTableRow(record: CaseRecord): TableItemConfig[] {
         {
             type: "text",
             value: record.case_name,
+        },
+        {
+            type: "text",
+            value: record.user_name,
         },
         {
             type: "text",
@@ -48,10 +52,12 @@ function toTableRow(record: CaseRecord): TableItemConfig[] {
         <div v-if="isLoading === true && records.length === 0">Fetching Data..</div>
         <div v-else-if="records.length > 0">
 
-            <TableView :title="recordTableConfig.title" :headers="recordTableConfig.headers" :rows="recordTableConfig.rows" />
+            <TableView :title="recordTableConfig.title" :headers="recordTableConfig.headers"
+                :rows="recordTableConfig.rows" />
             <div>
-                <button class="normalButton" @click="getRecords()" :disabled="hasMoreRecords === false || isLoading === true">
-                {{ viewMoreButtonText }}
+                <button class="normalButton" @click="getRecords()"
+                    :disabled="hasMoreRecords === false || isLoading === true">
+                    {{ viewMoreButtonText }}
                 </button>
             </div>
         </div>
