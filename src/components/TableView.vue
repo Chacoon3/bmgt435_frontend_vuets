@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type TableConfig } from './types';
 
-defineProps<TableConfig>();
+defineProps<{tableConfig:TableConfig}>();
 defineEmits<{
     (event:"clickItem", eventKey: string): void
 }>();
@@ -9,14 +9,14 @@ defineEmits<{
 
 <template>
     <table class="tableViewContainer">
-        <div class="tableViewTitle" v-if="$props.title">
-            {{ $props.title }}
+        <div class="tableViewTitle" v-if="tableConfig.title">
+            {{ tableConfig.title }}
         </div>
         <tbody class="tableViewBody">
-            <tr class="tableViewRow" v-if="$props.headers">
-                <th class="tableViewHead" v-for="(item, index) in $props.headers" :key="index">{{ item }}</th>
+            <tr class="tableViewRow" v-if="tableConfig.headers">
+                <th class="tableViewHead" v-for="(item, index) in tableConfig.headers" :key="index">{{ item }}</th>
             </tr>
-            <tr class="tableViewRow" v-for="(row, rowIndex) in $props.rows" :key="rowIndex">
+            <tr class="tableViewRow" v-for="(row, rowIndex) in tableConfig.rows" :key="rowIndex">
                 <td class="tableViewData" v-for="(rowItem, valIndex) in row" :key="valIndex">
                     <span v-if="rowItem.type === 'text'">{{ rowItem.value }}</span>
                     <button v-else-if="rowItem.type === 'button'" class="normalButton" @click="$emit('clickItem', rowItem.eventKey ?? rowItem.value)">{{ rowItem.value }}</button>                

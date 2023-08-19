@@ -38,7 +38,7 @@ const userTableState = computed<TableConfig>(():TableConfig => {
         <div>
             <div v-if="isLoadingUsers === true">Fetching Data...</div>
             <div v-else-if="users && users.length > 0">
-                <TableView :title="userTableState.title" :headers="userTableState.headers" :rows="userTableState.rows">
+                <TableView :table-config="userTableState">
                 </TableView>
                 <button class="normalButton" @click="getUsers" :disabled="hasMore === false">{{ hasMore ? "View more": "No more records"}}</button>
             </div>

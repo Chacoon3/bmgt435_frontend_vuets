@@ -52,8 +52,7 @@ function toTableRow(record: CaseRecord): TableItemConfig[] {
         <div v-if="isLoading === true && records.length === 0">Fetching Data..</div>
         <div v-else-if="records.length > 0">
 
-            <TableView :title="recordTableConfig.title" :headers="recordTableConfig.headers"
-                :rows="recordTableConfig.rows" />
+            <TableView :table-config="recordTableConfig" />
             <div>
                 <button class="normalButton" @click="getRecords()"
                     :disabled="hasMoreRecords === false || isLoading === true">

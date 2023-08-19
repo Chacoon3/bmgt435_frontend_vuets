@@ -17,7 +17,10 @@ function triggerRequestError<T>(
   endpoint: string,
   dataOrParams: T
 ) {
-  setErrorContext(error, ` A request has failed with error: ${error.response?.data}`);
+  setErrorContext(
+    error,
+    ` A request has failed with error: ${error.response?.data}`
+  );
   console.log(
     `Request to ${endpoint} failed with error: ${error.message ?? error}`
   );
@@ -25,7 +28,7 @@ function triggerRequestError<T>(
   console.log("logger ends -- -- -- -- -- -- -- --");
 }
 
-export function httpGet(url: string,  params:any, onCompleted: any): void {
+export function httpGet(url: string, params: any, onCompleted: any): void {
   try {
     axios
       .get(url, { params: params })
@@ -36,8 +39,18 @@ export function httpGet(url: string,  params:any, onCompleted: any): void {
   }
 }
 
-export const { get, set, createKey, clearCacheByEndpoint: clearCacheByEndpoint, clearAllCache } = useCache<AxiosResponse>();
-export function cachedHttpGet(endpoint: string, params: any, onCompleted: any): void {
+export const {
+  get,
+  set,
+  createKey,
+  clearCacheByEndpoint: clearCacheByEndpoint,
+  clearAllCache,
+} = useCache<AxiosResponse>();
+export function cachedHttpGet(
+  endpoint: string,
+  params: any,
+  onCompleted: any
+): void {
   try {
     const key = createKey(params);
     const cachedResp = get(endpoint, key);
@@ -57,18 +70,12 @@ export function cachedHttpGet(endpoint: string, params: any, onCompleted: any): 
   }
 }
 
-export function cachedHttpDownload(endpoint:string, params:any, onCompleted:any) {
+export function httpDownload(endpoint: string, params: any, onCompleted: any) {
   try {
-    const key = createKey(params);
-    const cachedResp = get(endpoint, key);
-    if (cachedResp) {
-      onCompleted(cachedResp);
-    } else {
     axios
-      .get(endpoint, { params: params, responseType: "stream" })
+      .get(endpoint, { params: params, responseType: "arraybuffer" })
       .then(onCompleted)
       .catch((err: AxiosError) => triggerRequestError(err, endpoint, params));
-    }
   } catch (err: any) {
     triggerRequestError(err, endpoint, params);
   }
@@ -125,7 +132,7 @@ export function usePaginatedGet<TData>(endpoint: string) {
 
   const isLoading = ref<boolean>(false);
 
-  const data = ref<PaginatedResponse<TData> | null>(null);
+  const data = ref<PaginatedData<TData> | null>(null);
 
   function fetchData(params: any = pagerParams) {
     isLoading.value = true;
@@ -161,7 +168,7 @@ export function useCachedPaginatedGet<TData>(endpoint: string) {
 
   const isLoading = ref<boolean>(false);
 
-  const data = ref<PaginatedResponse<TData> | null>(null);
+  const data = ref<PaginatedData<TData> | null>(null);
 
   function getData(params: any = pagerParams) {
     if (isLoading.value === true) {
@@ -185,14 +192,20 @@ export function useCachedPaginatedGet<TData>(endpoint: string) {
 
   watch<PaginatedParams>(pagerParams, getData, { deep: true });
 
-  return { isLoading, data, pagerParams, getData, clearCache: () => clearCacheByEndpoint(endpoint) };
+  return {
+    isLoading,
+    data,
+    pagerParams,
+    getData,
+    clearCache: () => clearCacheByEndpoint(endpoint),
+  };
 }
-
 
 export function useCachedCumulatedGet<TData>(
   endpoint: string,
   batchSize: number = 5,
-  order?: string
+  orderBy?: string,
+  asc: 1 | 0 = 1
 ) {
   const isLoading = ref<boolean>(false);
   const data = ref<TData[]>([]) as Ref<TData[]>;
@@ -200,8 +213,8 @@ export function useCachedCumulatedGet<TData>(
   const pagerParams: PaginatedParams = {
     page: 0,
     size: batchSize,
-    asc: 1,
-    order: order ?? "id",
+    asc: asc,
+    order: orderBy ?? "id",
   };
 
   function getData() {
@@ -219,10 +232,10 @@ export function useCachedCumulatedGet<TData>(
         asc: pagerParams.asc,
         order: pagerParams.order,
       },
-      (resp: AxiosResponse<PaginatedResponse<TData[]>>) => {
+      (resp: AxiosResponse<PaginatedData<TData[]>>) => {
         isLoading.value = false;
         if (resp.status === 200) {
-          data.value= data.value.concat(resp.data.data);
+          data.value = data.value.concat(resp.data.data);
           hasMore.value = resp.data.page < resp.data.totalPage;
         } else {
           pagerParams.page--;
@@ -232,7 +245,13 @@ export function useCachedCumulatedGet<TData>(
     );
   }
 
-  return { isLoading, data, getData, hasMore, clearCache: () => clearCacheByEndpoint(endpoint) };
+  return {
+    isLoading,
+    data,
+    getData,
+    hasMore,
+    clearCache: () => clearCacheByEndpoint(endpoint),
+  };
 }
 
 export type PaginatedParams = {
@@ -242,7 +261,7 @@ export type PaginatedParams = {
   order: string | "id";
 };
 
-export type PaginatedResponse<TData> = {
+export type PaginatedData<TData> = {
   data: TData;
   page: number;
   totalPage: number;

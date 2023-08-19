@@ -37,8 +37,13 @@ export const endpoints = {
   },
 
   caseRecords: {
-    get: "bmgt435/api/case-records/get",
+    getRecord: "bmgt435/api/case-records/get",
+    getFile: "bmgt435/api/case-records/file/get",
     paginated: "bmgt435/api/case-records/paginated",
+  },
+
+  leaderboard: {
+    paginated:"bmgt435/api/leader-board/paginated",
   },
 
   manage: {
