@@ -18,8 +18,9 @@ defineEmits<{
             </tr>
             <tr class="tableViewRow" v-for="(row, rowIndex) in tableConfig.rows" :key="rowIndex">
                 <td class="tableViewData" v-for="(rowItem, valIndex) in row" :key="valIndex">
-                    <span v-if="rowItem.type === 'text'">{{ rowItem.value }}</span>
-                    <button v-else-if="rowItem.type === 'button'" class="normalButton" @click="$emit('clickItem', rowItem.eventKey ?? rowItem.value)">{{ rowItem.value }}</button>                
+                    <span v-if="rowItem.elementType === 'text'">{{ rowItem.value }}</span>
+                    <button v-else-if="rowItem.elementType === 'button'" :class="rowItem.elementClass ?? 'normalButton'" @click="rowItem.onClick">{{ rowItem.value }}</button>
+                    <a v-else-if="rowItem.elementType == 'a'" :href="rowItem.href">{{ rowItem.value }}</a>         
                 </td>
             </tr>
         </tbody>

@@ -29,15 +29,15 @@ getLeaderBoard();
 function toTableRow(record: CaseRecord): TableItemConfig[] {
     return [
         {
-            type: 'text',
+            elementType: 'text',
             value: record.group_name,
         },
         {
-            type: "text",
+            elementType: "text",
             value: record.create_time,
         },
         {
-            type: "text",
+            elementType: "text",
             value: record.score?.toString() ?? "N/A",
         },
     ]

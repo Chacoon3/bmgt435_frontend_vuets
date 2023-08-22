@@ -46,7 +46,7 @@ function handleLeaveGroup() {
     <div id="groupViewContainer">
 
         <div v-if="isCurrentGroupLoading" class="groupDiv">
-            <h2 class="groupDivH2">Loading Data...</h2>
+            <h2 class="groupDivH2">Fetching Data...</h2>
         </div>
 
         <div v-else-if="currentGroup === null" class="groupDiv">

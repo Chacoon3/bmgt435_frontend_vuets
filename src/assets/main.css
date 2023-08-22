@@ -185,6 +185,21 @@ input[type=file] {
   background: var(--color-red-umd-light)
 }
 
+.aLikeButton {
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  cursor: pointer;
+  font-size: 15px;
+  text-decoration: underline; /* Simulate underlined link text */
+  color: var(--color-red-umd); /* Change text color to match link color */
+}
+
+.aLikeButton:hover {
+  color: var(--color-red-umd-dark);
+}
+
+
 h1{
   font-weight: 600;
 }

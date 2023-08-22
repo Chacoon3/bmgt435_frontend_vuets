@@ -9,10 +9,13 @@ import { type NavigationConfig } from './components/types';
 import FeedbackIcon from './components/FeedbackIcon.vue';
 import { useModal } from './utils/modalUtils';
 import ModalBox from './components/ModalBox.vue';
+import { useProgressBox } from './utils/progressBoxUtils';
+import ProgressBox from './components/ProgressBox.vue';
 
 const { currentUser, isAdmin } = useCurrentUser()
 const moduleTitle = ref<string>('')
 const { getModalStack } = useModal();
+const { getitemStack: getProgBoxStack } = useProgressBox();
 function setModuleTitle(newVal: any, oldVal: any) {
   if (newVal !== oldVal) {
     switch (newVal.name?.toString()) {
@@ -96,5 +99,6 @@ watch(currentUser, (user) => {
     </div>
     <FeedbackIcon v-if="router.currentRoute.value.meta.requireAuth === true"></FeedbackIcon>
     <ModalBox v-for="(modal, index) in getModalStack" :key="index" :modal-config="modal"></ModalBox>
+    <ProgressBox v-for="(progBox, index) in getProgBoxStack" :key="index" :config="progBox"></ProgressBox>
   </body>
 </template>

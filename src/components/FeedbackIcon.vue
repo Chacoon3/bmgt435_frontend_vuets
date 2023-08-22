@@ -50,4 +50,15 @@ function handleClick() {
 .feedbackImg:hover {
     background-color: var(--color-red-umd-dark);
 }
+
+.feedbackDiv:hover::after {
+  content: "feedback";
+  position: absolute;
+  left: 0;
+  top:-5px;
+  transform: translate(-0px, -100%);
+  background-color:beige;
+  color: black;
+  padding: 5px 5px;
+}
 </style>
