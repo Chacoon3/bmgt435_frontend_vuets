@@ -13,16 +13,17 @@ const userTableState = computed<TableConfig>(():TableConfig => {
         headers: ["Name", "Directory ID", "Group", "Role"],
         rows: users.value.map((user) => {
             return [{
-                type:"text",
+                elementType:"text",
                 value: formatUserName(user),
+                
             }, {
-                type:"text",
+                elementType:"text",
                 value: user.did,
             }, {
-                type:"text",
+                elementType:"text",
                 value: user.group_name ?? "",
             }, {
-                type:"text",
+                elementType:"text",
                 value: user.role,
             }];
         }

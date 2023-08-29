@@ -1,6 +1,6 @@
 import useErrorUtil from "./errorUtils";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
-import { type Ref, type UnwrapRef, ref, watch, reactive } from "vue";
+import { type Ref, ref, watch, reactive } from "vue";
 import { useCache } from "./cacheUtils";
 
 const server = "http://127.0.0.1:8000/";
@@ -21,11 +21,11 @@ function triggerRequestError<T>(
     error,
     ` A request has failed with error: ${error.response?.data}`
   );
-  console.log(
-    `Request to ${endpoint} failed with error: ${error.message ?? error}`
-  );
-  console.log(dataOrParams);
-  console.log("logger ends -- -- -- -- -- -- -- --");
+  // console.log(
+  //   `Request to ${endpoint} failed with error: ${error.message ?? error}`
+  // );
+  // console.log(dataOrParams);
+  // console.log("logger ends -- -- -- -- -- -- -- --");
 }
 
 export function httpGet(url: string, params: any, onCompleted: any): void {
@@ -267,14 +267,14 @@ export type PaginatedData<TData> = {
   totalPage: number;
 };
 
-export type GetDataResult<TData> = {
-  isLoading: Ref<boolean>;
-  data: Ref<UnwrapRef<TData> | null>;
-  httpGetter: (params: any, callback: any) => void;
-};
+// export type GetDataResult<TData> = {
+//   isLoading: Ref<boolean>;
+//   data: Ref<UnwrapRef<TData> | null>;
+//   httpGetter: (params: any, callback: any) => void;
+// };
 
-export type PostDataResult<TPost> = {
-  isLoading: Ref<boolean>;
-  response: Ref<AxiosResponse | null>;
-  httpPoster: (data: TPost, callback: any) => void;
-};
+// export type PostDataResult<TPost> = {
+//   isLoading: Ref<boolean>;
+//   response: Ref<AxiosResponse | null>;
+//   httpPoster: (data: TPost, callback: any) => void;
+// };

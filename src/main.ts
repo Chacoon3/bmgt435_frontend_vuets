@@ -30,6 +30,7 @@ app.mount("#app");
 router.push({ name: routePaths.loading });
 
 getCurrentUser((resp:any) => {
+  console.log(resp);
     if (resp.status === 200 && currentUser.value !== null) {
         router.push({ name: routePaths.workbench });
     }
@@ -37,5 +38,3 @@ getCurrentUser((resp:any) => {
         router.push({ name: routePaths.portal });
     }
 })
-
-document.title = "BMGT435 ELP";
