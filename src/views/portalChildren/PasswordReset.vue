@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 import InLineMsg from '@/components/InLineMsg.vue';
-import { InLineMsgConfig } from '@/components/types';
+import type { InLineMsgConfig } from '@/components/types';
 
 
 const inlineMsgState = reactive<InLineMsgConfig>({ show: false, content: "" });

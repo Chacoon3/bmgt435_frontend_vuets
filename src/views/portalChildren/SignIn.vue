@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { SignInForm, useSignIn } from '../../utils/userUtils';
+import {type SignInForm, useSignIn } from '../../utils/userUtils';
 import InLineMsg from '@/components/InLineMsg.vue';
 import router, {routePaths} from '@/router';
 import { validateText } from '@/utils/formUtils'

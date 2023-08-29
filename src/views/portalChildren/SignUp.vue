@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSignUp, SignUpForm } from '../../utils/userUtils';
+import { useSignUp, type SignUpForm } from '../../utils/userUtils';
 import { computed, reactive, ref } from 'vue';
 import InLineMsg from '@/components/InLineMsg.vue';
 import { type InLineMsgConfig } from '@/components/types';
