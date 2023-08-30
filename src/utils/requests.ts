@@ -3,7 +3,8 @@ import axios, { type AxiosError, type AxiosResponse } from "axios";
 import { type Ref, ref, watch, reactive } from "vue";
 import { useCache } from "./cacheUtils";
 
-const server = "http://127.0.0.1:8000/";
+
+const server = "http://localhost:8000/";
 axios.defaults.headers["Content-Type"] = "text/plain";
 axios.defaults.baseURL = server;
 axios.defaults.withCredentials = true;

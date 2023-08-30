@@ -29,12 +29,11 @@ app.mount("#app");
 
 router.push({ name: routePaths.loading });
 
-getCurrentUser((resp:any) => {
+getCurrentUser((resp: any) => {
   console.log(resp);
-    if (resp.status === 200 && currentUser.value !== null) {
-        router.push({ name: routePaths.workbench });
-    }
-    else{
-        router.push({ name: routePaths.portal });
-    }
-})
+  if (resp.status === 200 && currentUser.value !== null) {
+    router.push({ name: routePaths.workbench });
+  } else {
+    router.push({ name: routePaths.portal });
+  }
+});
