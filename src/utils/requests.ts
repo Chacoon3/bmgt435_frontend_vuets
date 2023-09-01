@@ -4,9 +4,11 @@ import { type Ref, ref, watch, reactive } from "vue";
 import { useCache } from "./cacheUtils";
 
 
-const server = "http://localhost:8000/";
+// const server = "http://localhost:8080/";
+// const server = import.meta.env["BMGT435_SERVICE"]
 axios.defaults.headers["Content-Type"] = "text/plain";
-axios.defaults.baseURL = server;
+axios.defaults.headers["Connection"] = "keep-alive";
+axios.defaults.baseURL = "/";
 axios.defaults.withCredentials = true;
 axios.defaults.validateStatus = (status) => status < 500;
 axios.defaults.timeout = 10000;
@@ -20,8 +22,9 @@ function triggerRequestError<T>(
 ) {
   setErrorContext(
     error,
-    ` A request has failed with error: ${error.response?.data}`
+    ` A request to server has failed with error. ${error.status ?? "", " ", error.message ?? ""}`
   );
+
   // console.log(
   //   `Request to ${endpoint} failed with error: ${error.message ?? error}`
   // );
