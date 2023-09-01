@@ -1,84 +1,104 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { watch, ref } from 'vue';
+import { RouterView } from 'vue-router'
+import router, { routePaths } from './router';
+import { useCurrentUser, formatUserName } from './utils/userUtils';
+import CustomTitle from './components/CustomTitle.vue';
+import NavigationBar from '@/components/NavigationBar.vue'
+import { type NavigationConfig } from './components/types';
+import FeedbackIcon from './components/FeedbackIcon.vue';
+import { useModal } from './utils/modalUtils';
+import ModalBox from './components/ModalBox.vue';
+import { useProgressBox } from './utils/progressBoxUtils';
+import ProgressBox from './components/ProgressBox.vue';
 
+const { currentUser, isAdmin } = useCurrentUser()
+const moduleTitle = ref<string>('')
+const { getModalStack } = useModal();
+const { getitemStack: getProgBoxStack } = useProgressBox();
+function setModuleTitle(newVal: any, oldVal: any) {
+  if (newVal !== oldVal) {
+    switch (newVal.name?.toString()) {
+      case 'workbench':
+        moduleTitle.value = `Welcome, ${formatUserName(currentUser.value)}!`
+        break;
+      case 'groups':
+        moduleTitle.value = 'Groups'
+        break;
+      case 'records':
+        moduleTitle.value = 'Case Records'
+        break;
+      case 'leader-board':
+        moduleTitle.value = 'Leader Board'
+        break;
+      case 'manage':
+        moduleTitle.value = 'Manage'
+        break;
+      case 'portal':
+        moduleTitle.value = 'Portal'
+        break;
+      default:
+        moduleTitle.value = ''
+        break;
+    }
+  }
+}
+
+watch(router.currentRoute, setModuleTitle, { immediate: true })
+
+const naviItemsBase: NavigationConfig = {
+  items: [
+    { url: routePaths.workbench, imgSource: '/icons/navigationBar/workbench.svg', text: 'Workbench' },
+    { url: routePaths.grouping, imgSource: '/icons/navigationBar/groups.svg', text: 'Groups' },
+    { url: routePaths.records, imgSource: '/icons/navigationBar/records.svg', text: 'Case Records' },
+    { url: routePaths.leaderBoard, imgSource: '/icons/navigationBar/leaderBoard.svg', text: 'Leader  Board' },
+  ]
+}
+const navigationItemAdmin: NavigationConfig = {
+  items: [
+    { url: routePaths.workbench, imgSource: '/icons/navigationBar/workbench.svg', text: 'Workbench' },
+    { url: routePaths.grouping, imgSource: '/icons/navigationBar/groups.svg', text: 'Groups' },
+    { url: routePaths.records, imgSource: '/icons/navigationBar/records.svg', text: 'Case Records' },
+    { url: routePaths.leaderBoard, imgSource: '/icons/navigationBar/leaderBoard.svg', text: 'Leader  Board' },
+    { url: routePaths.manage, imgSource: '/icons/navigationBar/manage.svg', text: 'Manage' },]
+}
+const naviItems = ref<NavigationConfig>(naviItemsBase);
+
+watch(currentUser, (user) => {
+  if (user !== null) {
+    if (isAdmin() === true) {
+      naviItems.value = navigationItemAdmin;
+    }
+    else {
+      naviItems.value = naviItemsBase
+    }
+  }
+  else {
+    naviItems.value = naviItemsBase;
+  }
+}, { immediate: true });
 </script>
 
 <template>
-  <!-- <header>
+  <body id="appContainer">
+    <KeepAlive>
+      <NavigationBar v-if="router.currentRoute.value.meta.requireAuth === true" :items="naviItems.items"></NavigationBar>
+    </KeepAlive>
 
-  </header> -->
+    <div id="moduleContainer">
 
-  <body>
-    <RouterView />
+      <div id="moduleTitle" v-if="router.currentRoute.value.meta.requireAuth === true">
+        <CustomTitle :title="moduleTitle"></CustomTitle>
+      </div>
 
-    <!-- <p v-if="reactiveFetchUsersResult.isLoading">Loading Data ...</p>
-    <p v-else> {{ reactiveFetchUsersResult.data[0].id }}</p> -->
-
+      <div id="moduleContent">
+        <!-- <KeepAlive> -->
+          <RouterView />
+        <!-- </KeepAlive> -->
+      </div>
+    </div>
+    <FeedbackIcon v-if="router.currentRoute.value.meta.requireAuth === true"></FeedbackIcon>
+    <ModalBox v-for="(modal, index) in getModalStack" :key="index" :modal-config="modal"></ModalBox>
+    <ProgressBox v-for="(progBox, index) in getProgBoxStack" :key="index" :config="progBox"></ProgressBox>
   </body>
-
-
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-</style>

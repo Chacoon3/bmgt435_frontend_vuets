@@ -1,24 +1,109 @@
 import { endpoints } from "./apis";
-import { useGet, usePost, type GetDataResult, type PostDataResult} from "./requests";
-import { type User } from "../ormTypes";
-import { ref } from "vue";
+import { httpPost, cachedHttpGet, clearCacheByEndpoint, clearAllCache } from "./requests";
+import { type User } from "./backendTypes";
+import { type AxiosResponse } from "axios";
+import { ref, watch } from "vue";
 
+const isCurrentUserLoading = ref<boolean>(false);
+const currentUser = ref<User | null>(null);
 
-export function getUsers(params: any = null, onCompleted: any = null): GetDataResult<User[]> {
-  return useGet<User[]>(endpoints.users, params, onCompleted);
+watch(currentUser, (newUser) => {
+  if (newUser === null) {
+    clearAllCache();
+  }
+}, { immediate: true });
+
+function getCurrentUser(callback?: (resp: AxiosResponse) => void) {
+  isCurrentUserLoading.value = true;
+  cachedHttpGet(endpoints.users.me, null, (resp: AxiosResponse) => {
+    isCurrentUserLoading.value = false;
+    if (resp.status === 200) {
+      currentUser.value = resp.data;
+    } else {
+      currentUser.value = null;
+    }
+    callback?.(resp);
+  });
 }
 
-export function signIn(data: SignInForm, onCompleted: any = null): PostDataResult<SignInForm> {
-  return usePost<SignInForm>(endpoints.signIn, data, onCompleted);
+function setCurrentUser(user: User) {
+  currentUser.value = user;
 }
 
-export function signUp(data: SignUpForm, onCompleted: any = null): PostDataResult<SignUpForm> {
-  return usePost<SignUpForm>(endpoints.signUp, data, onCompleted);
+function isAdmin() {
+  if (currentUser.value === null) {
+    return false;
+  } else {
+    return currentUser.value.role === "admin";
+  }
+}
+
+export function useCurrentUser() {
+  return {
+    isCurrentUserLoading,
+    currentUser,
+    getCurrentUser,
+    setCurrentUser,
+    isAdmin,
+    clearUserCache: () => clearCacheByEndpoint(endpoints.users.me),
+  };
+}
+
+export function useSignIn() {
+  const isLoading = ref<boolean>(false);
+  function signIn(data: SignInForm, callback?: (resp: AxiosResponse) => void) {
+    isLoading.value = true;
+    httpPost<SignInForm>(endpoints.auth.signIn, data, (resp: AxiosResponse) => {
+      isLoading.value = false;
+      setCurrentUser(resp.data);
+      callback?.(resp);
+    });
+  }
+  return { isLoading, signIn };
+}
+
+export function useSignUp() {
+  const isLoading = ref<boolean>(false);
+  function signUp(data: SignUpForm, callback?: (resp: AxiosResponse) => void) {
+    isLoading.value = true;
+    httpPost<SignUpForm>(endpoints.auth.signUp, data, (resp: AxiosResponse) => {
+      isLoading.value = false;
+      callback?.(resp);
+    });
+  }
+  return { isLoading, signUp };
+}
+
+export function useSignOut() {
+  const isLoading = ref<boolean>(false);
+  function signOut(callback?: (resp: AxiosResponse) => void) {
+    currentUser.value = null;
+    isLoading.value = true;
+    httpPost(endpoints.auth.signOut, null, (resp: AxiosResponse) => {
+      isLoading.value = false;
+      callback?.(resp);
+    });
+  }
+  return { isLoading, signOut };
+}
+
+export function formatUserName(user: User | null) {
+  if (!user) {
+    return "Anonymous";
+  } else if (user.first_name && user.last_name) {
+    return `${user.first_name} ${user.last_name}`;
+  } else if (user.first_name) {
+    return user.first_name;
+  } else if (user.last_name) {
+    return user.last_name;
+  } else {
+    return "Anonymous";
+  }
 }
 
 export type SignInForm = {
   did: string;
   password: string;
-}
+};
 
-export type SignUpForm = SignInForm
+export type SignUpForm = SignInForm;
