@@ -8,6 +8,7 @@ import { useCache } from "./cacheUtils";
 // const server = import.meta.env["BMGT435_SERVICE"]
 axios.defaults.headers["Content-Type"] = "text/plain";
 axios.defaults.headers["Connection"] = "keep-alive";
+
 axios.defaults.baseURL = "https://chaconn3.me/"
 axios.defaults.withCredentials = true;
 axios.defaults.validateStatus = (status) => status < 500;
