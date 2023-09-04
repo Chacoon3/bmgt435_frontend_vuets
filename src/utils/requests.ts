@@ -4,8 +4,8 @@ import { type Ref, ref, watch, reactive } from "vue";
 import { useCache } from "./cacheUtils";
 
 
-
-axios.defaults.headers["Content-Type"] = "text/plain";
+axios.defaults.xsrfCookieName = "csrftoken";
+// axios.defaults.headers["Content-Type"] = "text/plain";
 axios.defaults.baseURL = "https://chaconn3.me/"
 axios.defaults.withCredentials = true;
 axios.defaults.validateStatus = (status) => status < 500;
