@@ -4,11 +4,8 @@ import { type Ref, ref, watch, reactive } from "vue";
 import { useCache } from "./cacheUtils";
 
 
-// const server = "http://localhost:8080/";
-// const server = import.meta.env["BMGT435_SERVICE"]
-axios.defaults.headers["Content-Type"] = "text/plain";
-axios.defaults.headers["Connection"] = "keep-alive";
 
+axios.defaults.headers["Content-Type"] = "text/plain";
 axios.defaults.baseURL = "https://chaconn3.me/"
 axios.defaults.withCredentials = true;
 axios.defaults.validateStatus = (status) => status < 500;
