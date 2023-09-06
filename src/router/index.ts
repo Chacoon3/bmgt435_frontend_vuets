@@ -1,86 +1,86 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from "vue-router";
 
 export const routePaths = {
-  signIn: 'sign-in',
-  signUp: 'sign-up',
-  forgetPassword: 'forget-password',
-  workbench: 'workbench',
-  grouping:'grouping',
-  leaderBoard:'leader-board',
-  management:'management',
+  loading: "loading",
+  portal: "portal",
+  workbench: "workbench",
+  grouping: "groups",
+  leaderBoard: "leader-board",
+  records: "records",
+  manage: "manage",
+  errorPage: "error",
 };
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  // history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: `/${routePaths.signIn}`,
-      name: routePaths.signIn,
-      component: () => import('../views/SignInView.vue'),
-      alias: '/',
+      path: `/${routePaths.loading}`,
+      name: routePaths.loading,
+      component: () => import("../views/LoadingView.vue"),
       meta: {
-        requireAuth: false
+        requireAuth: false,
       }
     },
     {
-      path: `/${routePaths.signUp}`,
-      name: routePaths.signUp,
-      component: () => import('../views/SignUpView.vue'),
+      path: `/${routePaths.portal}`,
+      name: routePaths.portal,
+      component: () => import("../views/PortalView.vue"),
+      alias: "/",
       meta: {
-        requireAuth: false
-      }
+        requireAuth: false,
+      },
     },
-    // {
-    //   path: `/${routePaths.forgetPassword}`,
-    //   name: routePaths.forgetPassword,
-    //   component: () => import('../views/portal/ForgetPasswordView.vue'),
-    //   meta: {
-    //     requireAuth: false
-    //   }
-    // },
+    {
+      path: `/${routePaths.errorPage}`,
+      name: routePaths.errorPage,
+      component: () => import("../views/ErrorView.vue"),
+      meta: {
+        requireAuth: false,
+      },
+    },
+    {
+      path: `/${routePaths.workbench}`,
+      component: () => import("../views/WorkbenchView.vue"),
+      name: routePaths.workbench,
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
+      path: `/${routePaths.grouping}`,
+      name: routePaths.grouping,
+      component: () => import("../views/GroupView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
+      path: `/${routePaths.records}`,
+      name: routePaths.records,
+      component: () => import("../views/RecordsView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
+      path: `/${routePaths.manage}`,
+      name: routePaths.manage,
+      component: () => import("../views/ManageView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
+      path: `/${routePaths.leaderBoard}`,
+      name: routePaths.leaderBoard,
+      component: () => import("../views/LeaderBoardView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+  ],
+});
 
-
-    // {
-    //   path: `/${routePaths.workbench}`,
-    //   component: () => import('../views/system/WorkspaceView.vue'),
-    //   name: routePaths.workbench,
-    //   meta: {
-    //     requireAuth: true
-    //   }
-    // },
-    // {
-    //   path: `/${routePaths.grouping}`,
-    //   name: routePaths.grouping,
-    //   component: () => import('../views/system/GroupingView.vue'),
-    //   meta: {
-    //     requireAuth: true
-    //   }
-    // },
-    // {
-    //   path: `/${routePaths.records}`,
-    //   name: routePaths.records,
-    //   component: () => import('../views/system/RecordsView.vue'),
-    //   meta: {
-    //     requireAuth: true
-    //   }
-    // },
-    // {
-    //   path: `/${routePaths.management}`,
-    //   name: routePaths.management,
-    //   component: () => import('../views/system/ManagementView.vue'),
-    //   meta: {
-    //     requireAuth: true
-    //   }
-    // },
-    // {
-    //   path: `/${routePaths.leaderBoard}`,
-    //   name: routePaths.leaderBoard,
-    //   component: () => import('../views/system/LeaderBoardView.vue'),
-    //   meta: {
-    //     requireAuth: true
-    //   }
-    // },
-  ]
-})
-
-export default router
+export default router;

@@ -1,30 +1,89 @@
+import useErrorUtil from "./errorUtils";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
-import { type Ref, type UnwrapRef, ref } from "vue";
+import { type Ref, ref, watch, reactive } from "vue";
+import { useCache } from "./cacheUtils";
 
-const server = "http://127.0.0.1:8000/";
-axios.defaults.baseURL = server;
-axios.defaults.headers["Content-Type"] = "text/plain"; // for CORS
+
+axios.defaults.xsrfCookieName = "csrftoken";
+axios.defaults.headers["Content-Type"] = "text/plain";
+// axios.defaults.baseURL = "https://chaconn3.me/"
+axios.defaults.baseURL = "http://localhost:8000/"
 axios.defaults.withCredentials = true;
-axios.defaults.validateStatus = () => true;
-axios.defaults.timeout = 5000;
+axios.defaults.validateStatus = (status) => status < 600;
+axios.defaults.timeout = 10000;
 
-function requestErrorHandler<TData>(error: any, endpoint: string, data: TData) {
-  console.log("error at endpont" + endpoint);
-  console.log("error data" + data);
-  console.log(error);
-  // should route to error page
-  // throw new Error("request error handler not implemented");
+const { setErrorContext } = useErrorUtil();
+
+function triggerRequestError<T>(
+  error: AxiosError,
+  endpoint: string,
+  dataOrParams: T
+) {
+  setErrorContext(
+    error,
+    ` A request to server has failed with error. ${error.status ?? "", " ", error.message ?? ""}`
+  );
+
+  // console.log(
+  //   `Request to ${endpoint} failed with error: ${error.message ?? error}`
+  // );
+  // console.log(dataOrParams);
+  // console.log("logger ends -- -- -- -- -- -- -- --");
 }
 
-export function httpGet(
-  url: string,
-  params: any | null,
+export function httpGet(url: string, params: any, onCompleted: any): void {
+  try {
+    axios
+      .get(url, { params: params })
+      .then(onCompleted)
+      .catch((err: AxiosError) => triggerRequestError(err, url, params));
+  } catch (err: any) {
+    triggerRequestError(err, url, params);
+  }
+}
+
+export const {
+  get,
+  set,
+  createKey,
+  clearCacheByEndpoint: clearCacheByEndpoint,
+  clearAllCache,
+} = useCache<AxiosResponse>();
+
+
+export function cachedHttpGet(
+  endpoint: string,
+  params: any,
   onCompleted: any
 ): void {
-  axios
-    .get(url, { params: params })
-    .then(onCompleted)
-    .catch((err: AxiosError) => requestErrorHandler(err, url, params));
+  try {
+    const key = createKey(params);
+    const cachedResp = get(endpoint, key);
+    if (cachedResp) {
+      onCompleted(cachedResp);
+    } else {
+      axios
+        .get(endpoint, { params: params })
+        .then((resp) => {
+          set(endpoint, key, resp);
+          onCompleted?.(resp);
+        })
+        .catch((err: AxiosError) => triggerRequestError(err, endpoint, params));
+    }
+  } catch (err: any) {
+    triggerRequestError(err, endpoint, params);
+  }
+}
+
+export function httpDownload(endpoint: string, params: any, onCompleted: any) {
+  try {
+    axios
+      .get(endpoint, { params: params, responseType: "arraybuffer" })
+      .then(onCompleted)
+      .catch((err: AxiosError) => triggerRequestError(err, endpoint, params));
+  } catch (err: any) {
+    triggerRequestError(err, endpoint, params);
+  }
 }
 
 export function httpPost<TData>(
@@ -32,84 +91,176 @@ export function httpPost<TData>(
   data: TData,
   onCompleted: any
 ): void {
-  axios
-    .post(url, data)
-    .then(onCompleted)
-    .catch((err: AxiosError) => requestErrorHandler(err, url, data));
-}
-
-export function httpPut<TData>(
-  url: string,
-  data: TData,
-  onCompleted: any
-): void {
-  axios
-    .put(url, data)
-    .then(onCompleted)
-    .catch((err: AxiosError) => requestErrorHandler(err, url, data));
-}
-
-export function httpDelete<TData>(
-  url: string,
-  params: TData | null,
-  onCompleted: any
-): void {
-  axios
-    .delete(url, { params: params })
-    .then(onCompleted)
-    .catch((err: AxiosError) => requestErrorHandler(err, url, params));
-}
-
-export function useGet<TData>(
-  endpoint: string,
-  params: any = null,
-  onCompleted: any = null
-): GetDataResult<TData> {
-  const isLoading = ref<boolean>(true);
-  const data = ref<TData | null>(null);
-  function act(fetchParams: any = params) {
-    isLoading.value = true;
-    httpGet(endpoint, fetchParams, (resp: AxiosResponse) => {
-      isLoading.value = false;
-      data.value = resp.data;
-      onCompleted?.(resp);
-    });
+  try {
+    axios
+      .post(url, data)
+      .then(onCompleted)
+      .catch((err: AxiosError) => triggerRequestError(err, url, data));
+  } catch (err: any) {
+    triggerRequestError(err, url, data);
   }
-  act(params);
-
-  return { isLoading, data: data, act: act };
 }
 
-export function usePost<TData>(
-  endpoint: string,
-  data: TData,
-  onCompleted: any = null
-): PostDataResult<TData> {
-  const isLoading = ref<boolean>(true);
-  const response = ref<AxiosResponse | null>(null);
-  function act(data: TData) {
+export function usePaginatedGet<TData>(endpoint: string) {
+  const pagerParams = reactive<PaginatedParams>({
+    page: 1,
+    size: 5,
+    asc: 1,
+    order: "id",
+  });
+
+  const isLoading = ref<boolean>(false);
+
+  const data = ref<PaginatedData<TData> | null>(null);
+
+  function fetchData(params: any = pagerParams) {
     isLoading.value = true;
-    httpPost(endpoint, data, (resp: AxiosResponse) => {
-      isLoading.value = false;
-      response.value = resp;
-      onCompleted?.(resp);
-    });
+    httpGet(
+      endpoint,
+      {
+        page: params.page,
+        size: params.size,
+        asc: params.asc,
+        order: params.order,
+      },
+      (resp: AxiosResponse) => {
+        data.value = resp.status === 200 ? resp.data : null;
+        isLoading.value = false;
+      }
+    );
   }
-  act(data);
 
-  return { isLoading, response: response, act: act };
+  watch<PaginatedParams>(pagerParams, fetchData, { deep: true });
+
+  fetchData();
+
+  return { isLoading, data, pagerParams, fetchData };
 }
 
-export type GetDataResult<TData> = {
-  isLoading: Ref<boolean>;
-  data: Ref<UnwrapRef<TData> | null>;
-  act: (params: any) => void;
+export function useCachedPaginatedGet<TData>(endpoint: string) {
+  const pagerParams = reactive<PaginatedParams>({
+    page: 1,
+    size: 5,
+    asc: 1,
+    order: "id",
+  });
+
+  const isLoading = ref<boolean>(false);
+
+  const data = ref<PaginatedData<TData> | null>(null);
+
+  function getData(params: any = pagerParams) {
+    if (isLoading.value === true) {
+      return;
+    }
+    isLoading.value = true;
+    cachedHttpGet(
+      endpoint,
+      {
+        page: params.page,
+        size: params.size,
+        asc: params.asc,
+        order: params.order,
+      },
+      (resp: AxiosResponse) => {
+        data.value = resp.status === 200 ? resp.data : null;
+        isLoading.value = false;
+      }
+    );
+  }
+
+  watch<PaginatedParams>(pagerParams, getData, { deep: true });
+
+  return {
+    isLoading,
+    data,
+    pagerParams,
+    getData,
+    clearCache: () => clearCacheByEndpoint(endpoint),
+  };
+}
+
+export function useCachedCumulatedGet<TData>(
+  endpoint: string,
+  batchSize: number = 5,
+  orderBy?: string,
+  asc: 1 | 0 = 1
+) {
+  const isLoading = ref<boolean>(false);
+  const data = ref<TData[]>([]) as Ref<TData[]>;
+  const hasMore = ref<boolean>(false);
+  const pagerParams: PaginatedParams = {
+    page: 0,
+    size: batchSize,
+    asc: asc,
+    order: orderBy ?? "id",
+  };
+
+  function getData() {
+    if (isLoading.value === true) {
+      return;
+    }
+
+    isLoading.value = true;
+    pagerParams.page++;
+    cachedHttpGet(
+      endpoint,
+      {
+        page: pagerParams.page,
+        size: pagerParams.size,
+        asc: pagerParams.asc,
+        order: pagerParams.order,
+      },
+      (resp: AxiosResponse<PaginatedData<TData[]>>) => {
+        isLoading.value = false;
+        if (resp.status === 200) {
+          data.value = data.value.concat(resp.data.data);
+          hasMore.value = resp.data.page < resp.data.totalPage;
+        } else {
+          pagerParams.page--;
+          hasMore.value = false;
+        }
+      }
+    );
+  }
+
+  function reset() {
+    data.value = [];
+    pagerParams.page = 0;
+    hasMore.value = true;
+    clearCacheByEndpoint(endpoint);
+  }
+
+  return {
+    isLoading,
+    data,
+    getData,
+    hasMore,
+    reset,
+  };
+}
+
+export type PaginatedParams = {
+  page: number;
+  size: number;
+  asc: 1 | 0; // 1 for true and 0 for false
+  order: string | "id";
 };
 
-export type PostDataResult<TData> = {
-  isLoading: Ref<boolean>;
-  response: Ref<AxiosResponse | null>;
-  act: (data: TData) => void;
+export type PaginatedData<TData> = {
+  data: TData;
+  page: number;
+  totalPage: number;
 };
 
-export default { httpGet, httpPost, httpPut, httpDelete, useGet };
+// export type GetDataResult<TData> = {
+//   isLoading: Ref<boolean>;
+//   data: Ref<UnwrapRef<TData> | null>;
+//   httpGetter: (params: any, callback: any) => void;
+// };
+
+// export type PostDataResult<TPost> = {
+//   isLoading: Ref<boolean>;
+//   response: Ref<AxiosResponse | null>;
+//   httpPoster: (data: TPost, callback: any) => void;
+// };
