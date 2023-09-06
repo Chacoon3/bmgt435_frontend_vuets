@@ -4,13 +4,12 @@ import { type Ref, ref, watch, reactive } from "vue";
 import { useCache } from "./cacheUtils";
 
 
-// const server = "http://localhost:8080/";
-// const server = import.meta.env["BMGT435_SERVICE"]
+axios.defaults.xsrfCookieName = "csrftoken";
 axios.defaults.headers["Content-Type"] = "text/plain";
-axios.defaults.headers["Connection"] = "keep-alive";
-axios.defaults.baseURL = "/";
+// axios.defaults.baseURL = "https://chaconn3.me/"
+axios.defaults.baseURL = "http://localhost:8000/"
 axios.defaults.withCredentials = true;
-axios.defaults.validateStatus = (status) => status < 500;
+axios.defaults.validateStatus = (status) => status < 600;
 axios.defaults.timeout = 10000;
 
 const { setErrorContext } = useErrorUtil();
@@ -50,6 +49,8 @@ export const {
   clearCacheByEndpoint: clearCacheByEndpoint,
   clearAllCache,
 } = useCache<AxiosResponse>();
+
+
 export function cachedHttpGet(
   endpoint: string,
   params: any,
@@ -97,32 +98,6 @@ export function httpPost<TData>(
       .catch((err: AxiosError) => triggerRequestError(err, url, data));
   } catch (err: any) {
     triggerRequestError(err, url, data);
-  }
-}
-
-export function httpPut<TData>(
-  url: string,
-  data: TData,
-  onCompleted: any
-): void {
-  try {
-    axios
-      .put(url, data)
-      .then(onCompleted)
-      .catch((err: AxiosError) => triggerRequestError(err, url, data));
-  } catch (err: any) {
-    triggerRequestError(err, url, data);
-  }
-}
-
-export function httpDelete(url: string, params: any, onCompleted: any): void {
-  try {
-    axios
-      .delete(url, { params: params })
-      .then(onCompleted)
-      .catch((err: AxiosError) => triggerRequestError(err, url, params));
-  } catch (err: any) {
-    triggerRequestError(err, url, params);
   }
 }
 
@@ -249,12 +224,19 @@ export function useCachedCumulatedGet<TData>(
     );
   }
 
+  function reset() {
+    data.value = [];
+    pagerParams.page = 0;
+    hasMore.value = true;
+    clearCacheByEndpoint(endpoint);
+  }
+
   return {
     isLoading,
     data,
     getData,
     hasMore,
-    clearCache: () => clearCacheByEndpoint(endpoint),
+    reset,
   };
 }
 

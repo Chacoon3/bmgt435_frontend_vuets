@@ -1,7 +1,7 @@
 import { useCurrentUser } from "./userUtils";
 import { httpGet, httpPost, useCachedPaginatedGet, useCachedCumulatedGet, clearCacheByEndpoint } from "./requests";
 import { endpoints } from "./apis";
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { type Group } from "./backendTypes";
 
 
@@ -27,54 +27,27 @@ function getCurrrentGroup() {
   }
 }
 
-watch(
-  currentUser,
-  (newCurrenUser) => {
-    if (
-      newCurrenUser === null ||
-      newCurrenUser === undefined ||
-      newCurrenUser.group_id === null
-    ) {
-      currentGroup.value = null;
-      isCurrentGroupLoading.value = false;
-    } else {
-      getCurrrentGroup();
-    }
-  },
-  { immediate: true }
-);
-
 export function useCurrentGroup() {
+  getCurrrentGroup();
   return { isCurrentGroupLoading, currentGroup, getCurrrentGroup };
 }
 
 export function useCachedPaginatedGroups() {
-  const { isLoading, data, getData, clearCache} = useCachedPaginatedGet<Group[]>(endpoints.groups.paginated);
-  watch(currentGroup, () => {
-    clearCache();
-    getData();
-  });
-
-  return { isLoading, data, getData };
+  return useCachedPaginatedGet<Group[]>(endpoints.groups.paginated);
 }
 
 export function useCachedCumulatedGroups() {
-  const { isLoading, data, getData, clearCache } = useCachedCumulatedGet<Group>(endpoints.groups.paginated);
-  watch(currentGroup, () => {
-    clearCache();
-    getData();
-  });
-
-  return { isLoading, data, getData };
+  return useCachedCumulatedGet<Group>(endpoints.groups.paginated);
 }
 
 export function useCreateGroup() {
   const isCreatingGroup = ref<boolean>(false);
+
   function createGroup(callback: any = null) {
     isCreatingGroup.value = true;
     httpPost(endpoints.groups.create, null, (resp: any) => {
       isCreatingGroup.value = false;
-      if (resp.status === 201) {
+      if (resp.status === 200) {
         if (currentUser.value !== null) {
           currentUser.value.group_id = resp.data.id;
         }

@@ -11,6 +11,8 @@ import { useModal } from './utils/modalUtils';
 import ModalBox from './components/ModalBox.vue';
 import { useProgressBox } from './utils/progressBoxUtils';
 import ProgressBox from './components/ProgressBox.vue';
+import { useFeedbackModal } from './utils/feedbackUtils';
+import FeedbackForm from './components/FeedbackForm.vue';
 
 const { currentUser, isAdmin } = useCurrentUser()
 const moduleTitle = ref<string>('')
@@ -77,6 +79,8 @@ watch(currentUser, (user) => {
     naviItems.value = naviItemsBase;
   }
 }, { immediate: true });
+
+const { isFeedbackModalOpen } = useFeedbackModal();
 </script>
 
 <template>
@@ -97,7 +101,9 @@ watch(currentUser, (user) => {
         <!-- </KeepAlive> -->
       </div>
     </div>
+    
     <FeedbackIcon v-if="router.currentRoute.value.meta.requireAuth === true"></FeedbackIcon>
+    <FeedbackForm v-if="isFeedbackModalOpen === true"></FeedbackForm>
     <ModalBox v-for="(modal, index) in getModalStack" :key="index" :modal-config="modal"></ModalBox>
     <ProgressBox v-for="(progBox, index) in getProgBoxStack" :key="index" :config="progBox"></ProgressBox>
   </body>

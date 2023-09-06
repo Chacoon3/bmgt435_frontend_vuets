@@ -1,22 +1,12 @@
 <script setup lang="ts">
-import { useModal } from '@/utils/modalUtils';
+import { useFeedbackModal } from '@/utils/feedbackUtils';
 
-const { showModal, closeModal } = useModal();
-
-function handleClick() {
-    // showModal({
-    //     title: 'Send your feedback',
-    //     message: 'Please send your feedback',
-    //     onConfirm: closeModal,
-    //     onCancel: closeModal,
-    // });
-
-}
+const { openFeedbackModal } = useFeedbackModal();
 </script>
 
 <template>
     <div class="feedbackDiv">
-        <button class="feedbackButton" @click="handleClick">
+        <button class="feedbackButton" @click="openFeedbackModal">
             <img class="feedbackImg" src="/icons/feedback/feedback.svg" alt="feedback">
         </button>
     </div>

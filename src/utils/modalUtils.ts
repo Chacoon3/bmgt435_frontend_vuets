@@ -24,7 +24,8 @@ export type ModalConfig = {
   title?: string;
   message?: string;
   onConfirm?: () => void;
-  onCancel?: () => void;
   confirmText?: string;
+  // on  cancel part is rendered only when the two feilds below are provided
+  onCancel?: () => void;
   cancelText?: string;
 };

@@ -13,7 +13,8 @@ const signInForm = reactive<SignInForm>({
 
 const inlineMsgState = reactive({
     show: false,
-    msg: ""
+    msg: "",
+    type: "error"
 })
 
 function handleSignIn() {
@@ -44,13 +45,13 @@ function handleSignIn() {
         <InLineMsg :show="inlineMsgState.show" :content="inlineMsgState.msg"></InLineMsg>
         <form @submit.prevent="handleSignIn" autocomplete="on">
             <div class="formDiv">
-                <label for="did">directory ID</label>
+                <label>directory ID</label>
             </div>
             <div class="formDiv">
                 <input class="inputField" type='text' name="did" placeholder="directory ID" v-model.lazy="signInForm.did">
             </div>
             <div class="formDiv">
-                <label for="password">password</label>
+                <label>password</label>
             </div>
             <div class="formDiv">
                 <input class="inputField" type="password" name='password' placeholder="password"

@@ -4,14 +4,15 @@ import { type InLineMsgConfig } from './types';
 const props = withDefaults(defineProps<InLineMsgConfig>(),
     {
         show: false,
-        content: ""
+        content: "",
+        type: "error"
     }
 );
 
 </script>
 
 <template>
-    <div class="inLineMsg">
+    <div class="inLineMsg" :msgState="props.type">
         <span v-if="props.show" class="inline-msg">
             <span>{{ props.content }}</span>
         </span>
@@ -21,11 +22,20 @@ const props = withDefaults(defineProps<InLineMsgConfig>(),
 <style scoped>
 .inLineMsg {
     display: block;
-    /* color: red; */
-    color: var(--color-red-umd);
     text-align: center;
     margin: 1em;
 }
 
+.inLineMsg[msgState=error] {
+    color: var(--color-red-umd);
+}
 
-</style>../types
+.inLineMsg[msgState="normal"] {
+    color: black;
+}
+
+.inLineMsg[msgState="warning"] {
+    color: var(--color-red-umd)
+}
+
+</style>

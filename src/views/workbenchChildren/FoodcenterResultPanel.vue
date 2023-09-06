@@ -15,9 +15,9 @@ function handleDownload() {
 <template>
     <div class="foodcentrResultContainer">
         <div v-if="result === null">
-            <p class="caseDescription">
+            <h4 class="caseDescription">
                 Please submit the simulation first.
-            </p>
+            </h4>
         </div>
         <div v-else>
             <ul class="foodcenterResultList">
