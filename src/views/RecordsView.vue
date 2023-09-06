@@ -17,7 +17,7 @@ const viewMoreButtonText = computed(() => {
         return "No More Records"
     }
 })
-const { data: records, isLoading, clearCache: clearCachedRecords, getData: getRecords, hasMore: hasMoreRecords } = useCumulatedCaseRecords()
+const { data: records, isLoading, reset: resetCaseRecords, getData: getRecords, hasMore: hasMoreRecords } = useCumulatedCaseRecords()
 const recordTableConfig = computed<TableConfig>(() => {
     return {
         headers: ["Case Name", "Submitted by", "Time", "Score"],

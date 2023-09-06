@@ -46,6 +46,12 @@ export const endpoints = {
     paginated:"bmgt435/api/leader-board/paginated",
   },
 
+  feedback: {
+    post: "bmgt435/api/feedback/post",
+    get:"bmgt435/api/feedback/get",
+    paginated: "bmgt435/api/feedback/paginated",
+  },
+
   manage: {
     importUsers: "bmgt435/api/manage/import-users",
     viewUsers: "bmgt435/api/manage/view-users",

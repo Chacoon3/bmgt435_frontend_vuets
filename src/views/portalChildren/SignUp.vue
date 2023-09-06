@@ -9,7 +9,7 @@ import {validateText} from '@/utils/formUtils';
 
 const { isLoading, signUp } = useSignUp();
 const signUpForm = reactive<SignUpForm>({ did: "", password: "" });
-const inlineMsgState = reactive<InLineMsgConfig>({ show: false, content: "" });
+const inlineMsgState = reactive<InLineMsgConfig>({ show: false, content: "", type: "error" });
 const password_retyped = ref<string>("");
 const passwordMatch = computed(() => signUpForm.password === password_retyped.value)
 const { setPortalState } = usePortalState();
@@ -57,13 +57,13 @@ function handleSignUp() {
         <InLineMsg :show="inlineMsgState.show" :content="inlineMsgState.content"></InLineMsg>
         <form autocomplete="on" id="signUpForm" @submit.prevent="handleSignUp">
             <div class="formDiv">
-                <label for="did">directory ID</label>
+                <label>directory ID</label>
             </div>
             <div class="formDiv">
                 <input class="inputField" type="text" name="did" v-model.lazy="signUpForm.did" placeholder="directory ID">
             </div>
             <div class="formDiv">
-                <label for="password">password</label>
+                <label>password</label>
             </div>
             <div class="formDiv">
                 <input class="inputField" type="password" name="password" v-model="signUpForm.password"

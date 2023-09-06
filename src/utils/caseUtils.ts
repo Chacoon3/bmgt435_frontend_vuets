@@ -5,7 +5,7 @@ import { endpoints } from "./apis";
 import { type AxiosResponse } from "axios";
 import { useCumulatedCaseRecords } from "./caseRecordsUtils";
 
-const { clearCache: clearCachedCaseRecords } = useCumulatedCaseRecords();
+const { reset: clearCachedCaseRecords } = useCumulatedCaseRecords();
 export function useFoodcenter() {
   const isSubmitting = ref(false);
 
@@ -25,26 +25,6 @@ export function useFoodcenter() {
     return { case_id: 1, case_params: { centers, policies }};
   }
 
-  // function tryGetSubmissionResult(
-  //   caseRecordId: number,
-  //   callback: (resp: AxiosResponse) => void
-  // ) {
-  //   httpGet(
-  //     endpoints.cases.caseRecords,
-  //     { id: caseRecordId },
-  //     (resp: AxiosResponse) => {
-  //       if (resp.status === 200) {
-  //         isSubmitting.value = false;
-  //         submissionResult.value = resp.data;
-  //         callback?.(resp);
-  //       } else {
-  //         setTimeout(() => {
-  //           tryGetSubmissionResult(caseRecordId, callback);
-  //         }, 10000);
-  //       }
-  //     }
-  //   );
-  // }
 
   function submitCase(
     userInput: FoodcenterCenterState[],

@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive, ref, unref } from 'vue';
 import TextSection from '@/components/textual/TextSection.vue'
 import CenterConfigPanel from './CenterConfigPanel.vue';
-import { type FoodcenterCenterState, type SubmissionResult, type FoodCenterSummary,  useFoodcenter } from '@/utils/caseUtils'
+import { type FoodcenterCenterState, type SubmissionResult, type FoodCenterSummary, useFoodcenter } from '@/utils/caseUtils'
 import { type AxiosResponse } from 'axios';
 import InLineMsg from '@/components/InLineMsg.vue';
 import FoodcenterResultPanel from './FoodcenterResultPanel.vue';
+import { useModal } from '@/utils/modalUtils';
 
 
+const { showModal, closeModal } = useModal();
 const inlineMsgState = reactive({ show: false, content: '', });
 const fcResult = ref<SubmissionResult<FoodCenterSummary> | null>(null);
 const showBrief = ref<boolean>(true);
@@ -22,18 +24,31 @@ function handleSubmit() {
         return;
     }
 
+
     inlineMsgState.content = '';
     inlineMsgState.show = false;
-    submitFoodCenter(paramState.value, (resp: AxiosResponse) => {
-        resultState.value = resp.status === 200
-        if (resp.status !== 200) {
-            inlineMsgState.content = resp.data ?? "Failed to submit simulation!";
-            inlineMsgState.show = true;
-        }
-        else {
-            inlineMsgState.content = "Simulation submitted successfully!";
-            inlineMsgState.show = true;
-            fcResult.value = resp.data;
+    const cachedParams: FoodcenterCenterState[] = unref(paramState);
+
+    showModal({
+        title: "Submit simulation",
+        message: "Are you sure to submit the simulation?",
+        onConfirm: () => {
+            closeModal();
+            submitFoodCenter(cachedParams, (resp: AxiosResponse) => {
+                resultState.value = resp.status === 200
+                if (resp.status !== 200) {
+                    inlineMsgState.content = resp.data ?? "Failed to submit simulation!";
+                    inlineMsgState.show = true;
+                }
+                else {
+                    inlineMsgState.content = "Simulation submitted successfully!";
+                    inlineMsgState.show = true;
+                    fcResult.value = resp.data;
+                }
+            });
+        },
+        onCancel: () => {
+            closeModal();
         }
     });
 }
@@ -126,9 +141,7 @@ function handleSubmit() {
         <hr>
         <div class="foodcenterParamDiv">
             <CenterConfigPanel v-for="(item, index) in paramState" :key="index" v-model:isOn="item.isOn"
-                v-model:smallS="item.smallS" v-model:bigS="item.bigS" v-model:name="item.name"
-
-                ></CenterConfigPanel>
+                v-model:smallS="item.smallS" v-model:bigS="item.bigS" v-model:name="item.name"></CenterConfigPanel>
         </div>
 
         <InLineMsg :show="inlineMsgState.show" :content="inlineMsgState.content"></InLineMsg>
@@ -142,7 +155,7 @@ function handleSubmit() {
         <h2>Simulation Result</h2>
         <hr>
         <FoodcenterResultPanel :result="fcResult" :caseRecordId="1"></FoodcenterResultPanel>
-        
+
     </div>
 </template>
 

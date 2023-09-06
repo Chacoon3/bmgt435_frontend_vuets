@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import GroupItem from './groupChildren/GroupItem.vue';
-import { useCurrentGroup, useCachedPaginatedGroups, useCreateGroup, useLeaveGroup } from '@/utils/groupUtils';
+import { useCurrentGroup, useCachedCumulatedGroups, useCreateGroup, useLeaveGroup } from '@/utils/groupUtils';
 import { reactive } from 'vue';
 import InLineMsg from '@/components/InLineMsg.vue';
 
@@ -10,29 +10,36 @@ const inlineMsgState = reactive({
     msg: '',
 })
 const { isCreatingGroup, createGroup } = useCreateGroup();
-const { isCurrentGroupLoading, currentGroup } = useCurrentGroup();
+const { isCurrentGroupLoading, currentGroup, getCurrrentGroup } = useCurrentGroup();
 const { isLeavingGroup, leaveGroup } = useLeaveGroup();
-const { isLoading: isLoadingGroups, data: paginatedGroups, getData: getPaginatedData } = useCachedPaginatedGroups();
-getPaginatedData();
+const { isLoading: isLoadingGroups, data: groupData, getData: getGroupData, reset: resetGroupData, hasMore: hasMoreGroup } = useCachedCumulatedGroups();
+getGroupData();
 
 function handleCreateGroup() {
     inlineMsgState.show = false;
     createGroup(
         (resp: any) => {
-            if (resp.status === 201) {
+            if (resp.status === 200) {
                 inlineMsgState.msg = resp?.data ?? "create group success!"
+                getCurrrentGroup();
+                resetGroupData();
+                getGroupData();
             }
             else {
                 inlineMsgState.msg = resp?.data ?? "create group failed!";
             }
             inlineMsgState.show = true;
         });
+    
 }
 
 function handleLeaveGroup() {
     leaveGroup((resp: any) => {
         if (resp.status === 200) {
             inlineMsgState.msg = resp?.data ?? "leave group success!";
+            getCurrrentGroup();
+            resetGroupData();
+            getGroupData();
         }
         else {
             inlineMsgState.msg = resp?.data ?? "leave group failed!";
@@ -92,9 +99,10 @@ function handleLeaveGroup() {
             <div>
                 <h3 v-if="isLoadingGroups">Fetching data...</h3>
                 <ul v-else>
-                    <GroupItem v-for="item in paginatedGroups?.data" :key="item.id" :name="item.name" :id="item.id"
+                    <GroupItem v-for="item in groupData" :key="item.id" :name="item.name" :id="item.id"
                         :users="item.users"></GroupItem>
                 </ul>
+                <button class="normalButton" :disabled="hasMoreGroup === false" @click="getGroupData">{{ hasMoreGroup ? 'View more': 'No more groups'}}</button>
             </div>
         </div>
 
@@ -120,7 +128,7 @@ function handleLeaveGroup() {
     position: relative;
     padding-left: 30px;
     width: 375px;
-    height: 400px;
+    height: auto;
 }
 
 .groupDivH2 {

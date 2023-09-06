@@ -4,7 +4,7 @@ import InLineMsg from '@/components/InLineMsg.vue';
 import type { InLineMsgConfig } from '@/components/types';
 
 
-const inlineMsgState = reactive<InLineMsgConfig>({ show: false, content: "" });
+const inlineMsgState = reactive<InLineMsgConfig>({ show: false, content: "", type: "error" });
 
 const formData = reactive({ did: "" })
 
@@ -25,7 +25,7 @@ function handleForgetPassword() {
         <InLineMsg :show="inlineMsgState.show" :content="inlineMsgState.content"></InLineMsg>
         <form autocomplete="off" @submit.prevent="handleForgetPassword">
             <div class="formDiv">
-                <label for="did">directory ID</label>
+                <label>directory ID</label>
             </div>
             <div class="formDiv">
                 <input class="inputField" type="text" name="did" v-model="formData.did" placeholder="directory ID">

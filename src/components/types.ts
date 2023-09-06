@@ -3,6 +3,7 @@ import { type ComputedRef } from "vue";
 export type InLineMsgConfig = {
   show: boolean;
   content: string;
+  type: "normal" | "error" | "warning"; // defines the color of the message
 };
 
 export type DynamicFormField<TVal = object> = {
