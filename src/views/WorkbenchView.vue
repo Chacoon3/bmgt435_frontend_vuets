@@ -14,7 +14,7 @@ getCases();
 
 
 <template>
-    <div id="workbenchContainer">
+    <div id="workbenchContainer" class="contentViewContainer">
         <div v-if="caseSelection === null">
             <div class="workbenchContent" v-if="currentUser && currentUser.group_id !== null">
                 <div v-if="isCasesLoading === true">
@@ -47,7 +47,7 @@ getCases();
 <style scoped>
 #workbenchContainer {
     text-align: center;
-    padding-right: var(--width-whitespace-right);
+    /* padding-right: var(--width-whitespace-right); */
 }
 
 .normalButton {

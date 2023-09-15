@@ -39,7 +39,7 @@ const moduleState = ref<string>("")
 </script>
 
 <template>
-    <div id="manageViewContainer">
+    <div id="manageViewContainer" class="contentViewContainer">
         <div id="manageButtonContainer">
             <CustomSelect v-for="(item, index) in selectState" :key="index" :name="item.name" v-model:options="item.options"
                 @input="(newVal: string) => { moduleState = newVal; }"></CustomSelect>
@@ -58,7 +58,9 @@ const moduleState = ref<string>("")
 
 <style scoped>
 #manageViewContainer {
-    padding-right: var(--width-whitespace-right);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 #manageButtonContainer {

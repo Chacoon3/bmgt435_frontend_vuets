@@ -8,7 +8,7 @@ import {
 import { endpoints } from "@/utils/apis";
 import { type CaseRecord } from "@/utils/backendTypes";
 import type { AxiosResponse } from "axios";
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 
 export function useCumulatedCaseRecords() {
   return useCachedCumulatedGet<CaseRecord>(
@@ -55,25 +55,28 @@ export function useDownloadCaseRecord() {
   return { isDownloading, downloadCaseRecord };
 }
 
-export function useFoodcenterLeaderBoard() {
+export function useLeaderBoard(case_id: number) {
   const isLoading = ref<boolean>(false);
   const data = ref<CaseRecord[]>([]);
   const hasMore = ref<boolean>(true);
+  const requestParams = {
+    case_id: case_id, // hard coding
+    page: 0,
+    size: 10,
+    asc: 0,
+    order: "score",
+  };
 
   function getData() {
     if (isLoading.value === true) {
       return;
     }
     isLoading.value = true;
+
+    requestParams.page += 1;
     cachedHttpGet(
       endpoints.leaderboard.paginated,
-      {
-        case_id: 1,
-        page: 1,
-        size: 10,
-        asc: 0,
-        order: "score",
-      },
+      requestParams,
       (resp: AxiosResponse) => {
         isLoading.value = false;
         if (resp.status === 200) {

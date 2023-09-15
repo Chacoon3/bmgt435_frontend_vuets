@@ -46,3 +46,10 @@ export type Tag = {
   id: number;
   name: string;
 };
+
+export type SystemStatus = {
+  state: 'open' | 'close' | 'admin_only';
+  user_count: number;
+  activated_user_count: number;
+  case_record_count: number;
+}

@@ -50,7 +50,7 @@ function handleLeaveGroup() {
 </script>
 
 <template>
-    <div id="groupViewContainer">
+    <div id="groupViewContainer" class="contentViewContainer">
 
         <div v-if="isCurrentGroupLoading" class="groupDiv">
             <h2 class="groupDivH2">Fetching Data...</h2>

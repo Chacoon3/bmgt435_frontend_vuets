@@ -97,9 +97,13 @@ body {
   flex: 1;
 }
 
-#moduleContent {
+.contentViewContainer {
   position: relative;
-  display: block;}
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 9em;
+}
 
 .formDiv {
   display: block;

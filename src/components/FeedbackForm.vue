@@ -65,6 +65,14 @@ function handleSubmit() {
             throw new Error("Invalid user status! Please sign in and retry!");
         }
     }
+    else {
+        showModal({
+            title: "Empty feedback",
+            message: "Please enter your feedback!",
+            onConfirm:closeModal,
+        }
+        );
+    }
 }
 </script>
 

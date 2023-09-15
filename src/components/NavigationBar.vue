@@ -41,7 +41,7 @@ function handleSignOut() {
 <style scoped>
 #navigationBar {
     width: 220px;
-    padding-right: 150px;
+    /* padding-right: 150px; */
 }
 
 #naviWrapper {

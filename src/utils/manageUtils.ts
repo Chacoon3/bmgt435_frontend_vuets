@@ -1,8 +1,9 @@
-import { httpPost, useCachedCumulatedGet } from "./requests";
+import { cachedHttpGet, httpPost, useCachedCumulatedGet } from "./requests";
 import { useCache } from "./cacheUtils";
 import { endpoints } from "./apis";
-import { ref } from "vue";
-import { type User } from "./backendTypes";
+import { ref, type Ref } from "vue";
+import type { User, SystemStatus } from "./backendTypes";
+import type { AxiosResponse } from "axios";
 
 
 const { clearCacheByEndpoint } = useCache();
@@ -33,4 +34,33 @@ export function useImportUsers() {
 
 export function useCachedCumulatedUsers() {
   return useCachedCumulatedGet<User>(endpoints.manage.viewUsers, 10);
+}
+
+export function useSystemState() {
+  const isLoadingSystemState = ref<boolean>(false);
+  const systemState: Ref<SystemStatus | null > = ref<SystemStatus | null>(null);
+
+  function getSystemState() {
+    if (isLoadingSystemState.value === true) return;
+
+    isLoadingSystemState.value = true;
+    cachedHttpGet(endpoints.manage.systemState, null, (resp: AxiosResponse) => {
+      isLoadingSystemState.value = false;
+      if (resp.status === 200) {
+        systemState.value = resp.data;
+      } else {
+        systemState.value = null;
+      }
+    });
+  }
+
+  function setSystemState() {
+
+  }
+
+  function clearSystem() {
+    
+  }
+
+  return { isLoadingSystemState, systemState, getSystemState };
 }

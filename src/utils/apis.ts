@@ -55,6 +55,7 @@ export const endpoints = {
   manage: {
     importUsers: "bmgt435/api/manage/import-users",
     viewUsers: "bmgt435/api/manage/view-users",
+    systemState: "bmgt435/api/manage/system/state",
   }
 
 };

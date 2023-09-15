@@ -6,8 +6,7 @@ import { useCache } from "./cacheUtils";
 
 axios.defaults.xsrfCookieName = "csrftoken";
 axios.defaults.headers["Content-Type"] = "text/plain";
-// axios.defaults.baseURL = "https://chaconn3.me/"
-axios.defaults.baseURL = "http://localhost:8000/"
+axios.defaults.baseURL = import.meta.env.VITE_BMGT435_SERVICE;
 axios.defaults.withCredentials = true;
 axios.defaults.validateStatus = (status) => status < 600;
 axios.defaults.timeout = 10000;

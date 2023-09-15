@@ -13,13 +13,18 @@ defineProps({
 </template>
 
 <style scoped>
+#customTitleDiv {
+    padding-left: 9em;
+}
+
+
 #titleH1 {  
     margin: 3% 0 1% 0;
 }
 
 .titleHr {
     position: relative;
-    width: 75%;
+    width: 85%;
     margin-bottom: 30px;
 }
 </style>

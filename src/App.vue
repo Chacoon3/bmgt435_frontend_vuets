@@ -81,6 +81,8 @@ watch(currentUser, (user) => {
 }, { immediate: true });
 
 const { isFeedbackModalOpen } = useFeedbackModal();
+
+console.log(import.meta.env)
 </script>
 
 <template>
@@ -95,11 +97,11 @@ const { isFeedbackModalOpen } = useFeedbackModal();
         <CustomTitle :title="moduleTitle"></CustomTitle>
       </div>
 
-      <div id="moduleContent">
+      <!-- <div id="moduleContent"> -->
         <!-- <KeepAlive> -->
           <RouterView />
         <!-- </KeepAlive> -->
-      </div>
+      <!-- </div> -->
     </div>
     
     <FeedbackIcon v-if="router.currentRoute.value.meta.requireAuth === true"></FeedbackIcon>

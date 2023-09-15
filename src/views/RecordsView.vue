@@ -73,7 +73,7 @@ function toTableRow(record: CaseRecord): TableItemConfig[] {
 </script>
 
 <template>
-    <div>
+    <div class="contentViewContainer">
         <div v-if="isLoading === true && records.length === 0">Fetching Data..</div>
         <div v-else-if="records.length > 0">
 
