@@ -13,7 +13,7 @@ axios.defaults.timeout = 10000;
 
 const { setErrorContext } = useErrorUtil();
 
-function triggerRequestError<T>(
+function raiseRequestError<T>(
   error: AxiosError,
   endpoint: string,
   dataOrParams: T
@@ -35,9 +35,9 @@ export function httpGet(url: string, params: any, onCompleted: any): void {
     axios
       .get(url, { params: params })
       .then(onCompleted)
-      .catch((err: AxiosError) => triggerRequestError(err, url, params));
+      .catch((err: AxiosError) => raiseRequestError(err, url, params));
   } catch (err: any) {
-    triggerRequestError(err, url, params);
+    raiseRequestError(err, url, params);
   }
 }
 
@@ -67,10 +67,10 @@ export function cachedHttpGet(
           set(endpoint, key, resp);
           onCompleted?.(resp);
         })
-        .catch((err: AxiosError) => triggerRequestError(err, endpoint, params));
+        .catch((err: AxiosError) => raiseRequestError(err, endpoint, params));
     }
   } catch (err: any) {
-    triggerRequestError(err, endpoint, params);
+    raiseRequestError(err, endpoint, params);
   }
 }
 
@@ -79,9 +79,9 @@ export function httpDownload(endpoint: string, params: any, onCompleted: any) {
     axios
       .get(endpoint, { params: params, responseType: "arraybuffer" })
       .then(onCompleted)
-      .catch((err: AxiosError) => triggerRequestError(err, endpoint, params));
+      .catch((err: AxiosError) => raiseRequestError(err, endpoint, params));
   } catch (err: any) {
-    triggerRequestError(err, endpoint, params);
+    raiseRequestError(err, endpoint, params);
   }
 }
 
@@ -94,9 +94,9 @@ export function httpPost<TData>(
     axios
       .post(url, data)
       .then(onCompleted)
-      .catch((err: AxiosError) => triggerRequestError(err, url, data));
+      .catch((err: AxiosError) => raiseRequestError(err, url, data));
   } catch (err: any) {
-    triggerRequestError(err, url, data);
+    raiseRequestError(err, url, data);
   }
 }
 

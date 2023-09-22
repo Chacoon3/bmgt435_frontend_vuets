@@ -2,7 +2,7 @@ import { cachedHttpGet, httpPost, useCachedCumulatedGet } from "./requests";
 import { useCache } from "./cacheUtils";
 import { endpoints } from "./apis";
 import { ref, type Ref } from "vue";
-import type { User, SystemStatus } from "./backendTypes";
+import type { User, SystemStatus, ImportUserData } from "./backendTypes";
 import type { AxiosResponse } from "axios";
 
 
@@ -10,7 +10,7 @@ const { clearCacheByEndpoint } = useCache();
 export function useImportUsers() {
   const isLoading = ref<boolean>(false);
 
-  function importUsers(csvUsers: File, callback: any) {
+  function importUsers(csvUsers: File, semester_id:number,  callback: any) {
     if (isLoading.value === true) return;
 
     isLoading.value = true;
@@ -19,10 +19,10 @@ export function useImportUsers() {
       .getReader()
       .read()
       .then((bytes) => {
-        httpPost(endpoints.manage.importUsers, bytes.value, (resp: any) => {
+        httpPost<ImportUserData>(endpoints.manage.user.import, {file_stream:bytes.value, meta:{semester_id}}, (resp: any) => {
           isLoading.value = false;
           if (resp.status === 200) {
-            clearCacheByEndpoint(endpoints.manage.viewUsers)
+            clearCacheByEndpoint(endpoints.manage.user.view)
           }
           callback?.(resp);
         });
@@ -33,7 +33,7 @@ export function useImportUsers() {
 }
 
 export function useCachedCumulatedUsers() {
-  return useCachedCumulatedGet<User>(endpoints.manage.viewUsers, 10);
+  return useCachedCumulatedGet<User>(endpoints.manage.user.view, 10);
 }
 
 export function useSystemState() {
@@ -44,7 +44,7 @@ export function useSystemState() {
     if (isLoadingSystemState.value === true) return;
 
     isLoadingSystemState.value = true;
-    cachedHttpGet(endpoints.manage.systemState, null, (resp: AxiosResponse) => {
+    cachedHttpGet(endpoints.manage.system.state, null, (resp: AxiosResponse) => {
       isLoadingSystemState.value = false;
       if (resp.status === 200) {
         systemState.value = resp.data;

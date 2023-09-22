@@ -1,12 +1,12 @@
 export const endpoints = {
-  auth:{
+  auth: {
     signIn: "bmgt435/api/auth/sign-in",
     signUp: "bmgt435/api/auth/sign-up",
     signOut: "bmgt435/api/auth/sign-out",
     forgetPassword: "bmgt435/api/auth/forget-password",
   },
 
-  users:{
+  users: {
     me: "bmgt435/api/users/me",
     users: "bmgt435/api/users",
   },
@@ -14,26 +14,26 @@ export const endpoints = {
   groups: {
     get: "bmgt435/api/groups/get",
     paginated: "bmgt435/api/groups/paginated",
-    join:"bmgt435/api/groups/join",
-    create:"bmgt435/api/groups/create",
-    leave:"bmgt435/api/groups/leave",
+    join: "bmgt435/api/groups/join",
+    create: "bmgt435/api/groups/create",
+    leave: "bmgt435/api/groups/leave",
   },
 
-  tags:{
-    tags: "bmgt435/api/tags",
-    paginated: "bmgt435/api/tags/paginated",
-  },
+  // tags: {
+  //   tags: "bmgt435/api/tags",
+  //   paginated: "bmgt435/api/tags/paginated",
+  // },
 
-  roles:{
+  roles: {
     roles: "bmgt435/api/roles",
     paginated: "bmgt435/api/roles/paginated",
   },
 
-  cases:{
+  cases: {
     get: "bmgt435/api/cases/get",
     paginated: "bmgt435/api/cases/paginated",
-    run:"bmgt435/api/cases/run",
-    submit:"bmgt435/api/cases/submit",
+    run: "bmgt435/api/cases/run",
+    submit: "bmgt435/api/cases/submit",
   },
 
   caseRecords: {
@@ -43,19 +43,28 @@ export const endpoints = {
   },
 
   leaderboard: {
-    paginated:"bmgt435/api/leader-board/paginated",
+    paginated: "bmgt435/api/leader-board/paginated",
   },
 
   feedback: {
     post: "bmgt435/api/feedback/post",
-    get:"bmgt435/api/feedback/get",
+    get: "bmgt435/api/feedback/get",
     paginated: "bmgt435/api/feedback/paginated",
   },
 
   manage: {
-    importUsers: "bmgt435/api/manage/import-users",
-    viewUsers: "bmgt435/api/manage/view-users",
-    systemState: "bmgt435/api/manage/system/state",
-  }
-
+    user: {
+      import: "bmgt435/api/manage/user/import",
+      view: "bmgt435/api/manage/user/view",
+    },
+    group: {
+      create: "bmgt435/api/manage/group/create",
+    },
+    semester: {
+      create: "bmgt435/api/manage/semester/create",
+    },
+    system: {
+      state: "bmgt435/api/manage/system/state",
+    },
+  },
 };

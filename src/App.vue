@@ -81,8 +81,6 @@ watch(currentUser, (user) => {
 }, { immediate: true });
 
 const { isFeedbackModalOpen } = useFeedbackModal();
-
-console.log(import.meta.env)
 </script>
 
 <template>

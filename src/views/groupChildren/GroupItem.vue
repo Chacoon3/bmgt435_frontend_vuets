@@ -3,31 +3,35 @@ import { type Group } from '@/utils/backendTypes';
 import { useJoinGroup } from '@/utils/groupUtils';
 import { useCurrentUser } from '@/utils/userUtils';
 
-const props = defineProps<Group>();
+const props = defineProps<{
+    group: Group;
+}>();
 const { isJoiningGroup, joinGroup } = useJoinGroup();
 const { currentUser } = useCurrentUser();
 
 function handleJoinGroup() {
-    if (props.id === null) {
+    if (props.group.id === null) {
         throw new Error("group id is null");
     }
     else {
-        joinGroup(props.id);
+        joinGroup(props.group.id);
     }
 }
 </script>
 
 <template>
     <div id="groupItemContainer">
-        <span class="groupName">{{ $props.name }}</span>
-        <button class="normalButton" v-if="currentUser && currentUser.group_id === null" @click="handleJoinGroup" :disabled="isJoiningGroup === true">
+        <span class="groupName">{{ group.name }}</span>
+        <button class="normalButton" v-if="currentUser && currentUser.group_id === null" @click="handleJoinGroup"
+            :disabled="isJoiningGroup === true">
             {{ isJoiningGroup === true ? "Joining..." : "Join" }}
         </button>
-        <div>
-            <li class="groupUser" v-for="user in $props.users" :key="user.id">
+
+        <ul class="groupUserList">
+            <li class="groupUser" v-for="user in group.users" :key="user.id">
                 {{ user?.first_name }} {{ user?.last_name }}
             </li>
-        </div>
+        </ul>
     </div>
 </template>
 
@@ -42,7 +46,14 @@ function handleJoinGroup() {
     min-width: 140px;
 }
 
+.groupUserList {
+    flex-direction: row;
+    display: flex;
+    justify-content:left;
+}
+
 .groupUser {
     list-style: none;
+    margin-right: 2em;
 }
 </style>

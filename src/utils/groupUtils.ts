@@ -28,7 +28,6 @@ function getCurrrentGroup() {
 }
 
 export function useCurrentGroup() {
-  getCurrrentGroup();
   return { isCurrentGroupLoading, currentGroup, getCurrrentGroup };
 }
 

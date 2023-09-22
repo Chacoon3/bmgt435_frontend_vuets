@@ -9,6 +9,8 @@ export type User = {
   group_name: string | null;
   role: string;
   tag_id: number | null;
+  semester_id: number | null;
+  semester_name: string | null;
 };
 
 export type Case = {
@@ -29,12 +31,15 @@ export type CaseRecord = {
   state: string;
   score: number;
   detail_json: object;
+  file: string;
 };
 
 export type Group = {
   id: number;
   name: string;
   users: User[];
+  semester_id: number | null;
+  semester_name: string | null;
 };
 
 export type Role = {
@@ -53,3 +58,12 @@ export type SystemStatus = {
   activated_user_count: number;
   case_record_count: number;
 }
+
+export type FileUploadData<TMeta> = {
+  file_stream?: Uint8Array;
+  meta?: TMeta;
+}
+
+export type ImportUserData = FileUploadData<{
+  semester_id: number;
+}>
