@@ -80,7 +80,7 @@ function handleSubmit() {
     <div class="feedbackFormMask">
         <div class="feedbackFormContainer">
             <div class="feedbackFormTitle">
-                <h3>Share your feedback</h3>
+                <h3>Share us your feedback :)</h3>
             </div>
 
             <div class="feedbackFormBody">

@@ -3,7 +3,7 @@ import { watch, ref } from 'vue';
 import { RouterView } from 'vue-router'
 import router, { routePaths } from './router';
 import { useCurrentUser, formatUserName } from './utils/userUtils';
-import CustomTitle from './components/CustomTitle.vue';
+import ViewPageTitle from './components/ViewPageTitle.vue';
 import NavigationBar from '@/components/NavigationBar.vue'
 import { type NavigationConfig } from './components/types';
 import FeedbackIcon from './components/FeedbackIcon.vue';
@@ -92,7 +92,7 @@ const { isFeedbackModalOpen } = useFeedbackModal();
     <div id="moduleContainer">
 
       <div id="moduleTitle" v-if="router.currentRoute.value.meta.requireAuth === true">
-        <CustomTitle :title="moduleTitle"></CustomTitle>
+        <ViewPageTitle :title="moduleTitle"></ViewPageTitle>
       </div>
 
       <!-- <div id="moduleContent"> -->

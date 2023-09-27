@@ -31,7 +31,7 @@ export type CaseRecord = {
   state: string;
   score: number;
   detail_json: object;
-  file: string;
+  file_name: string;
 };
 
 export type Group = {
@@ -65,5 +65,10 @@ export type FileUploadData<TMeta> = {
 }
 
 export type ImportUserData = FileUploadData<{
-  semester_id: number;
+  semester_name: string;
 }>
+
+export type Semester = {
+  id: number;
+  name: string;
+}

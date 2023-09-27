@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { type ButtonConfig } from './types';
 
-defineProps<ButtonConfig>();
+defineProps<{config: ButtonConfig}>();
 </script>
 
 <template>
-    <button class="normalButton" :disabled="$props.disabled ?? false" @click="$props.onClick">
-        {{ $props.text }}
+    <button v-if="config.htmlClass" :class="config.htmlClass" :disabled="config.disabled?.() ?? false" @click="config.onClick">
+        {{ config.text }}
+    </button>
+    <button v-else :disabled="config.disabled?.() ?? false" @click="config.onClick">
+        {{ config.text }}
     </button>
 </template>

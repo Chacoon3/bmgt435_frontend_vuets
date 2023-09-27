@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { type CustomSelectConfig } from '@/components/types';
-import CustomSelect from '@/components/CustomSelect.vue';
+import CustomSelectGroup from '@/components/CustomSelectGroup.vue';
 import FoodcenterConfig from './manageChildren/FoodcenterConfig.vue'
 import ImportUser from './manageChildren/ImportUser.vue'
 import ViewUser from './manageChildren/ViewUser.vue';
 import { useCumulatedCases } from '@/utils/caseUtils';
 import { type Case } from '@/utils/backendTypes';
+import CreateSemester from './manageChildren/CreateSemester.vue';
 
 const { isLoading: isCasesLoading, data: cases, hasMore: hasMoreCases, getData: getCases } = useCumulatedCases();
 getCases();
@@ -19,17 +20,25 @@ const caseOptions = computed<string[]>(() => {
         })
     }
 })
-const selectState = computed<CustomSelectConfig[]>(() => [
+const selectConfig = computed<CustomSelectConfig[]>(() => [
     {
-        name: "User Management",
-        options: ["View Users", "Import Users"],
+        name: "User",
+        options: ["View users", "Import users"],
     },
     {
-        name: "Case Management",
+        name: "Group",
+        options: ["View groups", "Create groups"],
+    },
+    {
+        name: "Case",
         options: caseOptions.value,
     },
     {
-        name: "System Management",
+        name: "Semester",
+        options: ["Create semester", "View semester"],
+    },
+    {
+        name: "System",
         options: ["Config"],
     }
 ])
@@ -40,17 +49,18 @@ const moduleState = ref<string>("")
 
 <template>
     <div id="manageViewContainer" class="contentViewContainer">
+
         <div id="manageButtonContainer">
-            <CustomSelect v-for="(item, index) in selectState" :key="index" :name="item.name" v-model:options="item.options"
-                @input="(newVal: string) => { moduleState = newVal; }"></CustomSelect>
+            <CustomSelectGroup :select-configs="selectConfig" flexDir="row" @update:value="(val:string) => { moduleState = val}"></CustomSelectGroup>
         </div>
         <hr class="lv2Hr">
 
         <div id="manageModuleContainer">
             <KeepAlive>
-                <ImportUser v-if="moduleState === 'Import Users'"></ImportUser>
-                <ViewUser v-else-if="moduleState === 'View Users'"></ViewUser>
+                <ImportUser v-if="moduleState === 'Import users'"></ImportUser>
+                <ViewUser v-else-if="moduleState === 'View users'"></ViewUser>
                 <FoodcenterConfig v-else-if="moduleState === 'Food center'"></FoodcenterConfig>
+                <CreateSemester v-else-if="moduleState === 'Create semester'"></CreateSemester>
             </KeepAlive>
         </div>
     </div>
@@ -64,6 +74,7 @@ const moduleState = ref<string>("")
 }
 
 #manageButtonContainer {
+    margin: 1em;
     display: flex;
     flex-direction: row;
     justify-content: center;

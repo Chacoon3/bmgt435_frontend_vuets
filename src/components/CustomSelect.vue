@@ -2,20 +2,17 @@
 import { type CustomSelectConfig } from './types';
 import { ref} from 'vue';
 
-defineProps<CustomSelectConfig>();
-
-defineEmits<{
-    (event: 'input', value: string): void
-}>();
+defineProps<{selectConfig: CustomSelectConfig}>();
+defineEmits<{ (event: 'input', value: string): void }>();
 
 const isOn = ref<boolean>(false);
 </script>
 
 <template>
     <div class="customSelectContainer">
-        <button class="normalButton" :selectState="isOn" @click="isOn = ! isOn">{{ $props.name }}</button>
+        <button class="normalButton" :selectState="isOn" @click="isOn = ! isOn">{{ selectConfig.name }}</button>
         <div class="customSelectOptionDiv" v-if="isOn === true">
-            <div v-for="(item, index) in $props.options" :key="index">
+            <div v-for="(item, index) in selectConfig.options" :key="index">
                 <button class="customSelectOptionButton" @click="() => {$emit('input', item); isOn = false;}">{{ item }}</button>
             </div>
         </div>
@@ -32,7 +29,8 @@ const isOn = ref<boolean>(false);
 }
 
 .normalButton {
-    width: 175px;
+    min-width: 10em;
+    min-height: 2.5em;
     margin: 0;
 }
 
@@ -68,5 +66,4 @@ const isOn = ref<boolean>(false);
 .customSelectOptionButton:hover {
     background-color: var(--color-red-umd-slight-light);
 }
-
 </style>

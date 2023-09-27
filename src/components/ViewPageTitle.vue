@@ -25,6 +25,6 @@ defineProps({
 .titleHr {
     position: relative;
     width: 85%;
-    margin-bottom: 30px;
+    margin-bottom: 5px;
 }
 </style>

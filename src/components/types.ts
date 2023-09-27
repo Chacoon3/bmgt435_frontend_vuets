@@ -3,37 +3,23 @@ import { type ComputedRef } from "vue";
 export type InLineMsgConfig = {
   show: boolean;
   content: string;
-  type: "normal" | "error" | "warning"; // defines the color of the message
-};
-
-export type DynamicFormField<TVal = object> = {
-  fieldName: string;
-  fieldType:
-    | "text"
-    | "number"
-    | "password"
-    | "select"
-    | "checkbox"
-    | "radio"
-    | "textarea";
-  label?: string;
-  placeholder?: string;
-  value: TVal;
-};
-
-export type DynamicFormConfig = {
-  fields: DynamicFormField[];
+  type: "normal" | "error" | "warning"; // defines the state of the message, coupled with text color
 };
 
 export type CustomSelectConfig = {
   name: string;
   options: string[];
-  isOn?: boolean;
 };
 
 export type CustomSelectGroupConfig = {
   selectConfigs: CustomSelectConfig[];
   flexDirection?: "row" | "column";
+};
+
+export type DropdownConfig = {
+  name: string;
+  options: string[];
+  width?: number,
 };
 
 export type NavigationItemConfig = {
@@ -60,8 +46,9 @@ export type TableConfig = {
   rows: TableItemConfig[][];
 };
 
-export interface ButtonConfig {
+export type ButtonConfig = {
   text: string | ComputedRef<string>;
   onClick: () => void;
-  disabled?: boolean;
+  disabled: () => boolean;
+  htmlClass: string;
 }

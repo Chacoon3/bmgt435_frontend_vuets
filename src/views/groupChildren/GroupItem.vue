@@ -1,30 +1,18 @@
 <script setup lang="ts">
 import { type Group } from '@/utils/backendTypes';
-import { useJoinGroup } from '@/utils/groupUtils';
-import { useCurrentUser } from '@/utils/userUtils';
+import type { ButtonConfig } from '@/components/types';
 
-const props = defineProps<{
-    group: Group;
+defineProps<{ 
+    group: Group; 
+    buttonConfig: ButtonConfig | null;
 }>();
-const { isJoiningGroup, joinGroup } = useJoinGroup();
-const { currentUser } = useCurrentUser();
-
-function handleJoinGroup() {
-    if (props.group.id === null) {
-        throw new Error("group id is null");
-    }
-    else {
-        joinGroup(props.group.id);
-    }
-}
 </script>
 
 <template>
     <div id="groupItemContainer">
         <span class="groupName">{{ group.name }}</span>
-        <button class="normalButton" v-if="currentUser && currentUser.group_id === null" @click="handleJoinGroup"
-            :disabled="isJoiningGroup === true">
-            {{ isJoiningGroup === true ? "Joining..." : "Join" }}
+        <button v-if="buttonConfig" :class="buttonConfig.htmlClass" :disabled="buttonConfig.disabled()" @click="buttonConfig.onClick">
+            {{ buttonConfig?.text }}
         </button>
 
         <ul class="groupUserList">
@@ -37,7 +25,7 @@ function handleJoinGroup() {
 
 <style scoped>
 #groupItemContainer {
-    margin-bottom: 15px;
+    margin-bottom: 5px;
 }
 
 .groupName {
@@ -49,7 +37,8 @@ function handleJoinGroup() {
 .groupUserList {
     flex-direction: row;
     display: flex;
-    justify-content:left;
+    justify-content: left;
+    padding: 0%;
 }
 
 .groupUser {

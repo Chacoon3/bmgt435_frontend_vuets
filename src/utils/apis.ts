@@ -62,6 +62,7 @@ export const endpoints = {
     },
     semester: {
       create: "bmgt435/api/manage/semester/create",
+      all: "bmgt435/api/manage/semester/all",
     },
     system: {
       state: "bmgt435/api/manage/system/state",
