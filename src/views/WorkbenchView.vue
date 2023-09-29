@@ -20,7 +20,7 @@ getCases();
                 <div v-if="isCasesLoading === true">
                     Fetching Data...
                 </div>
-                <div v-else-if="cases !== null && cases !== null && cases.length > 0">
+                <div v-else-if="cases !== null && cases.length > 0">
                     <h3>Your Case : {{ cases[0].name }}</h3>
                     <div>
                         <button class="normalButton" @click="() => caseSelection = cases[0].id">Click to enter

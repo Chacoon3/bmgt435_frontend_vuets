@@ -19,12 +19,12 @@ export default function createProjectEnvVars() {
     }
   }
 
-  fs.writeFileSync(
+  fs.appendFileSync(
     "./.env",
     Array.from(envVars)
       .map(([key, value]) => `${key}=${value}`)
       .join("\n")
   );
-
+  
   console.log(`${counter} project env vars generated successfully!`);
 }
