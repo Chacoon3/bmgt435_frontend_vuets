@@ -9,7 +9,7 @@ import {validateText} from '@/utils/formUtils';
 
 const { isLoading, signUp } = useSignUp();
 const signUpForm = reactive<SignUpForm>({ did: "", password: "" });
-const inlineMsgState = reactive<InLineMsgConfig>({ show: false, content: "", type: "error" });
+const inlineMsgState = reactive<InLineMsgConfig>({ show: false, content: "", type: "error" ,textAlign: "center"});
 const password_retyped = ref<string>("");
 const passwordMatch = computed(() => signUpForm.password === password_retyped.value)
 const { setPortalState } = usePortalState();
@@ -54,7 +54,7 @@ function handleSignUp() {
 
 <template>
     <div class="portalSubmodule">
-        <InLineMsg :show="inlineMsgState.show" :content="inlineMsgState.content"></InLineMsg>
+        <InLineMsg :config="inlineMsgState"></InLineMsg>
         <form autocomplete="on" id="signUpForm" @submit.prevent="handleSignUp">
             <div class="formDiv">
                 <label>directory ID</label>

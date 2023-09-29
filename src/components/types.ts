@@ -3,7 +3,8 @@ import { type ComputedRef } from "vue";
 export type InLineMsgConfig = {
   show: boolean;
   content: string;
-  type: "normal" | "error" | "warning"; // defines the state of the message, coupled with text color
+  type?: "normal" | "error" | "warning"; // defines the state of the message, coupled with text color
+  textAlign?: "left" | "center" | "right";
 };
 
 export type CustomSelectConfig = {
@@ -19,6 +20,7 @@ export type CustomSelectGroupConfig = {
 export type DropdownConfig = {
   name: string;
   options: string[];
+  values?: string[];
   width?: number,
 };
 
@@ -52,3 +54,10 @@ export type ButtonConfig = {
   disabled: () => boolean;
   htmlClass: string;
 }
+
+export type CustomInputConfig = {
+  label: string;
+  type: string;
+  placeholder?: string;
+  defaultValue?: string;
+};

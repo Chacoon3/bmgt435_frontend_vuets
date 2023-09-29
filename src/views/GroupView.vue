@@ -5,6 +5,7 @@ import GroupList from './groupChildren/GroupList.vue';
 import MyGroup from './groupChildren/MyGroup.vue';
 import InLineMsg from '@/components/InLineMsg.vue';
 import type { ButtonConfig } from '@/components/types';
+import type { AxiosResponse } from 'axios';
 
 
 const inlineMsgState = reactive({
@@ -53,7 +54,18 @@ function mapButtonConfig(groupId: number): ButtonConfig | null {
             return isJoiningGroup.value === true;
         },
         onClick: () => {
-            joinGroup(groupId);
+            joinGroup(groupId, (resp:AxiosResponse) => {
+                if (resp.status === 200) {
+                    inlineMsgState.msg = resp?.data ?? "join group success!";
+                    getCurrrentGroup();
+                    resetGroupData();
+                    getGroupData();
+                }
+                else {
+                    inlineMsgState.msg = resp?.data ?? "join group failed!";
+                }
+                inlineMsgState.show = true;
+            });
         }
     }
 }

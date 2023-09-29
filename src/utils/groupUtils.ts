@@ -1,9 +1,15 @@
 import { useCurrentUser } from "./userUtils";
-import { httpGet, httpPost, useCachedPaginatedGet, useCachedCumulatedGet, clearCacheByEndpoint } from "./requests";
+import {
+  httpGet,
+  httpPost,
+  useCachedPaginatedGet,
+  useCachedCumulatedGet,
+  clearCacheByEndpoint,
+} from "./requests";
 import { endpoints } from "./apis";
 import { ref } from "vue";
 import { type Group } from "./backendTypes";
-
+import type { AxiosResponse } from "axios";
 
 const { currentUser } = useCurrentUser();
 const isCurrentGroupLoading = ref<boolean>(false);
@@ -12,16 +18,19 @@ const currentGroup = ref<Group | null>(null);
 function getCurrrentGroup() {
   if (currentUser.value && currentUser.value.group_id !== null) {
     isCurrentGroupLoading.value = true;
-    httpGet(endpoints.groups.get, {id: currentUser.value.group_id}, (resp: any) => {
-      if (resp.status === 200) {
-        currentGroup.value = resp.data;
-      } else {
-        currentGroup.value = null;
+    httpGet(
+      endpoints.groups.get,
+      { id: currentUser.value.group_id },
+      (resp: any) => {
+        if (resp.status === 200) {
+          currentGroup.value = resp.data;
+        } else {
+          currentGroup.value = null;
+        }
+        isCurrentGroupLoading.value = false;
       }
-      isCurrentGroupLoading.value = false;
-    });
-  }
-  else {
+    );
+  } else {
     currentGroup.value = null;
     isCurrentGroupLoading.value = false;
   }
@@ -42,21 +51,25 @@ export function useCachedCumulatedGroups() {
 export function useCreateGroup() {
   const isCreatingGroup = ref<boolean>(false);
 
-  function createGroup(callback: any = null) {
+  function createGroup(
+    semesterId: string | number,
+    numGroups?: string | number,
+    callback: any = null
+  ) {
+    if (isCreatingGroup.value === true) return;
+    
     isCreatingGroup.value = true;
-    httpPost(endpoints.groups.create, null, (resp: any) => {
-      isCreatingGroup.value = false;
-      if (resp.status === 200) {
-        if (currentUser.value !== null) {
-          currentUser.value.group_id = resp.data.id;
-        }
-        currentGroup.value = resp.data;
-        clearCacheByEndpoint(endpoints.groups.paginated);
-      } else {
-        currentGroup.value = null;
+    httpPost(
+      endpoints.manage.group.create,
+      {
+        semester_id: semesterId,
+        size: numGroups,
+      },
+      (resp: AxiosResponse) => {
+        isCreatingGroup.value = false;
+        callback?.(resp);
       }
-      callback?.(resp);
-    });
+    );
   }
 
   return { isCreatingGroup, createGroup };

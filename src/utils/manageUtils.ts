@@ -9,7 +9,7 @@ const { clearCacheByEndpoint } = useCache();
 export function useImportUsers() {
   const isLoading = ref<boolean>(false);
 
-  function importUsers(csvUsers: File, semester_name: string, callback: any) {
+  function importUsers(csvUsers: File, semester_id: string, callback: any) {
     if (isLoading.value === true) return;
 
     isLoading.value = true;
@@ -18,9 +18,9 @@ export function useImportUsers() {
       .getReader()
       .read()
       .then((bytes) => {
-        httpPost<ImportUserData>(
-          endpoints.manage.user.import,
-          { file_stream: bytes.value, meta: { semester_name: semester_name } },
+        httpPost(
+          `${endpoints.manage.user.import}/semester/${semester_id}`,
+          bytes.value,
           (resp: any) => {
             isLoading.value = false;
             if (resp.status === 200) {
@@ -69,7 +69,7 @@ export function useSystemState() {
 }
 
 const isLoadingSemesters = ref<boolean>(false);
-const semesters = ref<string[]>([]);
+const semesters = ref<Semester[]>([]);
 
 function getSemesters() {
   if (isLoadingSemesters.value === true) return;
@@ -78,8 +78,7 @@ function getSemesters() {
   cachedHttpGet(endpoints.manage.semester.all, null, (resp: AxiosResponse) => {
     isLoadingSemesters.value = false;
     if (resp.status === 200) {
-      const data: Semester[] = resp.data;
-      semesters.value = data.map((s) => s.name);
+      semesters.value = resp.data;
     } else {
       semesters.value = [];
     }

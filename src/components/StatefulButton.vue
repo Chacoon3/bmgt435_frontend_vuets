@@ -8,7 +8,7 @@ defineProps<{config: ButtonConfig}>();
     <button v-if="config.htmlClass" :class="config.htmlClass" :disabled="config.disabled?.() ?? false" @click="config.onClick">
         {{ config.text }}
     </button>
-    <button v-else :disabled="config.disabled?.() ?? false" @click="config.onClick">
+    <button v-else :disabled="config.disabled()" @click="config.onClick">
         {{ config.text }}
     </button>
 </template>

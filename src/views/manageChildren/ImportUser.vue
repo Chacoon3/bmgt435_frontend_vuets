@@ -4,11 +4,11 @@ import { useImportUsers } from '@/utils/manageUtils';
 import CustomDropdown from '@/components/CustomDropdown.vue';
 import InLineMsg from '@/components/InLineMsg.vue';
 import { ref } from 'vue';
-import type { DropdownConfig } from '@/components/types';
+import type { DropdownConfig, InLineMsgConfig } from '@/components/types';
 import { useSemester } from '@/utils/manageUtils';
 
-const contentMsgState = reactive({
-    msg: "",
+const contentMsgState = reactive<InLineMsgConfig>({
+    content: "",
     show: false,
 });
 const { isLoading: isImporting, importUsers } = useImportUsers();
@@ -18,22 +18,27 @@ function handleImportUser() {
     const inputHandle = document.getElementById("importUserFile") as HTMLInputElement;
     const file = inputHandle.files?.[0];
     if (file) {
-        importUsers(file, semesterSelected.value, (resp: any) => {
+        importUsers(file, selectedSemesterId.value, (resp: any) => {
             if (resp.status === 200) {
-                contentMsgState.msg = "Import success";
+                contentMsgState.content = "Import success";
             } else {
-                contentMsgState.msg = resp.data ?? "Import failed";
+                contentMsgState.content = resp.data ?? "Import failed";
             }
             contentMsgState.show = true;
         });
+    }
+    else {
+        contentMsgState.content = "Please select a file";
+        contentMsgState.show = true;
     }
 }
 
 const semesterDropdownConfig: DropdownConfig =reactive({
     name: "Semester",
-    options: semesters.value
+    options: semesters.value.map((item) => item.name),
+    values: semesters.value.map((item) => item.id.toString()),
 })
-const semesterSelected = ref("");
+const selectedSemesterId = ref<string>(semesterDropdownConfig.values?.[0] ?? "");
 </script>
 
 <template>
@@ -46,10 +51,10 @@ const semesterSelected = ref("");
                 <input id="importUserFile" type="file" accept=".csv">
             </div>
             <div>
-                <CustomDropdown :config="semesterDropdownConfig" @update:value="(val) => semesterSelected = val"></CustomDropdown>
+                <CustomDropdown :config="semesterDropdownConfig" @update:value="(val) => selectedSemesterId = val"></CustomDropdown>
             </div>
             <div>
-                <InLineMsg :content="contentMsgState.msg" :show="contentMsgState.show"></InLineMsg>
+                <InLineMsg :config="contentMsgState"></InLineMsg>
                 <input type="submit" :disabled="isImporting === true"
                     :value="isImporting === false ? 'Import Users' : 'Importing'">
             </div>

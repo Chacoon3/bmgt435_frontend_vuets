@@ -65,7 +65,7 @@ export type FileUploadData<TMeta> = {
 }
 
 export type ImportUserData = FileUploadData<{
-  semester_name: string;
+  semester_id: string;
 }>
 
 export type Semester = {

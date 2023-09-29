@@ -1,20 +1,14 @@
 <script setup lang="ts">
 import { type InLineMsgConfig } from './types';
 
-const props = withDefaults(defineProps<InLineMsgConfig>(),
-    {
-        show: false,
-        content: "",
-        type: "error"
-    }
-);
+defineProps<{config:InLineMsgConfig}>();
 
 </script>
 
 <template>
-    <div class="inLineMsg" :msgState="props.type">
-        <span v-if="props.show" class="inline-msg">
-            <span>{{ props.content }}</span>
+    <div class="inLineMsg" :msgState="config?.type ?? 'error'">
+        <span v-if="config.show === true" class="inline-msg">
+            <span>{{ config.content }}</span>
         </span>
     </div>
 </template>
@@ -22,8 +16,8 @@ const props = withDefaults(defineProps<InLineMsgConfig>(),
 <style scoped>
 .inLineMsg {
     display: block;
-    text-align: center;
     margin: 1em;
+    text-align: v-bind(config?.textAlign ?? 'left');
 }
 
 .inLineMsg[msgState=error] {

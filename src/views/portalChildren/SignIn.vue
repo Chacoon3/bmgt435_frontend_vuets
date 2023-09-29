@@ -4,6 +4,7 @@ import {type SignInForm, useSignIn } from '../../utils/userUtils';
 import InLineMsg from '@/components/InLineMsg.vue';
 import router, {routePaths} from '@/router';
 import { validateText } from '@/utils/formUtils'
+import type { InLineMsgConfig } from '@/components/types';
 
 const { isLoading, signIn } = useSignIn()
 const signInForm = reactive<SignInForm>({
@@ -11,26 +12,27 @@ const signInForm = reactive<SignInForm>({
     password: ""
 });
 
-const inlineMsgState = reactive({
+const inlineMsgState : InLineMsgConfig = reactive({
     show: false,
-    msg: "",
-    type: "error"
+    content: "",
+    type: "error",
+    textAlign: "center",
 })
 
 function handleSignIn() {
     if (!validateText(signInForm.did) || !validateText(signInForm.password)) {
-        inlineMsgState.msg = "Please input directory ID and password!"
+        inlineMsgState.content = "Please input directory ID and password!"
         inlineMsgState.show = true;
     }
     else {
         inlineMsgState.show = false;
-        inlineMsgState.msg = "";
+        inlineMsgState.content = "";
         signIn(signInForm, (resp) => {
             if (resp.status === 200) {
                 router.push({ name: routePaths.workbench})
             }
             else {
-                inlineMsgState.msg = resp === null ? "Sign in failed for unknwon error!" : resp.data;
+                inlineMsgState.content = resp === null ? "Sign in failed for unknwon error!" : resp.data;
                 inlineMsgState.show = true;
             }
         });
@@ -42,7 +44,7 @@ function handleSignIn() {
 
 <template>
     <div class="portalSubmodule">
-        <InLineMsg :show="inlineMsgState.show" :content="inlineMsgState.msg"></InLineMsg>
+        <InLineMsg :config="inlineMsgState"></InLineMsg>
         <form @submit.prevent="handleSignIn" autocomplete="on">
             <div class="formDiv">
                 <label>directory ID</label>

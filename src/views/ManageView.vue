@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { type CustomSelectConfig } from '@/components/types';
+import { useCumulatedCases } from '@/utils/caseUtils';
+import { type Case } from '@/utils/backendTypes';
 import CustomSelectGroup from '@/components/CustomSelectGroup.vue';
 import FoodcenterConfig from './manageChildren/FoodcenterConfig.vue'
 import ImportUser from './manageChildren/ImportUser.vue'
 import ViewUser from './manageChildren/ViewUser.vue';
-import { useCumulatedCases } from '@/utils/caseUtils';
-import { type Case } from '@/utils/backendTypes';
 import CreateSemester from './manageChildren/CreateSemester.vue';
+import CreateGroup from './manageChildren/CreateGroup.vue';
 
 const { isLoading: isCasesLoading, data: cases, hasMore: hasMoreCases, getData: getCases } = useCumulatedCases();
 getCases();
@@ -35,7 +36,7 @@ const selectConfig = computed<CustomSelectConfig[]>(() => [
     },
     {
         name: "Semester",
-        options: ["Create semester", "View semester"],
+        options: ["Create semester"],
     },
     {
         name: "System",
@@ -61,6 +62,7 @@ const moduleState = ref<string>("")
                 <ViewUser v-else-if="moduleState === 'View users'"></ViewUser>
                 <FoodcenterConfig v-else-if="moduleState === 'Food center'"></FoodcenterConfig>
                 <CreateSemester v-else-if="moduleState === 'Create semester'"></CreateSemester>
+                <CreateGroup v-else-if="moduleState === 'Create groups'"></CreateGroup>
             </KeepAlive>
         </div>
     </div>

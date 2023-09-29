@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useSemester } from '@/utils/manageUtils';
 import CustomDropdown from '@/components/CustomDropdown.vue';
-import type { DropdownConfig } from '@/components/types';
-import { ref } from 'vue';
+import type { DropdownConfig, InLineMsgConfig } from '@/components/types';
+import InLineMsg from '@/components/InLineMsg.vue';
+import { reactive, ref } from 'vue';
+import type { AxiosResponse } from 'axios';
 
 const { createSemester, clearCache, getSemesters } = useSemester();
 const date = new Date();
@@ -23,9 +25,22 @@ const seasonDropdownConfig: DropdownConfig = {
 
 const yearSelected = ref<string>(yearDropdownConfig.options[0]);
 const seasonSelected = ref<string>(seasonDropdownConfig.options[0]);
+const lineMsgState = reactive<InLineMsgConfig>({
+    content: "",
+    show: false,
+    textAlign:"left"
+})
 
 function handleCreateSemester() {
-    createSemester(yearSelected.value, seasonSelected.value, null);
+    createSemester(yearSelected.value, seasonSelected.value, (resp:AxiosResponse) => {
+            lineMsgState.show = true;
+        if (resp.status === 200) {
+            lineMsgState.content = "Create semester success";
+        }
+        else {
+            lineMsgState.content = resp.data ?? "Create semester failed";   
+        }
+    });
     clearCache();
     getSemesters();
 }
@@ -37,6 +52,7 @@ function handleCreateSemester() {
         <form @submit.prevent="handleCreateSemester">
             <CustomDropdown :config="yearDropdownConfig" @update:value="(val) => yearSelected = val"></CustomDropdown>
             <CustomDropdown :config="seasonDropdownConfig" @update:value="(val) => seasonSelected = val"></CustomDropdown>
+            <InLineMsg :config="lineMsgState"></InLineMsg>
             <div>
                 <input type="submit" value="Create semester">
             </div>

@@ -16,9 +16,14 @@ defineProps<{
         </button>
 
         <ul class="groupUserList">
+            <div v-if="group.users.length > 0">
             <li class="groupUser" v-for="user in group.users" :key="user.id">
                 {{ user?.first_name }} {{ user?.last_name }}
             </li>
+        </div>
+        <div v-else>
+            Group is empty
+        </div>
         </ul>
     </div>
 </template>
