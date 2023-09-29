@@ -86,7 +86,7 @@ function handleSubmit() {
             <div class="feedbackFormBody">
                 <textarea class="feedbackTextarea" maxlength="{{MAX_CHARACTERS}}" spellcheck="true"
                     v-model="feedbackText"></textarea>
-                <InLineMsg :show="true" :content="inlineMsgState.content" :type="inlineMsgState.type"></InLineMsg>
+                <InLineMsg :config="inlineMsgState"></InLineMsg>
             </div>
 
             <div class="feedbackFormFooter">
