@@ -3,15 +3,12 @@ import { useCurrentGroup, useCachedCumulatedGroups, useLeaveGroup, useJoinGroup 
 import { computed, reactive } from 'vue';
 import GroupList from './groupChildren/GroupList.vue';
 import MyGroup from './groupChildren/MyGroup.vue';
-import InLineMsg from '@/components/InLineMsg.vue';
 import type { ButtonConfig } from '@/components/types';
 import type { AxiosResponse } from 'axios';
+import { useModal, type ModalConfig } from '@/utils/modalUtils';
 
-
-const inlineMsgState = reactive({
-    show: false,
-    msg: '',
-})
+const { showModal, closeModal } = useModal();
+const modalState = reactive<ModalConfig>({ onConfirm: closeModal });
 const { isJoiningGroup, joinGroup } = useJoinGroup();
 const { isCurrentGroupLoading, currentGroup, getCurrrentGroup } = useCurrentGroup();
 const { isLeavingGroup, leaveGroup } = useLeaveGroup();
@@ -22,15 +19,15 @@ getGroupData();
 function handleLeaveGroup() {
     leaveGroup((resp: any) => {
         if (resp.status === 200) {
-            inlineMsgState.msg = resp?.data ?? "leave group success!";
-            getCurrrentGroup();
-            resetGroupData();
-            getGroupData();
+            modalState.message = resp?.data ?? "leave group success!";
         }
         else {
-            inlineMsgState.msg = resp?.data ?? "leave group failed!";
+            modalState.message = resp?.data ?? "leave group failed!";
         }
-        inlineMsgState.show = true;
+        showModal(modalState);
+        getCurrrentGroup();
+        resetGroupData();
+        getGroupData();
     });
 }
 
@@ -44,27 +41,25 @@ const myGroupButtonConfig: ButtonConfig = {
 }
 
 function mapButtonConfig(groupId: number): ButtonConfig | null {
-    if (currentGroup.value?.id === groupId) {
-        return null;
-    }
     return {
         text: "Join",
         htmlClass: "normalButton",
-        disabled: () => {
+        disabled: groupId === currentGroup.value?.id ? () => true : () => {
             return isJoiningGroup.value === true;
         },
         onClick: () => {
-            joinGroup(groupId, (resp:AxiosResponse) => {
+            joinGroup(groupId, (resp: AxiosResponse) => {
                 if (resp.status === 200) {
-                    inlineMsgState.msg = resp?.data ?? "join group success!";
-                    getCurrrentGroup();
-                    resetGroupData();
-                    getGroupData();
+                    modalState.message = "join group success!";
+
                 }
                 else {
-                    inlineMsgState.msg = resp?.data ?? "join group failed!";
+                    modalState.message = resp?.data ?? "join group failed!";
                 }
-                inlineMsgState.show = true;
+                showModal(modalState);
+                getCurrrentGroup();
+                resetGroupData();
+                getGroupData();
             });
         }
     }

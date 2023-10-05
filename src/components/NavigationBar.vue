@@ -2,15 +2,19 @@
 import { useCurrentUser, useSignOut } from '@/utils/userUtils';
 import router, { routePaths } from '@/router';
 import { type NavigationConfig } from './types';
+import { ref } from 'vue';
 
 defineProps<NavigationConfig>();
 
 const { isCurrentUserLoading, } = useCurrentUser();
 const { signOut } = useSignOut();
+const currentUrl = ref<string>("");
 
-function tryNavigate(url: string) {
+function handleClickNavigation(url: string) {
     if (isCurrentUserLoading.value === false)
-        router.push(url)
+        router.push(url).then(() => {
+            currentUrl.value = url;
+        });
 }
 
 function handleSignOut() {
@@ -25,7 +29,7 @@ function handleSignOut() {
 
         <div id="naviWrapper">
             <div v-for="(item, index) in $props.items" :key="index" :to="{ name: item.url }" class="navigationItemDiv"
-                @click="tryNavigate(item.url)">
+                :isCurrent="currentUrl === item.url" @click="handleClickNavigation(item.url)">
                 <img v-bind:src="item.imgSource" class="naviImg">
                 <span class="naviText">{{ item.text }}</span>
             </div>
@@ -41,7 +45,6 @@ function handleSignOut() {
 <style scoped>
 #navigationBar {
     width: 220px;
-    /* padding-right: 150px; */
 }
 
 #naviWrapper {
@@ -59,12 +62,16 @@ function handleSignOut() {
     height: calc(max(100vh / v-bind("$props.items.length + 1"), 100px));
     background-color: var(--color-red-umd);
     transition: var(--transition-button);
-    box-shadow: 2px 0px 2px  rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 0px 2px rgba(0, 0, 0, 0.5);
 }
 
 .navigationItemDiv:hover {
     background-color: palevioletred;
     cursor: pointer;
+}
+
+.navigationItemDiv[isCurrent="true"] {
+    background-color: palevioletred;
 }
 
 img.naviImg {

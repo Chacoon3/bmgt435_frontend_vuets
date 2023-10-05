@@ -15,6 +15,8 @@ defineProps<{
             {{ buttonConfig?.text }}
         </button>
 
+        <hr>
+
         <ul class="groupUserList">
             <div v-if="group.users.length > 0">
             <li class="groupUser" v-for="user in group.users" :key="user.id">
@@ -30,7 +32,9 @@ defineProps<{
 
 <style scoped>
 #groupItemContainer {
-    margin-bottom: 5px;
+    margin-bottom: 1em;
+    border: 1px solid grey;
+    padding: 2px 10px;
 }
 
 .groupName {

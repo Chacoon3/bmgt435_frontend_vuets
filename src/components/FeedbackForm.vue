@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useSubmitFeedback, useFeedbackModal } from '@/utils/feedbackUtils'
 import { computed, ref } from 'vue';
-import InLineMsg from './InLineMsg.vue';
 import { useCurrentUser } from '@/utils/userUtils';
 import { type InLineMsgConfig } from './types';
 import { useModal } from '@/utils/modalUtils';
@@ -86,7 +85,9 @@ function handleSubmit() {
             <div class="feedbackFormBody">
                 <textarea class="feedbackTextarea" maxlength="{{MAX_CHARACTERS}}" spellcheck="true"
                     v-model="feedbackText"></textarea>
-                <InLineMsg :config="inlineMsgState"></InLineMsg>
+                <div>
+                    {{ inlineMsgState.content }}
+                </div>
             </div>
 
             <div class="feedbackFormFooter">
@@ -119,7 +120,7 @@ function handleSubmit() {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: 300px;
+    width: 500px;
     margin: auto;
     padding: 20px 30px;
     background-color: #fff;

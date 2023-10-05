@@ -144,7 +144,7 @@ function handleSubmit() {
                 v-model:smallS="item.smallS" v-model:bigS="item.bigS" v-model:name="item.name"></CenterConfigPanel>
         </div>
 
-        <InLineMsg :show="inlineMsgState.show" :content="inlineMsgState.content"></InLineMsg>
+        <InLineMsg :config="inlineMsgState"></InLineMsg>
 
         <div>
             <button class="normalButton" btnFeature="simulation" @click="handleSubmit" :disabled="isSubmitting === true">

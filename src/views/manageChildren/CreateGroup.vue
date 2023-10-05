@@ -27,7 +27,7 @@ const inputConfig: CustomInputConfig = {
     label: "Number of groups",
     type: "text",
     placeholder: "Number of groups",
-    defaultValue: "20",
+    defaultValue: "10",
 }
 
 const btnText = computed<string>(() => {
