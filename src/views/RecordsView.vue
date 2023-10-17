@@ -20,7 +20,7 @@ const viewMoreButtonText = computed(() => {
 const { data: records, isLoading, reset: resetCaseRecords, getData: getRecords, hasMore: hasMoreRecords } = useCumulatedCaseRecords()
 const recordTableConfig = computed<TableConfig>(() => {
     return {
-        headers: ["Case Name", "Submitted by", "Time", "Score"],
+        headers: ["Case Name", "Submitted by", "Time", "Score", "Download"],
         rows: Array.from(records.value, (record) => {
             return toTableRow(record);
         })
@@ -65,7 +65,7 @@ function toTableRow(record: CaseRecord): TableItemConfig[] {
         {
             elementType:"button",
             elementClass:"aLikeButton",
-            value:"download detailed record",
+            value:"download simulation record",
             onClick:()=>handleDownloadCaseRecord(record.id),
         }
     ]

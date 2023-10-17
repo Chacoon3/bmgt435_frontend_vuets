@@ -141,6 +141,8 @@ function handleSubmit() {
 
 .feedbackTextarea {
     text-align: justify;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     min-height: 200px;
     resize: none;
 }

@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { type CustomSelectConfig } from '@/components/types';
+import { type CustomSelectConfig, type TableConfig } from '@/components/types';
 import { useCumulatedCases } from '@/utils/caseUtils';
 import { type Case } from '@/utils/backendTypes';
 import CustomSelectGroup from '@/components/CustomSelectGroup.vue';
 import FoodcenterConfig from './manageChildren/FoodcenterConfig.vue'
 import ImportUser from './manageChildren/ImportUser.vue'
-import ViewUser from './manageChildren/ViewUser.vue';
+import ObjectView from './manageChildren/ObjectView.vue';
 import CreateSemester from './manageChildren/CreateSemester.vue';
 import CreateGroup from './manageChildren/CreateGroup.vue';
+import { useCachedCumulatedUsers } from '@/utils/manageUtils';
+import { formatUserName } from '@/utils/userUtils';
 
 const { isLoading: isCasesLoading, data: cases, hasMore: hasMoreCases, getData: getCases } = useCumulatedCases();
 getCases();
@@ -44,6 +46,31 @@ const selectConfig = computed<CustomSelectConfig[]>(() => [
     }
 ])
 
+const { isLoading: isLoadingUsers, data: users, getData: getUsers, reset, hasMore: hasMoreUsers } = useCachedCumulatedUsers();
+getUsers();
+const userTableState = computed<TableConfig>((): TableConfig => {
+    return {
+        title: "Users",
+        headers: ["Name", "Directory ID", "Group", "Role"],
+        rows: users.value.map((user) => {
+            return [{
+                elementType: "text",
+                value: formatUserName(user),
+            }, {
+                elementType: "text",
+                value: user.did,
+            }, {
+                elementType: "text",
+                value: user.group_name ?? "",
+            }, {
+                elementType: "text",
+                value: user.role,
+            }];
+        }
+        )
+    };
+});
+
 const moduleState = ref<string>("")
 
 </script>
@@ -52,14 +79,16 @@ const moduleState = ref<string>("")
     <div id="manageViewContainer" class="contentViewContainer">
 
         <div id="manageButtonContainer">
-            <CustomSelectGroup :select-configs="selectConfig" flexDir="row" @update:value="(val:string) => { moduleState = val}"></CustomSelectGroup>
+            <CustomSelectGroup :select-configs="selectConfig" flexDir="row"
+                @update:value="(val: string) => { moduleState = val }"></CustomSelectGroup>
         </div>
         <hr class="lv2Hr">
 
         <div id="manageModuleContainer">
             <KeepAlive>
                 <ImportUser v-if="moduleState === 'Import users'"></ImportUser>
-                <ViewUser v-else-if="moduleState === 'View users'"></ViewUser>
+                <ObjectView v-else-if="moduleState === 'View users'" :config="userTableState" :is-loading="isLoadingUsers"
+                    :disable-get-data="! hasMoreUsers"></ObjectView>
                 <FoodcenterConfig v-else-if="moduleState === 'Food center'"></FoodcenterConfig>
                 <CreateSemester v-else-if="moduleState === 'Create semester'"></CreateSemester>
                 <CreateGroup v-else-if="moduleState === 'Create groups'"></CreateGroup>
