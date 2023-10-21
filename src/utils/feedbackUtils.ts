@@ -39,11 +39,10 @@ export function useSubmitFeedback() {
   return { isSubmitting, submitFeedback };
 }
 
-export function useCachedCumulatedFeedback() {
-  return useCachedCumulatedGet(endpoints.feedback.paginated);
-}
-
 export type Feedback = {
+  id: number;
   user_id: number;
+  create_time: string;
+  user_name: string;
   content: string;
 };

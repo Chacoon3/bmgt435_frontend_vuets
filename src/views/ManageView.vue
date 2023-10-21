@@ -2,15 +2,19 @@
 import { computed, ref } from 'vue';
 import { type CustomSelectConfig, type TableConfig } from '@/components/types';
 import { useCumulatedCases } from '@/utils/caseUtils';
-import { type Case } from '@/utils/backendTypes';
+import { type Case, type Group } from '@/utils/backendTypes';
 import CustomSelectGroup from '@/components/CustomSelectGroup.vue';
 import FoodcenterConfig from './manageChildren/FoodcenterConfig.vue'
 import ImportUser from './manageChildren/ImportUser.vue'
 import ObjectView from './manageChildren/ObjectView.vue';
 import CreateSemester from './manageChildren/CreateSemester.vue';
 import CreateGroup from './manageChildren/CreateGroup.vue';
-import { useCachedCumulatedUsers } from '@/utils/manageUtils';
+import { useUserMgnt, useGroupMgnt, useSemesterMgnt, useFeedbackMgnt } from '@/utils/manageUtils';
 import { formatUserName } from '@/utils/userUtils';
+import { useModal } from '@/utils/modalUtils';
+import type { Feedback } from '@/utils/feedbackUtils';
+
+const { showModal, closeModal } = useModal();
 
 const { isLoading: isCasesLoading, data: cases, hasMore: hasMoreCases, getData: getCases } = useCumulatedCases();
 getCases();
@@ -23,30 +27,27 @@ const caseOptions = computed<string[]>(() => {
         })
     }
 })
-const selectConfig = computed<CustomSelectConfig[]>(() => [
-    {
-        name: "User",
-        options: ["View users", "Import users"],
-    },
-    {
-        name: "Group",
-        options: ["View groups", "Create groups"],
-    },
-    {
-        name: "Case",
-        options: caseOptions.value,
-    },
-    {
-        name: "Semester",
-        options: ["Create semester"],
-    },
-    {
-        name: "System",
-        options: ["Config"],
-    }
-])
 
-const { isLoading: isLoadingUsers, data: users, getData: getUsers, reset, hasMore: hasMoreUsers } = useCachedCumulatedUsers();
+const { isLoading: isLoadingGroups, data: groups, getData: getGroups, hasMore: hasMoreGroups } = useGroupMgnt();
+getGroups();
+const groupTableState = computed<TableConfig>((): TableConfig => {
+    return {
+        title: "Groups",
+        headers: ["Name", "Members"],
+        rows: groups.value.map((group: Group) => {
+            return [{
+                elementType: "text",
+                value: group.name,
+            }, {
+                elementType: "text",
+                value: group.users.length.toString(),
+            }];
+        }
+        )
+    };
+});
+
+const { isLoading: isLoadingUsers, data: users, getData: getUsers, reset, hasMore: hasMoreUsers } = useUserMgnt();
 getUsers();
 const userTableState = computed<TableConfig>((): TableConfig => {
     return {
@@ -71,8 +72,81 @@ const userTableState = computed<TableConfig>((): TableConfig => {
     };
 });
 
-const moduleState = ref<string>("")
+const { isLoading: isLoadingSemesters, data: semesters, getData: getSemesters } = useSemesterMgnt();
+getSemesters();
+const semesterTableState = computed<TableConfig>((): TableConfig => {
+    return {
+        title: "Semesters",
+        headers: ["Name",],
+        rows: semesters.value.map((semester) => {
+            return [{
+                elementType: "text",
+                value: semester.name,
+            },];
+        }
+        )
+    };
+});
 
+const { isLoading: isLoadingFeedbacks, data: feedbacks, getData: getFeedbacks, hasMore: hasMoreFeedback } = useFeedbackMgnt();
+getFeedbacks();
+const feedbackTableState = computed<TableConfig>((): TableConfig => {
+    return {
+        title: "Feedbacks",
+        headers: ["User", "Time", "Content"],
+        rows: feedbacks.value.map((feedback) => {
+            return [
+                {
+                    elementType: "text",
+                    value: feedback.user_name,
+                }, {
+                    elementType: "text",
+                    value: feedback.create_time,
+                },
+                {
+                    elementType: "text",
+                    value: feedback.content.length > 20 ? feedback.content.slice(0, 20) + "..." : feedback.content,
+                },
+                {
+                    elementType: "button",
+                    value: "View detail",
+                    onClick: () => {
+                        showModal({
+                            title: "Feedback detail",
+                            message: feedback.content,
+                            onConfirm: closeModal,
+                        })
+                    }
+                }];
+        }
+        )
+    };
+});
+
+const moduleState = ref<string>("");
+
+const selectConfig = computed<CustomSelectConfig[]>(() => [
+    {
+        name: "User",
+        options: ["View users", "Import users"],
+    },
+    {
+        name: "Group",
+        options: ["View groups", "Create groups"],
+    },
+    {
+        name: "Case",
+        options: caseOptions.value,
+    },
+    {
+        name: "Semester",
+        options: ["View semesters", "Create semester",],
+    },
+    {
+        name: "System",
+        options: ["Config", "View feedback"],
+    }
+])
 </script>
 
 <template>
@@ -88,7 +162,14 @@ const moduleState = ref<string>("")
             <KeepAlive>
                 <ImportUser v-if="moduleState === 'Import users'"></ImportUser>
                 <ObjectView v-else-if="moduleState === 'View users'" :config="userTableState" :is-loading="isLoadingUsers"
-                    :disable-get-data="! hasMoreUsers"></ObjectView>
+                    :disable-get-data="!hasMoreUsers" @get-data="getUsers"></ObjectView>
+                <ObjectView v-else-if="moduleState === 'View groups'" :config="groupTableState"
+                    :is-loading="isLoadingGroups" :disable-get-data="hasMoreGroups === false" @get-data="getGroups">
+                </ObjectView>
+                <ObjectView v-else-if="moduleState === 'View semesters'" :config="semesterTableState"
+                    :is-loading="isLoadingSemesters" :disable-get-data="true"></ObjectView>
+                    <ObjectView v-else-if="moduleState === 'View feedback'" :config="feedbackTableState"
+                    :is-loading="isLoadingFeedbacks" :disable-get-data="hasMoreFeedback === false"></ObjectView>
                 <FoodcenterConfig v-else-if="moduleState === 'Food center'"></FoodcenterConfig>
                 <CreateSemester v-else-if="moduleState === 'Create semester'"></CreateSemester>
                 <CreateGroup v-else-if="moduleState === 'Create groups'"></CreateGroup>

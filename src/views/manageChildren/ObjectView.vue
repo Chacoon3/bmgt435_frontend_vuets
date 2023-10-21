@@ -22,7 +22,7 @@ defineEmits<{
                 <TableView :table-config="config">
                 </TableView>
                 <button class="normalButton" @click="$emit('get-data')" :disabled="disableGetData">{{
-                    disableGetData ? "View more" : "No more records" }}</button>
+                    disableGetData === false ? "View more" : "No more records" }}</button>
             </div>
             <div v-else>No data available at this time.</div>
         </div>

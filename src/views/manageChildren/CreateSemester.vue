@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useSemester } from '@/utils/manageUtils';
+import { useSemesterMgnt } from '@/utils/manageUtils';
 import CustomDropdown from '@/components/CustomDropdown.vue';
 import type { DropdownConfig, InLineMsgConfig } from '@/components/types';
 import InLineMsg from '@/components/InLineMsg.vue';
 import { reactive, ref } from 'vue';
 import type { AxiosResponse } from 'axios';
 
-const { createSemester, clearCache, getSemesters } = useSemester();
+const { create: createSemester, clearCache, getData: getSemesters } = useSemesterMgnt();
 const date = new Date();
 const validYears = Array.from({ length: 3 }, (_, i) => date.getFullYear() + i);
 const yearDropdownConfig: DropdownConfig = {

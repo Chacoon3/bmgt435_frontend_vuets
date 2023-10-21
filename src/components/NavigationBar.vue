@@ -1,27 +1,13 @@
 <script setup lang="ts">
-import { useCurrentUser, useSignOut } from '@/utils/userUtils';
-import router, { routePaths } from '@/router';
 import { type NavigationConfig } from './types';
 import { ref } from 'vue';
 
 defineProps<NavigationConfig>();
+defineEmits<{
+    (event: 'update:focus', value: number): void
+}>();
 
-const { isCurrentUserLoading, } = useCurrentUser();
-const { signOut } = useSignOut();
 const currentUrl = ref<string>("");
-
-function handleClickNavigation(url: string) {
-    if (isCurrentUserLoading.value === false)
-        router.push(url).then(() => {
-            currentUrl.value = url;
-        });
-}
-
-function handleSignOut() {
-    router.push({ name: routePaths.portal })
-    signOut();
-}
-
 </script>
 
 <template>
@@ -29,14 +15,9 @@ function handleSignOut() {
 
         <div id="naviWrapper">
             <div v-for="(item, index) in $props.items" :key="index" :to="{ name: item.url }" class="navigationItemDiv"
-                :isCurrent="currentUrl === item.url" @click="handleClickNavigation(item.url)">
+                :isCurrent="currentUrl === item.url" @click="$emit('update:focus', index)">
                 <img v-bind:src="item.imgSource" class="naviImg">
                 <span class="naviText">{{ item.text }}</span>
-            </div>
-
-            <div class="navigationItemDiv" @click="handleSignOut()">
-                <img v-bind:src="'/icons/navigationBar/exit.svg'" class="naviImg">
-                <span class="naviText">Sign Out</span>
             </div>
         </div>
     </nav>
@@ -59,7 +40,7 @@ function handleSignOut() {
     align-items: center;
     justify-content: center;
     padding: 0 10px 0 10px;
-    height: calc(max(100vh / v-bind("$props.items.length + 1"), 100px));
+    height: calc(max(100vh / v-bind("$props.items.length"), 100px));
     background-color: var(--color-red-umd);
     transition: var(--transition-button);
     box-shadow: 2px 0px 2px rgba(0, 0, 0, 0.5);

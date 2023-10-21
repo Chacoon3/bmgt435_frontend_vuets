@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { type CaseRecord, type Case } from "./backendTypes";
-import { httpGet, httpPost, useCachedCumulatedGet } from "./requests";
+import { httpPost, useCachedCumulatedGet } from "./requests";
 import { endpoints } from "./apis";
 import { type AxiosResponse } from "axios";
 import { useCumulatedCaseRecords } from "./caseRecordsUtils";

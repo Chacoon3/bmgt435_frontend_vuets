@@ -47,8 +47,6 @@ export const endpoints = {
 
   feedback: {
     post: "bmgt435-service/api/feedback/post",
-    get: "bmgt435-service/api/feedback/get",
-    paginated: "bmgt435-service/api/feedback/paginated",
   },
 
   manage: {
@@ -58,10 +56,15 @@ export const endpoints = {
     },
     group: {
       create: "bmgt435-service/api/manage/group/create",
+      viewPaginated: "bmgt435-service/api/manage/group/paginated",
     },
     semester: {
       create: "bmgt435-service/api/manage/semester/create",
       all: "bmgt435-service/api/manage/semester/all",
+    },
+    feedback: {
+      paginated: "bmgt435-service/api/manage/feedback/paginated",
+      get: "bmgt435-service/api/manage/feedback/",
     },
     system: {
       state: "bmgt435-service/api/manage/system/state",

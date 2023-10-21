@@ -5,14 +5,15 @@ import CustomDropdown from '@/components/CustomDropdown.vue';
 import InLineMsg from '@/components/InLineMsg.vue';
 import { ref } from 'vue';
 import type { DropdownConfig, InLineMsgConfig } from '@/components/types';
-import { useSemester } from '@/utils/manageUtils';
+import { useSemesterMgnt } from '@/utils/manageUtils';
 
 const contentMsgState = reactive<InLineMsgConfig>({
     content: "",
     show: false,
 });
 const { isLoading: isImporting, importUsers } = useImportUsers();
-const { semesters } = useSemester();
+const { data: semesters, getData:getSemesters } = useSemesterMgnt();
+getSemesters();
 function handleImportUser() {
     contentMsgState.show = false;
     const inputHandle = document.getElementById("importUserFile") as HTMLInputElement;

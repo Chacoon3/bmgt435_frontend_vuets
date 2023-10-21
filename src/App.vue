@@ -2,7 +2,7 @@
 import { watch, ref } from 'vue';
 import { RouterView } from 'vue-router'
 import router, { routePaths } from './router';
-import { useCurrentUser, formatUserName } from './utils/userUtils';
+import { useCurrentUser, formatUserName, useSignOut } from './utils/userUtils';
 import ViewPageTitle from './components/ViewPageTitle.vue';
 import NavigationBar from '@/components/NavigationBar.vue'
 import { type NavigationConfig } from './components/types';
@@ -15,8 +15,9 @@ import { useFeedbackModal } from './utils/feedbackUtils';
 import FeedbackForm from './components/FeedbackForm.vue';
 
 const { currentUser, isAdmin } = useCurrentUser()
+const {signOut} = useSignOut();
 const moduleTitle = ref<string>('')
-const { getModalStack } = useModal();
+const { getModalStack, showModal, closeModal } = useModal();
 const { getitemStack: getProgBoxStack } = useProgressBox();
 function setModuleTitle(newVal: any, oldVal: any) {
   if (newVal !== oldVal) {
@@ -48,37 +49,63 @@ function setModuleTitle(newVal: any, oldVal: any) {
 
 watch(router.currentRoute, setModuleTitle, { immediate: true })
 
-const naviItemsBase: NavigationConfig = {
+const naviItemBase: NavigationConfig = {
   items: [
     { url: routePaths.workbench, imgSource: '/icons/navigationBar/workbench.svg', text: 'Workbench' },
     { url: routePaths.grouping, imgSource: '/icons/navigationBar/groups.svg', text: 'Groups' },
     { url: routePaths.records, imgSource: '/icons/navigationBar/records.svg', text: 'Case Records' },
-    { url: routePaths.leaderBoard, imgSource: '/icons/navigationBar/leaderBoard.svg', text: 'Leader  Board' },
+    { url: routePaths.leaderBoard, imgSource: '/icons/navigationBar/leaderBoard.svg', text: 'Leader Board' },
+    { url: routePaths.portal, imgSource: '/icons/navigationBar/exit.svg', text: 'Sign Out' }
   ]
 }
-const navigationItemAdmin: NavigationConfig = {
+
+const naviItemAdmin: NavigationConfig = {
   items: [
     { url: routePaths.workbench, imgSource: '/icons/navigationBar/workbench.svg', text: 'Workbench' },
     { url: routePaths.grouping, imgSource: '/icons/navigationBar/groups.svg', text: 'Groups' },
     { url: routePaths.records, imgSource: '/icons/navigationBar/records.svg', text: 'Case Records' },
     { url: routePaths.leaderBoard, imgSource: '/icons/navigationBar/leaderBoard.svg', text: 'Leader  Board' },
-    { url: routePaths.manage, imgSource: '/icons/navigationBar/manage.svg', text: 'Manage' },]
+    { url: routePaths.manage, imgSource: '/icons/navigationBar/manage.svg', text: 'Manage' },
+    { url: routePaths.portal, imgSource: '/icons/navigationBar/exit.svg', text: 'Sign Out' }]
 }
-const naviItems = ref<NavigationConfig>(naviItemsBase);
+
+const naviItems = ref<NavigationConfig>(naviItemBase);
 
 watch(currentUser, (user) => {
   if (user !== null) {
     if (isAdmin() === true) {
-      naviItems.value = navigationItemAdmin;
+      naviItems.value = naviItemAdmin;
     }
     else {
-      naviItems.value = naviItemsBase
+      naviItems.value = naviItemBase
     }
   }
   else {
-    naviItems.value = naviItemsBase;
+    naviItems.value = naviItemBase;
   }
 }, { immediate: true });
+
+function handleClickNavigation(clickedIndex: number) {
+  if (clickedIndex === naviItems.value.items.length - 1) {
+    showModal({
+      title: 'Sign Out',
+      message: 'Are you sure you want to sign out?',
+      confirmText: 'Sign Out',
+      cancelText: 'Cancel',
+      onConfirm: () => {
+        closeModal();
+        router.push(naviItems.value.items[clickedIndex].url);
+        signOut();
+      },
+      onCancel: () => { 
+        closeModal();
+      }      
+    })
+  }
+  else {
+    router.push(naviItems.value.items[clickedIndex].url);
+  }
+}
 
 const { isFeedbackModalOpen } = useFeedbackModal();
 </script>
@@ -86,7 +113,7 @@ const { isFeedbackModalOpen } = useFeedbackModal();
 <template>
   <body id="appContainer">
     <KeepAlive>
-      <NavigationBar v-if="router.currentRoute.value.meta.requireAuth === true" :items="naviItems.items"></NavigationBar>
+      <NavigationBar v-if="router.currentRoute.value.meta.requireAuth === true" :items="naviItems.items" @update:focus="handleClickNavigation"></NavigationBar>
     </KeepAlive>
 
     <div id="moduleContainer">
@@ -96,12 +123,12 @@ const { isFeedbackModalOpen } = useFeedbackModal();
       </div>
 
       <!-- <div id="moduleContent"> -->
-        <!-- <KeepAlive> -->
-          <RouterView />
-        <!-- </KeepAlive> -->
+      <!-- <KeepAlive> -->
+      <RouterView />
+      <!-- </KeepAlive> -->
       <!-- </div> -->
     </div>
-    
+
     <FeedbackIcon v-if="router.currentRoute.value.meta.requireAuth === true"></FeedbackIcon>
     <FeedbackForm v-if="isFeedbackModalOpen === true"></FeedbackForm>
     <ModalBox v-for="(modal, index) in getModalStack" :key="index" :modal-config="modal"></ModalBox>

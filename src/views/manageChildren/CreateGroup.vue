@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useSemester } from '@/utils/manageUtils';
+import { useSemesterMgnt } from '@/utils/manageUtils';
 import { useCreateGroup } from '@/utils/groupUtils';
 import CustomDropdown from '@/components/CustomDropdown.vue';
 import type { DropdownConfig } from '@/components/types';
@@ -12,7 +12,8 @@ import InLineMsg from '@/components/InLineMsg.vue';
 import type { InLineMsgConfig } from '@/components/types';
 import type { AxiosResponse } from 'axios';
 
-const { semesters } = useSemester();
+const { data: semesters, getData: getSemesters } = useSemesterMgnt();
+getSemesters();
 const { createGroup, isCreatingGroup } = useCreateGroup();
 const semesterDropdownConfig: DropdownConfig = {
     name: "Semester",

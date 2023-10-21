@@ -2,8 +2,8 @@
 import { type Group } from '@/utils/backendTypes';
 import type { ButtonConfig } from '@/components/types';
 
-defineProps<{ 
-    group: Group; 
+defineProps<{
+    group: Group;
     buttonConfig: ButtonConfig | null;
 }>();
 </script>
@@ -11,7 +11,8 @@ defineProps<{
 <template>
     <div id="groupItemContainer">
         <span class="groupName">{{ group.name }}</span>
-        <button v-if="buttonConfig" :class="buttonConfig.htmlClass" :disabled="buttonConfig.disabled()" @click="buttonConfig.onClick">
+        <button v-if="buttonConfig" :class="buttonConfig.htmlClass" :disabled="buttonConfig.disabled()"
+            @click="buttonConfig.onClick">
             {{ buttonConfig?.text }}
         </button>
 
@@ -19,13 +20,13 @@ defineProps<{
 
         <ul class="groupUserList">
             <div v-if="group.users.length > 0">
-            <li class="groupUser" v-for="user in group.users" :key="user.id">
-                {{ user?.first_name }} {{ user?.last_name }}
-            </li>
-        </div>
-        <div v-else>
-            Group is empty
-        </div>
+                <li class="groupUser" v-for="user in group.users" :key="user.id">
+                    {{ user?.first_name }} {{ user?.last_name }}
+                </li>
+            </div>
+            <div v-else>
+                Group is empty
+            </div>
         </ul>
     </div>
 </template>
@@ -51,6 +52,8 @@ defineProps<{
 }
 
 .groupUser {
+    display: inline-block;
+    min-width: 10em;
     list-style: none;
     margin-right: 2em;
 }
