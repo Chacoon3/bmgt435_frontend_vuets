@@ -18,11 +18,6 @@ export const endpoints = {
     leave: "bmgt435-service/api/groups/leave",
   },
 
-  // tags: {
-  //   tags: "bmgt435-service/api/tags",
-  //   paginated: "bmgt435-service/api/tags/paginated",
-  // },
-
   roles: {
     roles: "bmgt435-service/api/roles",
     paginated: "bmgt435-service/api/roles/paginated",

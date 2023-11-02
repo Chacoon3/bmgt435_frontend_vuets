@@ -51,7 +51,7 @@ watch(router.currentRoute, setModuleTitle, { immediate: true })
 
 const naviItemBase: NavigationConfig = {
   items: [
-    { url: routePaths.workbench, imgSource: '/icons/navigationBar/workbench.svg', text: 'Workbench' },
+    { url: routePaths.workbench, imgSource:  '/icons/navigationBar/workbench.svg', text: 'Workbench' },
     { url: routePaths.grouping, imgSource: '/icons/navigationBar/groups.svg', text: 'Groups' },
     { url: routePaths.records, imgSource: '/icons/navigationBar/records.svg', text: 'Case Records' },
     { url: routePaths.leaderBoard, imgSource: '/icons/navigationBar/leaderBoard.svg', text: 'Leader Board' },
@@ -67,6 +67,13 @@ const naviItemAdmin: NavigationConfig = {
     { url: routePaths.leaderBoard, imgSource: '/icons/navigationBar/leaderBoard.svg', text: 'Leader  Board' },
     { url: routePaths.manage, imgSource: '/icons/navigationBar/manage.svg', text: 'Manage' },
     { url: routePaths.portal, imgSource: '/icons/navigationBar/exit.svg', text: 'Sign Out' }]
+}
+
+if (import.meta.env.PROD === true) {
+  naviItemBase.items = naviItemBase.items.map((item) => {
+    item.imgSource = `/~zizheng/${item.imgSource}`
+    return item;
+  })
 }
 
 const naviItems = ref<NavigationConfig>(naviItemBase);
@@ -122,11 +129,8 @@ const { isFeedbackModalOpen } = useFeedbackModal();
         <ViewPageTitle :title="moduleTitle"></ViewPageTitle>
       </div>
 
-      <!-- <div id="moduleContent"> -->
-      <!-- <KeepAlive> -->
+
       <RouterView />
-      <!-- </KeepAlive> -->
-      <!-- </div> -->
     </div>
 
     <FeedbackIcon v-if="router.currentRoute.value.meta.requireAuth === true"></FeedbackIcon>
