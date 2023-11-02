@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 import { useImportUsers } from '@/utils/manageUtils';
 import CustomDropdown from '@/components/CustomDropdown.vue';
 import InLineMsg from '@/components/InLineMsg.vue';
@@ -7,30 +7,45 @@ import { ref } from 'vue';
 import type { DropdownConfig, InLineMsgConfig } from '@/components/types';
 import { useSemesterMgnt } from '@/utils/manageUtils';
 
-const contentMsgState = reactive<InLineMsgConfig>({
+const importMsgState = reactive<InLineMsgConfig>({
     content: "",
+    show: false,
+});
+const semesterDropdownMsgState = reactive<InLineMsgConfig>({
+    content: "Please create a semester first",
     show: false,
 });
 const { isLoading: isImporting, importUsers } = useImportUsers();
 const { data: semesters, getData:getSemesters } = useSemesterMgnt();
 getSemesters();
+watch(semesters, (newVal) => {
+    semesterDropdownMsgState.show = newVal === undefined || newVal.length === 0;
+}, { immediate: true })
+
 function handleImportUser() {
-    contentMsgState.show = false;
+    importMsgState.show = false;
+    semesterDropdownMsgState.show = false;
     const inputHandle = document.getElementById("importUserFile") as HTMLInputElement;
     const file = inputHandle.files?.[0];
+
+    if (selectedSemesterId.value === "") {
+        semesterDropdownMsgState.show = true;
+        return;
+    }
+
     if (file) {
         importUsers(file, selectedSemesterId.value, (resp: any) => {
             if (resp.status === 200) {
-                contentMsgState.content = "Import success";
+                importMsgState.content = "Import success";
             } else {
-                contentMsgState.content = resp.data ?? "Import failed";
+                importMsgState.content = resp.data ?? "Import failed";
             }
-            contentMsgState.show = true;
+            importMsgState.show = true;
         });
     }
     else {
-        contentMsgState.content = "Please select a file";
-        contentMsgState.show = true;
+        importMsgState.content = "Please select a file";
+        importMsgState.show = true;
     }
 }
 
@@ -53,9 +68,10 @@ const selectedSemesterId = ref<string>(semesterDropdownConfig.values?.[0] ?? "")
             </div>
             <div>
                 <CustomDropdown :config="semesterDropdownConfig" @update:value="(val) => selectedSemesterId = val"></CustomDropdown>
+                <InLineMsg :config="semesterDropdownMsgState"></InLineMsg>
             </div>
             <div>
-                <InLineMsg :config="contentMsgState"></InLineMsg>
+                <InLineMsg :config="importMsgState"></InLineMsg>
                 <input type="submit" :disabled="isImporting === true"
                     :value="isImporting === false ? 'Import Users' : 'Importing'">
             </div>

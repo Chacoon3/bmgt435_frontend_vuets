@@ -35,7 +35,7 @@ export function useDownloadCaseRecord() {
         isDownloading.value = false;
         if (resp.status === 200) {
           const blob = new Blob([resp.data], {
-            type: "octet/stream",
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           });
           const downloadLink = document.createElement("a");
           downloadLink.href = URL.createObjectURL(blob);

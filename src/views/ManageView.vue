@@ -12,11 +12,10 @@ import CreateGroup from './manageChildren/CreateGroup.vue';
 import { useUserMgnt, useGroupMgnt, useSemesterMgnt, useFeedbackMgnt } from '@/utils/manageUtils';
 import { formatUserName } from '@/utils/userUtils';
 import { useModal } from '@/utils/modalUtils';
-import type { Feedback } from '@/utils/feedbackUtils';
 
 const { showModal, closeModal } = useModal();
 
-const { isLoading: isCasesLoading, data: cases, hasMore: hasMoreCases, getData: getCases } = useCumulatedCases();
+const { isLoading: isCasesLoading, data: cases, getData: getCases } = useCumulatedCases();
 getCases();
 const caseOptions = computed<string[]>(() => {
     if (isCasesLoading.value === true) {
@@ -160,16 +159,17 @@ const selectConfig = computed<CustomSelectConfig[]>(() => [
 
         <div id="manageModuleContainer">
             <KeepAlive>
-                <ImportUser v-if="moduleState === 'Import users'"></ImportUser>
-                <ObjectView v-else-if="moduleState === 'View users'" :config="userTableState" :is-loading="isLoadingUsers"
-                    :disable-get-data="!hasMoreUsers" @get-data="getUsers"></ObjectView>
+                <ObjectView v-if="moduleState === 'View users'" :config="userTableState" :is-loading="isLoadingUsers"
+                :disable-get-data="!hasMoreUsers" @get-data="getUsers"></ObjectView>
                 <ObjectView v-else-if="moduleState === 'View groups'" :config="groupTableState"
-                    :is-loading="isLoadingGroups" :disable-get-data="hasMoreGroups === false" @get-data="getGroups">
+                :is-loading="isLoadingGroups" :disable-get-data="hasMoreGroups === false" @get-data="getGroups">
                 </ObjectView>
                 <ObjectView v-else-if="moduleState === 'View semesters'" :config="semesterTableState"
-                    :is-loading="isLoadingSemesters" :disable-get-data="true"></ObjectView>
-                    <ObjectView v-else-if="moduleState === 'View feedback'" :config="feedbackTableState"
-                    :is-loading="isLoadingFeedbacks" :disable-get-data="hasMoreFeedback === false"></ObjectView>
+                :is-loading="isLoadingSemesters" :disable-get-data="true"></ObjectView>
+                <ObjectView v-else-if="moduleState === 'View feedback'" :config="feedbackTableState"
+                :is-loading="isLoadingFeedbacks" :disable-get-data="hasMoreFeedback === false"></ObjectView>
+                
+                <ImportUser v-else-if="moduleState === 'Import users'"></ImportUser>
                 <FoodcenterConfig v-else-if="moduleState === 'Food center'"></FoodcenterConfig>
                 <CreateSemester v-else-if="moduleState === 'Create semester'"></CreateSemester>
                 <CreateGroup v-else-if="moduleState === 'Create groups'"></CreateGroup>

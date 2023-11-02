@@ -1,8 +1,8 @@
-import { cachedHttpGet, get, httpPost, useCachedCumulatedGet } from "./requests";
+import { cachedHttpGet, httpPost, useCachedCumulatedGet } from "./requests";
 import { useCache } from "./cacheUtils";
 import { endpoints } from "./apis";
 import {ref, type Ref } from "vue";
-import { type User, type SystemStatus, type ImportUserData, type Semester, type Group } from "./backendTypes";
+import { type User, type SystemStatus, type Semester, type Group } from "./backendTypes";
 import type { AxiosResponse } from "axios";
 import { type Feedback } from "./feedbackUtils";
 
@@ -25,16 +25,14 @@ export function useImportUsers() {
           bytes.value,
           (resp: any) => {
             isLoading.value = false;
-            if (resp.status === 200) {
-              clearCacheByEndpoint(endpoints.manage.user.view);
-            }
+            clearCacheByEndpoint(endpoints.manage.user.view);
             callback?.(resp);
           }
         );
       });
   }
 
-  return { importUsers, isLoading };
+  return { importUsers, isLoading,};
 }
 
 export function useUserMgnt() {

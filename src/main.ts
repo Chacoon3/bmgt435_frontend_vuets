@@ -41,7 +41,7 @@ router.push({ name: routePaths.loading });
 getCurrentUser((resp: any) => {
   if (resp.status === 200 && currentUser.value !== null) {
     const lastRoute = localStorage.getItem("lastRoute");
-    if (lastRoute !== null) {
+    if (lastRoute !== null && lastRoute !== routePaths.loading && lastRoute !== routePaths.errorPage) {
       router.push({ name:lastRoute });
     } else {
     router.push({ name: routePaths.workbench });

@@ -33,7 +33,7 @@ getCases();
             </div>
 
             <div class="workbenchContent" v-else>
-                <h2>It appears you are not in a group yet. Please join or create a group first.</h2>
+                <h2>It appears you are not in a group yet. Please join a group first.</h2>
                 <button class="normalButton" @click="router.push({ name: routePaths.grouping })">Okay!</button>
             </div>
         </div>

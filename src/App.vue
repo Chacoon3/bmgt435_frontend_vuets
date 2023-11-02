@@ -74,6 +74,11 @@ if (import.meta.env.PROD === true) {
     item.imgSource = `/~zizheng/${item.imgSource}`
     return item;
   })
+
+  naviItemAdmin.items = naviItemAdmin.items.map((item) => {
+    item.imgSource = `/~zizheng/${item.imgSource}`
+    return item;
+  })
 }
 
 const naviItems = ref<NavigationConfig>(naviItemBase);
