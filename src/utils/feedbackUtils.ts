@@ -1,4 +1,4 @@
-import { httpPost, useCachedCumulatedGet } from "./requests";
+import { httpPost } from "./requests";
 import { endpoints } from "./apis";
 import { type AxiosResponse } from "axios";
 import { computed, ref } from "vue";
@@ -22,7 +22,8 @@ export function useSubmitFeedback() {
 
   function submitFeedback(
     feedback: Feedback,
-    callback: (resp: AxiosResponse) => void
+    onSuccess: (resp: AxiosResponse) => void,
+    onFail: (errMsg: string) => void
   ) {
     if (isSubmitting.value === true) return;
 
@@ -32,7 +33,11 @@ export function useSubmitFeedback() {
       feedback,
       (resp: AxiosResponse) => {
         isSubmitting.value = false;
-        callback?.(resp);
+        if (resp.data.data) {
+          onSuccess(resp);
+        } else {
+          onFail(resp.data.msg);
+        }
       }
     );
   }

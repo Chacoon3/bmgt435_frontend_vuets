@@ -25,13 +25,14 @@ export function globalErrorHandler(
   instance: any | null,
   info: string
 ) {
-  console.log("uncaughtErrorHandler starts -- -- -- -- -- -- -- --");
-  console.log(err);
-  console.log(instance);
-  console.log(info);
-  console.log("uncaughtErrorHandler ends -- -- -- -- -- -- -- --");
+  throw err;
+  // console.log("uncaughtErrorHandler starts -- -- -- -- -- -- -- --");
+  // console.log(err);
+  // console.log(instance);
+  // console.log(info);
+  // console.log("uncaughtErrorHandler ends -- -- -- -- -- -- -- --");
 
-  setErrorContext(err);
+  // setErrorContext(err);
 }
 
 export default function useErrorUtil() {

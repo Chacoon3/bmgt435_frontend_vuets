@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { type CaseRecord, type Case } from "./backendTypes";
+import { type Case, type CaseSubmissionParams, type CaseSubmissionResult, type FoodcenterCenterState, type FoodcenterParams } from "./backendTypes";
 import { httpPost, useCachedCumulatedGet } from "./requests";
 import { endpoints } from "./apis";
 import { type AxiosResponse } from "axios";
@@ -9,9 +9,7 @@ const { reset: clearCachedCaseRecords } = useCumulatedCaseRecords();
 export function useFoodcenter() {
   const isSubmitting = ref(false);
 
-  function convertUserInput(
-    userInput: FoodcenterCenterState[]
-  ): CaseSubmissionParams<FoodcenterParams> {
+  function convertUserInput(userInput: FoodcenterCenterState[]): CaseSubmissionParams<FoodcenterParams> {
 
     const centers: string[] = [];
     const policies: number[][] = [];
@@ -28,17 +26,25 @@ export function useFoodcenter() {
 
   function submitCase(
     userInput: FoodcenterCenterState[],
-    callback: (resp: AxiosResponse) => void
+    onSuccess: (res: CaseSubmissionResult) => void,
+    onFail: (errMsg: string) => void
   ) {
+    if (isSubmitting.value === true) {
+      return;
+    }
+    
     isSubmitting.value = true;
-
     httpPost<CaseSubmissionParams<FoodcenterParams>>(
       endpoints.cases.submit,
       convertUserInput(userInput),
       (resp: AxiosResponse) => {
         isSubmitting.value = false;
         clearCachedCaseRecords();
-        callback?.(resp);
+        if (resp.data.data) {
+          onSuccess(resp.data.data);
+        } else {
+          onFail(resp.data.msg);
+        }
       }
     );
   }
@@ -49,34 +55,3 @@ export function useFoodcenter() {
 export function useCumulatedCases() {
   return useCachedCumulatedGet<Case>(endpoints.cases.paginated);
 }
-
-export type FoodcenterParams = {
-  centers: string[];
-  policies: number[][];
-};
-
-export type FoodcenterCenterState = {
-  isOn: boolean;
-  name: string;
-  smallS: number;
-  bigS: number;
-};
-
-export type CaseSubmissionParams<CaseParams> = {
-  case_id: number;
-  case_params: CaseParams;
-};
-
-export type FoodCenterSummary = {
-  perf_metric: number;
-  total_revenue: number;
-  total_shortage_count: number;
-  total_shortage_amount: number;
-  total_holding_cost: number;
-  total_fixed_cost: number;
-}
-
-export type SubmissionResult<TSummary> = {
-  case_record_id: number;
-  summary:TSummary;
-};

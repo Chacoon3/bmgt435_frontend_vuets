@@ -27,15 +27,14 @@ function handleSignIn() {
     else {
         inlineMsgState.show = false;
         inlineMsgState.content = "";
-        signIn(signInForm, (resp) => {
-            if (resp.status === 200) {
-                router.push({ name: routePaths.workbench})
-            }
-            else {
-                inlineMsgState.content = resp === null ? "Sign in failed for unknwon error!" : resp.data;
+        signIn(
+            signInForm,
+            () => router.push({ name: routePaths.workbench}),
+            (msg) => {
+                inlineMsgState.content = msg ?? "Sign in failed!"
                 inlineMsgState.show = true;
             }
-        });
+        );
     }
 }
 

@@ -1,5 +1,7 @@
 // Server-side ORM types
 
+import type { AxiosResponse } from "axios";
+
 export type User = {
   id: number;
   did: string;
@@ -17,6 +19,38 @@ export type Case = {
   id: number;
   create_time: string;
   name: string;
+};
+
+export type FoodcenterParams = {
+  centers: string[];
+  policies: number[][];
+};
+
+export type FoodcenterCenterState = {
+  isOn: boolean;
+  name: string;
+  smallS: number;
+  bigS: number;
+};
+
+export type CaseSubmissionParams<CaseParams> = {
+  case_id: number;
+  case_params: CaseParams;
+};
+
+export type FoodCenterSummary = {
+  perf_metric: number;
+  total_revenue: number;
+  total_shortage_count: number;
+  total_shortage_amount: number;
+  total_holding_cost: number;
+  total_fixed_cost: number;
+}
+
+export type CaseSubmissionResult<TSummary =any> = {
+  case_record_id: number;
+  summary:TSummary;
+  file_url: string;
 };
 
 export type CaseRecord = {
@@ -72,3 +106,10 @@ export type Semester = {
   id: number;
   name: string;
 }
+
+export type ValidatedBody<TData> = {
+  data?: TData;
+  errorMsg?: string;
+}
+
+export type ValidatedResponse<TData = any> = AxiosResponse<ValidatedBody<TData>>;

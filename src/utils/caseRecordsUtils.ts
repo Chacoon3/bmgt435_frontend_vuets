@@ -8,7 +8,7 @@ import {
 import { endpoints } from "@/utils/apis";
 import { type CaseRecord } from "@/utils/backendTypes";
 import type { AxiosResponse } from "axios";
-import { reactive, ref } from "vue";
+import { ref } from "vue";
 
 export function useCumulatedCaseRecords() {
   return useCachedCumulatedGet<CaseRecord>(
@@ -79,8 +79,8 @@ export function useLeaderBoard(case_id: number) {
       requestParams,
       (resp: AxiosResponse) => {
         isLoading.value = false;
-        if (resp.status === 200) {
-          const paginatedResp: PaginatedData<CaseRecord[]> = resp.data;
+        if (resp.data.data) {
+          const paginatedResp: PaginatedData<CaseRecord> = resp.data.data;
           data.value = data.value.concat(paginatedResp.data);
           hasMore.value = paginatedResp.page < paginatedResp.totalPage;
         }

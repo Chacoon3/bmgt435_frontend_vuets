@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { type SubmissionResult, type FoodCenterSummary } from '@/utils/caseUtils';
+import { type CaseSubmissionResult, type FoodCenterSummary } from '@/utils/backendTypes';
 import { useDownloadCaseRecord } from '@/utils/caseRecordsUtils';
 
-const props = defineProps<{ result: SubmissionResult<FoodCenterSummary> | null }>();
+const props = defineProps<{ result: CaseSubmissionResult<FoodCenterSummary> | null }>();
 const { isDownloading, downloadCaseRecord } = useDownloadCaseRecord();
 function handleDownload() {
     if (props.result === null) {

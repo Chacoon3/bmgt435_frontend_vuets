@@ -16,7 +16,7 @@ const semesterDropdownMsgState = reactive<InLineMsgConfig>({
     show: false,
 });
 const { isLoading: isImporting, importUsers } = useImportUsers();
-const { data: semesters, getData:getSemesters } = useSemesterMgnt();
+const { data: semesters, getData: getSemesters } = useSemesterMgnt();
 getSemesters();
 watch(semesters, (newVal) => {
     semesterDropdownMsgState.show = newVal === undefined || newVal.length === 0;
@@ -26,22 +26,22 @@ function handleImportUser() {
     importMsgState.show = false;
     semesterDropdownMsgState.show = false;
     const inputHandle = document.getElementById("importUserFile") as HTMLInputElement;
-    const file = inputHandle.files?.[0];
+    const fileObj = inputHandle.files?.[0];
 
     if (selectedSemesterId.value === "") {
         semesterDropdownMsgState.show = true;
         return;
     }
 
-    if (file) {
-        importUsers(file, selectedSemesterId.value, (resp: any) => {
-            if (resp.status === 200) {
-                importMsgState.content = "Import success";
-            } else {
-                importMsgState.content = resp.data ?? "Import failed";
-            }
-            importMsgState.show = true;
-        });
+    if (fileObj) {
+        importUsers(fileObj, selectedSemesterId.value,
+            (msg: any) => {
+                importMsgState.content = msg ?? "Import failed";
+            },
+            (msg: string) => {
+                importMsgState.content = msg ?? "Import failed";
+                importMsgState.show = true;
+            });
     }
     else {
         importMsgState.content = "Please select a file";
@@ -49,7 +49,7 @@ function handleImportUser() {
     }
 }
 
-const semesterDropdownConfig: DropdownConfig =reactive({
+const semesterDropdownConfig: DropdownConfig = reactive({
     name: "Semester",
     options: semesters.value.map((item) => item.name),
     values: semesters.value.map((item) => item.id.toString()),
@@ -67,7 +67,8 @@ const selectedSemesterId = ref<string>(semesterDropdownConfig.values?.[0] ?? "")
                 <input id="importUserFile" type="file" accept=".csv">
             </div>
             <div>
-                <CustomDropdown :config="semesterDropdownConfig" @update:value="(val) => selectedSemesterId = val"></CustomDropdown>
+                <CustomDropdown :config="semesterDropdownConfig" @update:value="(val) => selectedSemesterId = val">
+                </CustomDropdown>
                 <InLineMsg :config="semesterDropdownMsgState"></InLineMsg>
             </div>
             <div>

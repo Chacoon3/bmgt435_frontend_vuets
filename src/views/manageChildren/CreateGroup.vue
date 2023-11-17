@@ -10,7 +10,6 @@ import StatefulButton from '@/components/StatefulButton.vue';
 import type { ButtonConfig } from '@/components/types';
 import InLineMsg from '@/components/InLineMsg.vue';
 import type { InLineMsgConfig } from '@/components/types';
-import type { AxiosResponse } from 'axios';
 
 const { data: semesters, getData: getSemesters } = useSemesterMgnt();
 getSemesters();
@@ -38,22 +37,23 @@ const btnText = computed<string>(() => {
         return 'Create';
     }
 })
-const buttonConfig:ButtonConfig = {
+const buttonConfig: ButtonConfig = {
     text: btnText.value,
     disabled: () => {
         return isCreatingGroup.value === true;
     },
     htmlClass: "normalButton",
     onClick: () => {
-        createGroup(formData.semesterId, formData.numberOfGroups, (resp: AxiosResponse) => {
-            if (resp.status === 200 ){
-                msgConfig.content = "Groups created successfully";
+        createGroup(formData.semesterId, formData.numberOfGroups,
+            (msg: any) => {
+                msgConfig.content = msg ?? "Groups created successfully";
                 msgConfig.show = true;
-            } else {
-                msgConfig.content = resp.data ?? "Error creating groups";
+            },
+            (msg: any) => {
+                msgConfig.content = msg ?? "Error creating groups";
                 msgConfig.show = true;
             }
-        });
+        );
     }
 }
 const formData = reactive({

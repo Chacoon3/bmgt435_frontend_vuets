@@ -1,6 +1,6 @@
 import useErrorUtil from "./errorUtils";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
-import { type Ref, ref, watch, reactive } from "vue";
+import { type Ref, ref, watch, reactive, shallowReactive } from "vue";
 import { useCache } from "./cacheUtils";
 
 
@@ -14,23 +14,18 @@ axios.defaults.timeout = 10000;
 const { setErrorContext } = useErrorUtil();
 
 function raiseRequestError<T>(
-  error: AxiosError,
+  error: any,
   endpoint: string,
   dataOrParams: T
 ) {
-  setErrorContext(
-    error,
-    ` A request to server has failed with error. ${error.status ?? "", " ", error.message ?? ""}`
-  );
-
-  // console.log(
-  //   `Request to ${endpoint} failed with error: ${error.message ?? error}`
+  throw error;
+  // setErrorContext(
+  //   error,
+  //   ` A request to server has failed with error. ${error.status ?? "", " ", error.message ?? ""}`
   // );
-  // console.log(dataOrParams);
-  // console.log("logger ends -- -- -- -- -- -- -- --");
 }
 
-export function httpGet(url: string, params: any, onCompleted: any): void {
+export function httpGet(url: string, params: any, onCompleted?: (resp:AxiosResponse) => void): void {
   try {
     axios
       .get(url, { params: params })
@@ -100,42 +95,6 @@ export function httpPost<TData>(
   }
 }
 
-export function usePaginatedGet<TData>(endpoint: string) {
-  const pagerParams = reactive<PaginatedParams>({
-    page: 1,
-    size: 5,
-    asc: 1,
-    order: "id",
-  });
-
-  const isLoading = ref<boolean>(false);
-
-  const data = ref<PaginatedData<TData> | null>(null);
-
-  function fetchData(params: any = pagerParams) {
-    isLoading.value = true;
-    httpGet(
-      endpoint,
-      {
-        page: params.page,
-        size: params.size,
-        asc: params.asc,
-        order: params.order,
-      },
-      (resp: AxiosResponse) => {
-        data.value = resp.status === 200 ? resp.data : null;
-        isLoading.value = false;
-      }
-    );
-  }
-
-  watch<PaginatedParams>(pagerParams, fetchData, { deep: true });
-
-  fetchData();
-
-  return { isLoading, data, pagerParams, fetchData };
-}
-
 export function useCachedPaginatedGet<TData>(endpoint: string) {
   const pagerParams = reactive<PaginatedParams>({
     page: 1,
@@ -146,7 +105,11 @@ export function useCachedPaginatedGet<TData>(endpoint: string) {
 
   const isLoading = ref<boolean>(false);
 
-  const data = ref<PaginatedData<TData> | null>(null);
+  const data = shallowReactive<PaginatedData<TData> >({
+    data: [],
+    page: 0,
+    totalPage: 0,
+  });
 
   function getData(params: any = pagerParams) {
     if (isLoading.value === true) {
@@ -162,8 +125,15 @@ export function useCachedPaginatedGet<TData>(endpoint: string) {
         order: params.order,
       },
       (resp: AxiosResponse) => {
-        data.value = resp.status === 200 ? resp.data : null;
         isLoading.value = false;
+        if (resp.data.data) {
+          data.page = resp.data.data.page;
+          data.totalPage = resp.data.data.totalPage;
+          data.data = resp.data.data.data;
+        }
+        else {
+          data.page --;
+        }
       }
     );
   }
@@ -181,7 +151,7 @@ export function useCachedPaginatedGet<TData>(endpoint: string) {
 
 export function useCachedCumulatedGet<TData>(
   endpoint: string,
-  batchSize: number = 5,
+  size: number = 5,
   orderBy?: string,
   asc: 1 | 0 = 1
 ) {
@@ -190,7 +160,7 @@ export function useCachedCumulatedGet<TData>(
   const hasMore = ref<boolean>(false);
   const pagerParams: PaginatedParams = {
     page: 0,
-    size: batchSize,
+    size: size,
     asc: asc,
     order: orderBy ?? "id",
   };
@@ -210,11 +180,12 @@ export function useCachedCumulatedGet<TData>(
         asc: pagerParams.asc,
         order: pagerParams.order,
       },
-      (resp: AxiosResponse<PaginatedData<TData[]>>) => {
+      (resp: AxiosResponse) => {
         isLoading.value = false;
-        if (resp.status === 200) {
-          data.value = data.value.concat(resp.data.data);
-          hasMore.value = resp.data.page < resp.data.totalPage;
+        if (resp.data.data) {
+          const pageData:PaginatedData<TData> = resp.data.data;
+          data.value.push(...pageData.data);
+          hasMore.value =pageData.page < pageData.totalPage;
         } else {
           pagerParams.page--;
           hasMore.value = false;
@@ -247,19 +218,7 @@ export type PaginatedParams = {
 };
 
 export type PaginatedData<TData> = {
-  data: TData;
+  data: TData[];
   page: number;
   totalPage: number;
 };
-
-// export type GetDataResult<TData> = {
-//   isLoading: Ref<boolean>;
-//   data: Ref<UnwrapRef<TData> | null>;
-//   httpGetter: (params: any, callback: any) => void;
-// };
-
-// export type PostDataResult<TPost> = {
-//   isLoading: Ref<boolean>;
-//   response: Ref<AxiosResponse | null>;
-//   httpPoster: (data: TPost, callback: any) => void;
-// };

@@ -16,23 +16,28 @@ const isCurrentGroupLoading = ref<boolean>(false);
 const currentGroup = ref<Group | null>(null);
 
 function getCurrrentGroup() {
+  if (isCurrentGroupLoading.value === true) {
+    return;
+  }
+
   if (currentUser.value && currentUser.value.group_id !== null) {
     isCurrentGroupLoading.value = true;
     httpGet(
       endpoints.groups.get,
       { id: currentUser.value.group_id },
-      (resp: any) => {
-        if (resp.status === 200) {
-          currentGroup.value = resp.data;
-        } else {
+      (resp: AxiosResponse) => {
+        isCurrentGroupLoading.value = false;
+        if (resp.data.data) {
+        currentGroup.value = resp.data.data;
+        }
+        else {
           currentGroup.value = null;
         }
-        isCurrentGroupLoading.value = false;
       }
     );
   } else {
-    currentGroup.value = null;
     isCurrentGroupLoading.value = false;
+    currentGroup.value = null;
   }
 }
 
@@ -41,7 +46,7 @@ export function useCurrentGroup() {
 }
 
 export function useCachedPaginatedGroups() {
-  return useCachedPaginatedGet<Group[]>(endpoints.groups.paginated);
+  return useCachedPaginatedGet<Group>(endpoints.groups.paginated);
 }
 
 export function useCachedCumulatedGroups() {
@@ -54,7 +59,8 @@ export function useCreateGroup() {
   function createGroup(
     semesterId: string | number,
     numGroups?: string | number,
-    callback: any = null
+    onSuccess?: (msg: string) => void,
+    onFail?: (errMsg: string) => void
   ) {
     if (isCreatingGroup.value === true) return;
     
@@ -67,7 +73,12 @@ export function useCreateGroup() {
       },
       (resp: AxiosResponse) => {
         isCreatingGroup.value = false;
-        callback?.(resp);
+        if (resp.data.data) {
+          onSuccess?.(resp.data.data);
+        }
+        else{
+          onFail?.(resp.data.errMsg);
+        }
       }
     );
   }
@@ -77,18 +88,21 @@ export function useCreateGroup() {
 
 export function useJoinGroup() {
   const isJoiningGroup = ref<boolean>(false);
-  function joinGroup(groupId: number, callback: any = null) {
+  function joinGroup(groupId: number, onSuccess?: (group: Group) => void, onFail?: (errMsg: string) => void) {
+    if (isJoiningGroup.value === true) return;
+
     isJoiningGroup.value = true;
-    httpPost(endpoints.groups.join, { group_id: groupId }, (resp: any) => {
+    httpPost(endpoints.groups.join, { group_id: groupId }, (resp: AxiosResponse) => {
       isJoiningGroup.value = false;
-      if (resp.status === 200) {
-        if (currentUser.value !== null) {
-          currentUser.value.group_id = resp.data.id;
-        }
-        currentGroup.value = resp.data;
-        clearCacheByEndpoint(endpoints.groups.paginated);
+      clearCacheByEndpoint(endpoints.groups.paginated);
+      if (resp.data.data) {
+        currentGroup.value =resp.data.data;
+        onSuccess?.(resp.data.data);
       }
-      callback?.(resp);
+      else {
+        currentGroup.value = null;
+        onFail?.(resp.data.errMsg);
+      }
     });
   }
 
@@ -97,20 +111,26 @@ export function useJoinGroup() {
 
 export function useLeaveGroup() {
   const isLeavingGroup = ref<boolean>(false);
-  function leaveGroup(callback: any = null) {
+  function leaveGroup(callback: (msg:string) => void) {
+    if (isLeavingGroup.value === true) return;
+    
     isLeavingGroup.value = true;
-    httpPost(endpoints.groups.leave, null, (resp: any) => {
+    httpPost(endpoints.groups.leave, null, 
+      (resp: AxiosResponse) => {
       isLeavingGroup.value = false;
-      if (resp.status === 200) {
+      if (resp.data.data) {
         if (currentUser.value !== null) {
           currentUser.value.group_id = null;
         }
         currentGroup.value = null;
         clearCacheByEndpoint(endpoints.groups.paginated);
+        callback?.(resp.data.data);
       }
-      callback?.(resp);
-    });
-  }
+      else{
+        callback?.(resp.data.errMsg);
+      }
+    }
+  )}
 
-  return { isLeavingGroup, leaveGroup };
-}
+    return { isLeavingGroup, leaveGroup };
+  }

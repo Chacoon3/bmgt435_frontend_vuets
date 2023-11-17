@@ -4,8 +4,8 @@ import { computed, reactive } from 'vue';
 import GroupList from './groupChildren/GroupList.vue';
 import MyGroup from './groupChildren/MyGroup.vue';
 import type { ButtonConfig } from '@/components/types';
-import type { AxiosResponse } from 'axios';
 import { useModal, type ModalConfig } from '@/utils/modalUtils';
+import type { Group } from '@/utils/backendTypes';
 
 const { showModal, closeModal } = useModal();
 const modalState = reactive<ModalConfig>({ onConfirm: closeModal });
@@ -48,19 +48,19 @@ function mapButtonConfig(groupId: number): ButtonConfig | null {
             return isJoiningGroup.value === true;
         },
         onClick: () => {
-            joinGroup(groupId, (resp: AxiosResponse) => {
-                if (resp.status === 200) {
+            joinGroup(groupId, (group: Group) => {
+                if (group !== null)
                     modalState.message = "join group success!";
+            },
+                (msg: string) => {
 
-                }
-                else {
-                    modalState.message = resp?.data ?? "join group failed!";
-                }
-                showModal(modalState);
-                getCurrrentGroup();
-                resetGroupData();
-                getGroupData();
-            });
+                    modalState.message = msg ?? "join group failed!";
+
+                    showModal(modalState);
+                    getCurrrentGroup();
+                    resetGroupData();
+                    getGroupData();
+                });
         }
     }
 }

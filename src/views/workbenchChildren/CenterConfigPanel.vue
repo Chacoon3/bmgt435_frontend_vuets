@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { type FoodcenterCenterState } from '@/utils/caseUtils'
+import { type FoodcenterCenterState } from '@/utils/backendTypes'
 
 const props = defineProps<FoodcenterCenterState>()
 defineEmits<{

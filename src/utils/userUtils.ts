@@ -1,7 +1,6 @@
 import { endpoints } from "./apis";
 import { httpPost, cachedHttpGet, clearCacheByEndpoint, clearAllCache } from "./requests";
-import { type User } from "./backendTypes";
-import { type AxiosResponse } from "axios";
+import { type User, type ValidatedResponse } from "./backendTypes";
 import { ref, watch } from "vue";
 
 const isCurrentUserLoading = ref<boolean>(false);
@@ -13,21 +12,23 @@ watch(currentUser, (newUser) => {
   }
 }, { immediate: true });
 
-function getCurrentUser(callback?: (resp: AxiosResponse) => void) {
-  isCurrentUserLoading.value = true;
-  cachedHttpGet(endpoints.users.me, null, (resp: AxiosResponse) => {
-    isCurrentUserLoading.value = false;
-    if (resp.status === 200) {
-      currentUser.value = resp.data;
-    } else {
-      currentUser.value = null;
-    }
-    callback?.(resp);
-  });
-}
+function getCurrentUser(onSuccess?: (resp: User) => void, onFail?: (resp: string) => void) {
+  if (isCurrentUserLoading.value === true) {
+    return;
+  }
 
-function setCurrentUser(user: User) {
-  currentUser.value = user;
+  isCurrentUserLoading.value = true;
+  cachedHttpGet(endpoints.users.me, null, (resp: ValidatedResponse<User>) => {
+    isCurrentUserLoading.value = false;
+    if (resp.data.data) {
+      currentUser.value = resp.data.data;
+      onSuccess?.(currentUser.value as User);
+      }
+    else {
+      currentUser.value = null;
+      onFail?.(resp.data.errorMsg ?? "");
+    }
+  })
 }
 
 function isAdmin() {
@@ -43,48 +44,63 @@ export function useCurrentUser() {
     isCurrentUserLoading,
     currentUser,
     getCurrentUser,
-    setCurrentUser,
     isAdmin,
     clearUserCache: () => clearCacheByEndpoint(endpoints.users.me),
   };
 }
 
+const isSignInLoading = ref<boolean>(false);
 export function useSignIn() {
-  const isLoading = ref<boolean>(false);
-  function signIn(data: SignInForm, callback?: (resp: AxiosResponse) => void) {
-    isLoading.value = true;
-    httpPost<SignInForm>(endpoints.auth.signIn, data, (resp: AxiosResponse) => {
-      isLoading.value = false;
-      setCurrentUser(resp.data);
-      callback?.(resp);
+  function signIn(data: SignInForm, onSuccess?: (user: User) => void, onFail?: (errMsg: string) => void) {
+    if (isSignInLoading.value === true) {
+      return;
+    }
+    isSignInLoading.value = true;
+    httpPost<SignInForm>(endpoints.auth.signIn, data, (resp: ValidatedResponse<User>) => {
+      isSignInLoading.value = false;
+      if (resp.data.data) {
+        currentUser.value = resp.data.data;
+        onSuccess?.(currentUser.value as User);
+      } else {
+        currentUser.value = null;
+        onFail?.(resp.data.errorMsg ?? "");
+      }
     });
   }
-  return { isLoading, signIn };
+  return { isLoading: isSignInLoading, signIn };
 }
 
+const isSignUpLoading = ref<boolean>(false);
 export function useSignUp() {
-  const isLoading = ref<boolean>(false);
-  function signUp(data: SignUpForm, callback?: (resp: AxiosResponse) => void) {
-    isLoading.value = true;
-    httpPost<SignUpForm>(endpoints.auth.signUp, data, (resp: AxiosResponse) => {
-      isLoading.value = false;
-      callback?.(resp);
+  function signUp(data: SignUpForm, onSuccess?: (msg: string) => void, onFail?: (msg: string) => void) {
+    if (isSignUpLoading.value === true) {
+      return;
+    }
+
+    isSignUpLoading.value = true;
+    httpPost<SignUpForm>(endpoints.auth.signUp, data, (resp: ValidatedResponse<string>) => {
+      isSignUpLoading.value = false;
+      if (resp.data.data) {
+        onSuccess?.(resp.data.data);
+      } else {
+        onFail?.(resp.data.errorMsg ?? "");
+      }
     });
   }
-  return { isLoading, signUp };
+  return { isLoading: isSignUpLoading, signUp };
 }
 
+const isSignOutLoading = ref<boolean>(false);
 export function useSignOut() {
-  const isLoading = ref<boolean>(false);
-  function signOut(callback?: (resp: AxiosResponse) => void) {
+  function signOut(callback?: (resp: ValidatedResponse) => void) {
     currentUser.value = null;
-    isLoading.value = true;
-    httpPost(endpoints.auth.signOut, null, (resp: AxiosResponse) => {
-      isLoading.value = false;
+    isSignOutLoading.value = true;
+    httpPost(endpoints.auth.signOut, null, (resp: ValidatedResponse) => {
+      isSignOutLoading.value = false;
       callback?.(resp);
     });
   }
-  return { isLoading, signOut };
+  return { isLoading: isSignOutLoading, signOut };
 }
 
 export function formatUserName(user: User | null) {

@@ -2,16 +2,16 @@
 import { reactive, ref, unref } from 'vue';
 import TextSection from '@/components/textual/TextSection.vue'
 import CenterConfigPanel from './CenterConfigPanel.vue';
-import { type FoodcenterCenterState, type SubmissionResult, type FoodCenterSummary, useFoodcenter } from '@/utils/caseUtils'
-import { type AxiosResponse } from 'axios';
+import { type FoodcenterCenterState, type CaseSubmissionResult, type FoodCenterSummary } from '@/utils/backendTypes'
 import InLineMsg from '@/components/InLineMsg.vue';
 import FoodcenterResultPanel from './FoodcenterResultPanel.vue';
 import { useModal } from '@/utils/modalUtils';
+import { useFoodcenter } from '@/utils/caseUtils';
 
 
 const { showModal, closeModal } = useModal();
 const inlineMsgState = reactive({ show: false, content: '', });
-const fcResult = ref<SubmissionResult<FoodCenterSummary> | null>(null);
+const fcResult = ref<CaseSubmissionResult<FoodCenterSummary> | null>(null);
 const showBrief = ref<boolean>(true);
 const paramState = ref<FoodcenterCenterState[]>(
     Array.from([1, 2, 3, 4, 5, 6],
@@ -34,18 +34,18 @@ function handleSubmit() {
         message: "Are you sure to submit the simulation?",
         onConfirm: () => {
             closeModal();
-            submitFoodCenter(cachedParams, (resp: AxiosResponse) => {
-                resultState.value = resp.status === 200
-                if (resp.status !== 200) {
-                    inlineMsgState.content = resp.data ?? "Failed to submit simulation!";
-                    inlineMsgState.show = true;
-                }
-                else {
+            submitFoodCenter(cachedParams,
+                (res: CaseSubmissionResult) => {
+                    resultState.value = res !== null;
                     inlineMsgState.content = "Simulation submitted successfully!";
                     inlineMsgState.show = true;
-                    fcResult.value = resp.data;
-                }
-            });
+                    fcResult.value = res;
+
+                },
+                (err: string) => {
+                    inlineMsgState.content = err ?? "Failed to submit simulation!";
+                    inlineMsgState.show = true;
+                });
         },
         onCancel: () => {
             closeModal();
