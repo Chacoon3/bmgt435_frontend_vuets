@@ -4,7 +4,6 @@ import CustomDropdown from '@/components/CustomDropdown.vue';
 import type { DropdownConfig, InLineMsgConfig } from '@/components/types';
 import InLineMsg from '@/components/InLineMsg.vue';
 import { reactive, ref } from 'vue';
-import type { AxiosResponse } from 'axios';
 
 const { create: createSemester, clearCache, getData: getSemesters } = useSemesterMgnt();
 const date = new Date();
@@ -32,15 +31,16 @@ const lineMsgState = reactive<InLineMsgConfig>({
 })
 
 function handleCreateSemester() {
-    createSemester(yearSelected.value, seasonSelected.value, (resp:AxiosResponse) => {
+    createSemester(yearSelected.value, seasonSelected.value, 
+    (msg: string) => {
             lineMsgState.show = true;
-        if (resp.status === 200) {
-            lineMsgState.content = "Create semester success";
+            lineMsgState.content = msg ?? "Create semester successfully";
+        },
+    (msg:string) => {
+            lineMsgState.show = true;
+            lineMsgState.content = msg ?? "Create semester failed";   
         }
-        else {
-            lineMsgState.content = resp.data ?? "Create semester failed";   
-        }
-    });
+    );
     clearCache();
     getSemesters();
 }

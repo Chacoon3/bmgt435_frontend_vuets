@@ -8,8 +8,8 @@ import {
 } from "./requests";
 import { endpoints } from "./apis";
 import { ref } from "vue";
-import { type Group } from "./backendTypes";
-import type { AxiosResponse } from "axios";
+import { type Group, type ValidatedResponse } from "./backendTypes";
+
 
 const { currentUser } = useCurrentUser();
 const isCurrentGroupLoading = ref<boolean>(false);
@@ -23,9 +23,9 @@ function getCurrrentGroup() {
   if (currentUser.value && currentUser.value.group_id !== null) {
     isCurrentGroupLoading.value = true;
     httpGet(
-      endpoints.groups.get,
-      { id: currentUser.value.group_id },
-      (resp: AxiosResponse) => {
+      endpoints.groups.me,
+      null,
+      (resp: ValidatedResponse) => {
         isCurrentGroupLoading.value = false;
         if (resp.data.data) {
         currentGroup.value = resp.data.data;
@@ -71,13 +71,14 @@ export function useCreateGroup() {
         semester_id: semesterId,
         size: numGroups,
       },
-      (resp: AxiosResponse) => {
+      (resp: ValidatedResponse) => {
         isCreatingGroup.value = false;
+        clearCacheByEndpoint(endpoints.groups.paginated);
         if (resp.data.data) {
           onSuccess?.(resp.data.data);
         }
         else{
-          onFail?.(resp.data.errMsg);
+          onFail?.(resp.data.errorMsg ?? "Create group failed!");
         }
       }
     );
@@ -92,7 +93,7 @@ export function useJoinGroup() {
     if (isJoiningGroup.value === true) return;
 
     isJoiningGroup.value = true;
-    httpPost(endpoints.groups.join, { group_id: groupId }, (resp: AxiosResponse) => {
+    httpPost(endpoints.groups.join, { group_id: groupId }, (resp: ValidatedResponse) => {
       isJoiningGroup.value = false;
       clearCacheByEndpoint(endpoints.groups.paginated);
       if (resp.data.data) {
@@ -100,8 +101,7 @@ export function useJoinGroup() {
         onSuccess?.(resp.data.data);
       }
       else {
-        currentGroup.value = null;
-        onFail?.(resp.data.errMsg);
+        onFail?.(resp.data.errorMsg ?? "Join group failed!");
       }
     });
   }
@@ -111,23 +111,26 @@ export function useJoinGroup() {
 
 export function useLeaveGroup() {
   const isLeavingGroup = ref<boolean>(false);
-  function leaveGroup(callback: (msg:string) => void) {
+  function leaveGroup(    
+    onSuccess: (msg:string) => void,
+    onFail: (errMsg: string) => void
+    ) {
     if (isLeavingGroup.value === true) return;
     
     isLeavingGroup.value = true;
     httpPost(endpoints.groups.leave, null, 
-      (resp: AxiosResponse) => {
+      (resp: ValidatedResponse) => {
       isLeavingGroup.value = false;
+      clearCacheByEndpoint(endpoints.groups.paginated);
       if (resp.data.data) {
         if (currentUser.value !== null) {
           currentUser.value.group_id = null;
         }
         currentGroup.value = null;
-        clearCacheByEndpoint(endpoints.groups.paginated);
-        callback?.(resp.data.data);
+        onSuccess?.(resp.data.data);
       }
       else{
-        callback?.(resp.data.errMsg);
+        onFail?.(resp.data.errorMsg ?? "Leave group failed!");
       }
     }
   )}

@@ -13,7 +13,7 @@ import { ref } from "vue";
 export function useCumulatedCaseRecords() {
   return useCachedCumulatedGet<CaseRecord>(
     endpoints.caseRecords.paginated,
-    5,
+    10,
     "create_time"
   );
 }

@@ -42,7 +42,7 @@ app.mount("#app");
 router.push({ name: routePaths.loading });
 
 getCurrentUser(
-  (user: User) => {
+  () => {
     const lastRoute = localStorage.getItem("lastRoute");
     if (lastRoute !== null && lastRoute !== routePaths.loading && lastRoute !== routePaths.errorPage) {
       router.push({ name:lastRoute });
@@ -51,7 +51,7 @@ getCurrentUser(
     localStorage.setItem("lastRoute", routePaths.workbench);
     }
   },
-  (errMsg: string) => {
+  () => {
     router.push({ name: routePaths.portal });
     localStorage.setItem("lastRoute", routePaths.portal);
   }

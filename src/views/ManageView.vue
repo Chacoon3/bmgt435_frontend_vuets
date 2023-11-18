@@ -6,7 +6,7 @@ import { type Case, type Group } from '@/utils/backendTypes';
 import CustomSelectGroup from '@/components/CustomSelectGroup.vue';
 import FoodcenterConfig from './manageChildren/FoodcenterConfig.vue'
 import ImportUser from './manageChildren/ImportUser.vue'
-import ObjectView from './manageChildren/ObjectView.vue';
+import ObjectView from '@/components/ObjectView.vue';
 import CreateSemester from './manageChildren/CreateSemester.vue';
 import CreateGroup from './manageChildren/CreateGroup.vue';
 import { useUserMgnt, useGroupMgnt, useSemesterMgnt, useFeedbackMgnt } from '@/utils/manageUtils';
@@ -32,7 +32,7 @@ getGroups();
 const groupTableState = computed<TableConfig>((): TableConfig => {
     return {
         title: "Groups",
-        headers: ["Name", "Members"],
+        headers: ["Name", "Size", "Semester"],
         rows: groups.value.map((group: Group) => {
             return [{
                 elementType: "text",
@@ -40,6 +40,9 @@ const groupTableState = computed<TableConfig>((): TableConfig => {
             }, {
                 elementType: "text",
                 value: group.users.length.toString(),
+            }, {
+                elementType: "text",
+                value: group.semester_name ?? "",
             }];
         }
         )
@@ -160,15 +163,22 @@ const selectConfig = computed<CustomSelectConfig[]>(() => [
         <div id="manageModuleContainer">
             <KeepAlive>
                 <ObjectView v-if="moduleState === 'View users'" :config="userTableState" :is-loading="isLoadingUsers"
-                :disable-get-data="!hasMoreUsers" @get-data="getUsers"></ObjectView>
-                <ObjectView v-else-if="moduleState === 'View groups'" :config="groupTableState"
-                :is-loading="isLoadingGroups" :disable-get-data="hasMoreGroups === false" @get-data="getGroups">
+                    :disable-get-data="hasMoreUsers === false || isLoadingUsers" @get-data="getUsers">
                 </ObjectView>
+
+                <ObjectView v-else-if="moduleState === 'View groups'" :config="groupTableState"
+                    :is-loading="isLoadingGroups" :disable-get-data="hasMoreGroups === false || isLoadingGroups"
+                    @get-data="getGroups">
+                </ObjectView>
+
                 <ObjectView v-else-if="moduleState === 'View semesters'" :config="semesterTableState"
-                :is-loading="isLoadingSemesters" :disable-get-data="true"></ObjectView>
+                    :is-loading="isLoadingSemesters" :disable-get-data="true">
+                </ObjectView>
+
                 <ObjectView v-else-if="moduleState === 'View feedback'" :config="feedbackTableState"
-                :is-loading="isLoadingFeedbacks" :disable-get-data="hasMoreFeedback === false"></ObjectView>
-                
+                    :is-loading="isLoadingFeedbacks" :disable-get-data="hasMoreFeedback === false || isLoadingFeedbacks">
+                </ObjectView>
+
                 <ImportUser v-else-if="moduleState === 'Import users'"></ImportUser>
                 <FoodcenterConfig v-else-if="moduleState === 'Food center'"></FoodcenterConfig>
                 <CreateSemester v-else-if="moduleState === 'Create semester'"></CreateSemester>

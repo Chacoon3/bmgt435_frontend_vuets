@@ -17,18 +17,16 @@ getCurrrentGroup();
 getGroupData();
 
 function handleLeaveGroup() {
-    leaveGroup((resp: any) => {
-        if (resp.status === 200) {
-            modalState.message = resp?.data ?? "leave group success!";
-        }
-        else {
-            modalState.message = resp?.data ?? "leave group failed!";
-        }
-        showModal(modalState);
-        getCurrrentGroup();
-        resetGroupData();
-        getGroupData();
-    });
+    leaveGroup(
+        (msg: string) => {
+            resetGroupData();
+            getGroupData();
+        },
+        (msg: string) => {
+            modalState.message = msg;
+            showModal(modalState);
+        },
+    );
 }
 
 const myGroupButtonConfig: ButtonConfig = {
@@ -48,18 +46,15 @@ function mapButtonConfig(groupId: number): ButtonConfig | null {
             return isJoiningGroup.value === true;
         },
         onClick: () => {
-            joinGroup(groupId, (group: Group) => {
-                if (group !== null)
-                    modalState.message = "join group success!";
-            },
-                (msg: string) => {
-
-                    modalState.message = msg ?? "join group failed!";
-
-                    showModal(modalState);
-                    getCurrrentGroup();
+            joinGroup(
+                groupId,
+                () => {
                     resetGroupData();
                     getGroupData();
+                },
+                (msg: string) => {
+                    modalState.message = msg;
+                    showModal(modalState);
                 });
         }
     }

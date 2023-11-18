@@ -12,6 +12,7 @@ export const endpoints = {
   },
 
   groups: {
+    me: "bmgt435-service/api/groups/me",
     get: "bmgt435-service/api/groups/get",
     paginated: "bmgt435-service/api/groups/paginated",
     join: "bmgt435-service/api/groups/join",
@@ -41,25 +42,27 @@ export const endpoints = {
   },
 
   feedback: {
-    post: "bmgt435-service/api/feedback/post",
+    post: "bmgt435-service/api/feedbacks/post",
   },
 
   manage: {
     user: {
-      import: "bmgt435-service/api/manage/user/import",
-      view: "bmgt435-service/api/manage/user/view",
+      import: "bmgt435-service/api/manage/users/import",
+      view: "bmgt435-service/api/manage/users/view",
     },
     group: {
-      create: "bmgt435-service/api/manage/group/create",
-      viewPaginated: "bmgt435-service/api/manage/group/paginated",
+      create: "bmgt435-service/api/manage/groups/create",
+      viewPaginated: "bmgt435-service/api/manage/groups/paginated",
+      delete: "bmgt435-service/api/manage/groups/delete",
     },
     semester: {
-      create: "bmgt435-service/api/manage/semester/create",
-      all: "bmgt435-service/api/manage/semester/all",
+      create: "bmgt435-service/api/manage/semesters/create",
+      all: "bmgt435-service/api/manage/semesters/all",
+      delete: "bmgt435-service/api/manage/semesters/delete",
     },
     feedback: {
-      paginated: "bmgt435-service/api/manage/feedback/paginated",
-      get: "bmgt435-service/api/manage/feedback/",
+      paginated: "bmgt435-service/api/manage/feedbacks/paginated",
+      get: "bmgt435-service/api/manage/feedbacks/",
     },
     system: {
       state: "bmgt435-service/api/manage/system/state",

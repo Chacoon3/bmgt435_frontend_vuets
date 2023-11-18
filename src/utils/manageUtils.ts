@@ -23,13 +23,13 @@ export function useImportUsers() {
         httpPost(
           `${endpoints.manage.user.import}/semester/${semester_id}`,
           bytes.value,
-          (resp: any) => {
+          (resp: ValidatedResponse) => {
             isLoading.value = false;
             clearCacheByEndpoint(endpoints.manage.user.view);
             if (resp.data.data) {
               onSuccess(resp.data.data);
             } else {
-              onFail(resp.data.msg);
+              onFail(resp.data.errorMsg ?? "");
             }
           }
         );
@@ -87,16 +87,16 @@ export function useSemesterMgnt() {
     });
   }
   
-  function create(year: string, season: string, onSuccess: any, onFail: any) {
+  function create(year: string, season: string, onSuccess: any, onFail: (msg: string) => void) {
     httpPost(
       endpoints.manage.semester.create,
       { year: year, season: season },
-      (resp: AxiosResponse) => {
+      (resp: ValidatedResponse) => {
         if (resp.data.data) {
           onSuccess(resp.data.data);
         }
         else {
-          onFail(resp.data.msg);
+          onFail(resp.data.errorMsg ?? "");
         }
       }
     );
@@ -111,9 +111,9 @@ export function useSemesterMgnt() {
 }
 
 export function useGroupMgnt() {
-  return useCachedCumulatedGet<Group>(endpoints.manage.group.viewPaginated);
+  return useCachedCumulatedGet<Group>(endpoints.manage.group.viewPaginated, 10);
 }
 
 export function useFeedbackMgnt() {
-  return useCachedCumulatedGet<Feedback>(endpoints.manage.feedback.paginated);
+  return useCachedCumulatedGet<Feedback>(endpoints.manage.feedback.paginated, 10);
 }
