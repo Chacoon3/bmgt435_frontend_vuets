@@ -1,8 +1,7 @@
 import { ref } from "vue";
-import { type Case, type CaseSubmissionParams, type CaseSubmissionResult, type FoodcenterCenterState, type FoodcenterParams } from "./backendTypes";
+import { type Case, type CaseSubmissionParams, type CaseSubmissionResult, type FoodcenterCenterState, type FoodcenterParams, type ValidatedResponse } from "./backendTypes";
 import { httpPost, useCachedCumulatedGet } from "./requests";
 import { endpoints } from "./apis";
-import { type AxiosResponse } from "axios";
 import { useCumulatedCaseRecords } from "./caseRecordsUtils";
 
 const { reset: clearCachedCaseRecords } = useCumulatedCaseRecords();
@@ -37,13 +36,13 @@ export function useFoodcenter() {
     httpPost<CaseSubmissionParams<FoodcenterParams>>(
       endpoints.cases.submit,
       convertUserInput(userInput),
-      (resp: AxiosResponse) => {
+      (resp: ValidatedResponse) => {
         isSubmitting.value = false;
         clearCachedCaseRecords();
         if (resp.data.data) {
           onSuccess(resp.data.data);
         } else {
-          onFail(resp.data.msg);
+          onFail(resp.data.errorMsg ?? "Failed to submit simulation!");
         }
       }
     );

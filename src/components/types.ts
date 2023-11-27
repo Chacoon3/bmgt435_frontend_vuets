@@ -35,16 +35,17 @@ export type NavigationConfig = {
 };
 
 export interface TableItemConfig {
-  elementType: "text" | "button" | "a";
+  elementType: "text" | "button" | "a" | "checkbox";
+  value: string | ComputedRef<string>;
   elementClass?: string;
-  value: string;
   onClick?: () => void;
+  onChange?: (val: any) => void;
   href?: string;
 }
 
 export type TableConfig = {
   title?: string;
-  headers?: string[];
+  headers?: TableItemConfig[];
   rows: TableItemConfig[][];
 };
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useSemesterMgnt } from '@/utils/manageUtils';
+import { useSemesterMgnt, useGroupMgnt } from '@/utils/manageUtils';
 import { useCreateGroup } from '@/utils/groupUtils';
 import CustomDropdown from '@/components/CustomDropdown.vue';
 import type { DropdownConfig } from '@/components/types';
@@ -14,6 +14,8 @@ import type { InLineMsgConfig } from '@/components/types';
 const { data: semesters, getData: getSemesters } = useSemesterMgnt();
 getSemesters();
 const { createGroup, isCreatingGroup } = useCreateGroup();
+const {reset: resetGroupData, getData: getGroups} = useGroupMgnt();
+
 const semesterDropdownConfig: DropdownConfig = {
     name: "Semester",
     options: semesters.value.map((semester) => {
@@ -46,10 +48,13 @@ const buttonConfig: ButtonConfig = {
     onClick: () => {
         createGroup(formData.semesterId, formData.numberOfGroups,
             (msg: any) => {
+                resetGroupData();
+                getGroups();
                 msgConfig.content = msg ?? "Groups created successfully";
                 msgConfig.show = true;
             },
             (msg: any) => {
+                resetGroupData();
                 msgConfig.content = msg ?? "Error creating groups";
                 msgConfig.show = true;
             }
@@ -58,7 +63,7 @@ const buttonConfig: ButtonConfig = {
 }
 const formData = reactive({
     semesterId: semesters.value?.[0]?.id.toString(),
-    numberOfGroups: "20"
+    numberOfGroups: inputConfig.defaultValue
 })
 const msgConfig = reactive<InLineMsgConfig>({
     content: "",

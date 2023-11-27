@@ -20,7 +20,28 @@ const viewMoreButtonText = computed(() => {
 const { data: records, isLoading, reset: resetCaseRecords, getData: getRecords, hasMore: hasMoreRecords } = useCumulatedCaseRecords()
 const recordTableConfig = computed<TableConfig>(() => {
     return {
-        headers: ["Case Name", "Submitted by", "Time", "Score", "Download"],
+        headers: [
+            {
+                elementType: "text",
+                value: "Case Name",
+            },
+            {
+                elementType: "text",
+                value: "Submitted By",
+            },
+            {
+                elementType: "text",
+                value: "Date",
+            },
+            {
+                elementType: "text",
+                value: "Score",
+            },
+            {
+                elementType: "text",
+                value: "Download",
+            },
+        ],
         rows: Array.from(records.value, (record) => {
             return toTableRow(record);
         })

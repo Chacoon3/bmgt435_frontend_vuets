@@ -37,40 +37,34 @@ function handleSubmit() {
 
     if (feedbackText.value.length > 0) {
         if (currentUser.value && currentUser.value.id) {
-            submitFeedback({
-                user_id: currentUser.value.id,
-                content: feedbackText.value
-            }, (resp) => {
-                closeFeedbackModal();
-                if (resp.status === 200) {
+            submitFeedback(
+                feedbackText.value,
+                (msg: string) => {
+                    closeFeedbackModal();
                     showModal({
                         title: "Feedback submitted",
-                        message: "Thank you for your feedback!",
-                        onConfirm:closeModal,
+                        message: msg,
+                        onConfirm: closeModal,
                     }
                     );
-                }
-                else {
+                },
+                (msg: string) => {
                     showModal({
                         title: "Failed to submit feedback",
-                        message: "Please try again later!",
-                        onConfirm:closeModal,
+                        message: msg,
+                        onConfirm: closeModal,
                     }
-                    );
-                }
-            });
+                    )
+                });
         }
         else {
-            throw new Error("Invalid user status! Please sign in and retry!");
+            showModal({
+                title: "Empty feedback",
+                message: "Please enter your feedback!",
+                onConfirm: closeModal,
+            }
+            );
         }
-    }
-    else {
-        showModal({
-            title: "Empty feedback",
-            message: "Please enter your feedback!",
-            onConfirm:closeModal,
-        }
-        );
     }
 }
 </script>
@@ -142,7 +136,7 @@ function handleSubmit() {
 .feedbackTextarea {
     text-align: justify;
     font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     min-height: 200px;
     resize: none;
 }

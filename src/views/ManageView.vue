@@ -27,23 +27,101 @@ const caseOptions = computed<string[]>(() => {
     }
 })
 
-const { isLoading: isLoadingGroups, data: groups, getData: getGroups, hasMore: hasMoreGroups } = useGroupMgnt();
+const { isLoading: isLoadingGroups, data: groups, getData: getGroups, hasMore: hasMoreGroups, batchDeleteGroups } = useGroupMgnt();
 getGroups();
+const selectedGroups = ref<Set<number>>(new Set());
+function handleBatchDeleteGroups() {
+    if (selectedGroups.value.size === 0) {
+        showModal({
+            title: "Delete groups",
+            message: "Please select at least one group to delete.",
+            onConfirm: closeModal,
+        })
+    }
+    showModal({
+        title: "Delete groups",
+        message: "Are you sure you want to delete the selected groups?",
+        onConfirm: () => {
+            batchDeleteGroups(
+                Array.from(selectedGroups.value),
+                (msg: string) => {
+                    selectedGroups.value.clear();
+                    getGroups();
+                    showModal({
+                        title: "Delete groups",
+                        message: msg,
+                        onConfirm: closeModal,
+                    })
+                },
+                (msg: string) => {
+                    getGroups();
+                    showModal({
+                        title: "Delete groups",
+                        message: msg,
+                        onConfirm: closeModal,
+                    })
+                }
+            );
+            closeModal();
+        },
+        onCancel: closeModal,
+    })
+
+}
 const groupTableState = computed<TableConfig>((): TableConfig => {
     return {
         title: "Groups",
-        headers: ["Name", "Size", "Semester"],
+        headers: [
+            {
+                elementType: "checkbox",
+                value: "Select",
+                onChange: (newVal: boolean) => {
+                    if (newVal === true) {
+                        groups.value.forEach((group: Group) => {
+                            selectedGroups.value.add(group.id);
+                        })
+                    } else {
+                        selectedGroups.value.clear();
+                    }
+                }
+            },
+            {
+                elementType: "text",
+                value: "Name",
+            }, {
+                elementType: "text",
+                value: "Number of users",
+            }, {
+                elementType: "text",
+                value: "Semester",
+            }
+        ],
         rows: groups.value.map((group: Group) => {
-            return [{
-                elementType: "text",
-                value: group.name,
-            }, {
-                elementType: "text",
-                value: group.users.length.toString(),
-            }, {
-                elementType: "text",
-                value: group.semester_name ?? "",
-            }];
+            return [
+                {
+                    elementType: "checkbox",
+                    elementClass: "checkboxItem",
+                    value: selectedGroups.value.has(group.id) === true ? "true" : "false",
+                    onChange: (newVal: boolean) => {
+                        if (newVal === true) {
+                            selectedGroups.value.add(group.id);
+                        } else {
+                            if (selectedGroups.value.has(group.id) === true) {
+                                selectedGroups.value.delete(group.id);
+                            }
+                        }
+                    }
+                },
+                {
+                    elementType: "text",
+                    value: group.name,
+                }, {
+                    elementType: "text",
+                    value: group.users.length.toString(),
+                }, {
+                    elementType: "text",
+                    value: group.semester_name ?? "",
+                }];
         }
         )
     };
@@ -54,7 +132,21 @@ getUsers();
 const userTableState = computed<TableConfig>((): TableConfig => {
     return {
         title: "Users",
-        headers: ["Name", "Directory ID", "Group", "Role"],
+        headers: [
+            {
+                elementType: "text",
+                value: "Name",
+            }, {
+                elementType: "text",
+                value: "DID",
+            }, {
+                elementType: "text",
+                value: "Group",
+            }, {
+                elementType: "text",
+                value: "Role",
+            }
+        ],
         rows: users.value.map((user) => {
             return [{
                 elementType: "text",
@@ -79,7 +171,12 @@ getSemesters();
 const semesterTableState = computed<TableConfig>((): TableConfig => {
     return {
         title: "Semesters",
-        headers: ["Name",],
+        headers: [
+            {
+                elementType: "text",
+                value: "Name",
+            },
+        ],
         rows: semesters.value.map((semester) => {
             return [{
                 elementType: "text",
@@ -95,13 +192,31 @@ getFeedbacks();
 const feedbackTableState = computed<TableConfig>((): TableConfig => {
     return {
         title: "Feedbacks",
-        headers: ["User", "Time", "Content"],
+        headers: [
+            {
+                elementType: "text",
+                value: "User",
+            },
+            {
+                elementType: "text",
+                value: "Time",
+            },
+            {
+                elementType: "text",
+                value: "Content",
+            },
+            {
+                elementType: "button",
+                value: "View detail",
+            }
+        ],
         rows: feedbacks.value.map((feedback) => {
             return [
                 {
                     elementType: "text",
                     value: feedback.user_name,
-                }, {
+                },
+                {
                     elementType: "text",
                     value: feedback.create_time,
                 },
@@ -119,7 +234,8 @@ const feedbackTableState = computed<TableConfig>((): TableConfig => {
                             onConfirm: closeModal,
                         })
                     }
-                }];
+                }
+            ];
         }
         )
     };
@@ -161,29 +277,27 @@ const selectConfig = computed<CustomSelectConfig[]>(() => [
         <hr class="lv2Hr">
 
         <div id="manageModuleContainer">
-            <KeepAlive>
-                <ObjectView v-if="moduleState === 'View users'" :config="userTableState" :is-loading="isLoadingUsers"
-                    :disable-get-data="hasMoreUsers === false || isLoadingUsers" @get-data="getUsers">
-                </ObjectView>
+            <ObjectView v-if="moduleState === 'View users'" :config="userTableState" :is-loading="isLoadingUsers"
+                :disable-get-data="hasMoreUsers === false || isLoadingUsers" @get-data="getUsers">
+            </ObjectView>
 
-                <ObjectView v-else-if="moduleState === 'View groups'" :config="groupTableState"
-                    :is-loading="isLoadingGroups" :disable-get-data="hasMoreGroups === false || isLoadingGroups"
-                    @get-data="getGroups">
-                </ObjectView>
+            <ObjectView v-else-if="moduleState === 'View groups'" :config="groupTableState" :is-loading="isLoadingGroups"
+                :disable-get-data="hasMoreGroups === false || isLoadingGroups" @get-data="getGroups">
+                <button class="normalButton" @click="handleBatchDeleteGroups">Delete selected</button>
+            </ObjectView>
 
-                <ObjectView v-else-if="moduleState === 'View semesters'" :config="semesterTableState"
-                    :is-loading="isLoadingSemesters" :disable-get-data="true">
-                </ObjectView>
+            <ObjectView v-else-if="moduleState === 'View semesters'" :config="semesterTableState"
+                :is-loading="isLoadingSemesters" :disable-get-data="true">
+            </ObjectView>
 
-                <ObjectView v-else-if="moduleState === 'View feedback'" :config="feedbackTableState"
-                    :is-loading="isLoadingFeedbacks" :disable-get-data="hasMoreFeedback === false || isLoadingFeedbacks">
-                </ObjectView>
+            <ObjectView v-else-if="moduleState === 'View feedback'" :config="feedbackTableState"
+                :is-loading="isLoadingFeedbacks" :disable-get-data="hasMoreFeedback === false || isLoadingFeedbacks">
+            </ObjectView>
 
-                <ImportUser v-else-if="moduleState === 'Import users'"></ImportUser>
-                <FoodcenterConfig v-else-if="moduleState === 'Food center'"></FoodcenterConfig>
-                <CreateSemester v-else-if="moduleState === 'Create semester'"></CreateSemester>
-                <CreateGroup v-else-if="moduleState === 'Create groups'"></CreateGroup>
-            </KeepAlive>
+            <ImportUser v-else-if="moduleState === 'Import users'"></ImportUser>
+            <FoodcenterConfig v-else-if="moduleState === 'Food center'"></FoodcenterConfig>
+            <CreateSemester v-else-if="moduleState === 'Create semester'"></CreateSemester>
+            <CreateGroup v-else-if="moduleState === 'Create groups'"></CreateGroup>
         </div>
     </div>
 </template>

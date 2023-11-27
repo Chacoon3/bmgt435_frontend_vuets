@@ -1,4 +1,4 @@
-import { cachedHttpGet, httpPost, useCachedCumulatedGet } from "./requests";
+import { cachedHttpGet, httpPost, useCachedCumulatedGet, useCachedPaginatedGet } from "./requests";
 import { useCache } from "./cacheUtils";
 import { endpoints } from "./apis";
 import {ref, type Ref } from "vue";
@@ -110,8 +110,41 @@ export function useSemesterMgnt() {
   };
 }
 
-export function useGroupMgnt() {
-  return useCachedCumulatedGet<Group>(endpoints.manage.group.viewPaginated, 10);
+
+  const components = useCachedCumulatedGet<Group>(endpoints.manage.group.viewPaginated, 10);
+
+  const isDeleting = ref<boolean>(false);
+  function batchDeleteGroups(groupIds: number[], onSuccess: (msg: string) => void, onFail: (msg: string) => void) {
+    if (isDeleting.value === true) {
+      return;
+    }
+
+    isDeleting.value = true;
+    const data = {
+      arr_group_id: groupIds,
+    };
+    httpPost(
+      endpoints.manage.group.delete,
+      data,
+      (resp: ValidatedResponse) => {
+        isDeleting.value = false;
+        if (resp.data.data) {
+          components.reset();
+          onSuccess?.(resp.data.data ?? "Batch deletion succeeded!");  
+        }
+        else {
+          onFail?.(resp.data.errorMsg ?? "Batch deletion failed!");
+        }
+      }
+    );
+  }
+  
+export function useGroupMgnt() {  
+  return {
+    ...components,
+    isDeleting,
+    batchDeleteGroups,
+  };
 }
 
 export function useFeedbackMgnt() {

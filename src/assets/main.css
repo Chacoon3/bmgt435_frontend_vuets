@@ -163,6 +163,13 @@ input[type=file] {
   text-align: left;
 }
 
+input[type=checkbox] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  vertical-align: middle;
+}
+
 .normalButton {
   transition: var(--transition-button);
   /* margin-top: 1em;

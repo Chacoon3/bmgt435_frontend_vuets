@@ -95,10 +95,10 @@ export function httpPost<TData>(
   }
 }
 
-export function useCachedPaginatedGet<TData>(endpoint: string) {
+export function useCachedPaginatedGet<TData>(endpoint: string, pageSize: number = 5) {
   const pagerParams = reactive<PaginatedParams>({
     page: 1,
-    size: 5,
+    size: pageSize,
     asc: 1,
     order: "id",
   });

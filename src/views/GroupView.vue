@@ -83,7 +83,7 @@ const groupItemButtonConfig = computed<Array<ButtonConfig | null>>(() => {
 
             <div>
                 <GroupList :group-list="groupData" :button-config="groupItemButtonConfig" />
-                <button class="normalButton" :disabled="hasMoreGroup === false" @click="getGroupData">{{ hasMoreGroup ?
+                <button class="normalButton" :disabled="hasMoreGroup === false || isLoadingGroups === true " @click="getGroupData">{{ hasMoreGroup ?
                     'View more' : 'No more groups' }}</button>
             </div>
         </div>

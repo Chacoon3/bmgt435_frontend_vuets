@@ -9,7 +9,7 @@ defineProps<{
 }>();
 
 defineEmits<{
-    (event: 'get-data'): void
+    (event: 'get-data'): void,
 }>();
 
 </script>
@@ -21,6 +21,9 @@ defineEmits<{
                 <TableView :table-config="config">
                 </TableView>
                 <button class="normalButton" @click="$emit('get-data')" :disabled="disableGetData">{{ "View more" }}</button>
+                <slot>
+                    
+                </slot>
             </div>
             <div v-else-if="isLoading">Fetching Data...</div>
             <div v-else>No data available at this time.</div>

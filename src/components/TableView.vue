@@ -2,9 +2,6 @@
 import { type TableConfig } from './types';
 
 defineProps<{tableConfig:TableConfig}>();
-defineEmits<{
-    (event:"clickItem", eventKey: string): void
-}>();
 </script>
 
 <template>
@@ -14,13 +11,22 @@ defineEmits<{
         </div>
         <tbody class="tableViewBody">
             <tr class="tableViewRow" v-if="tableConfig.headers">
-                <th class="tableViewHead" v-for="(item, index) in tableConfig.headers" :key="index">{{ item }}</th>
+                <th class="tableViewData" v-for="(rowItem, valIndex) in tableConfig.headers" :key="valIndex">
+                    <span v-if="rowItem.elementType === 'text'">{{ rowItem.value }}</span>
+                    <button v-else-if="rowItem.elementType === 'button'" :class="rowItem.elementClass ?? 'normalButton'" @click="rowItem.onClick">{{ rowItem.value }}</button>
+                    <a v-else-if="rowItem.elementType === 'a'" :href="rowItem.href">{{ rowItem.value }}</a>   
+                    <input v-else-if="rowItem.elementType === 'checkbox'" type="checkbox" @change="(e) => rowItem.onChange?.(e.target?.checked)"
+                    :checked="rowItem.value === 'true'"/>
+                </th>
             </tr>
+
             <tr class="tableViewRow" v-for="(row, rowIndex) in tableConfig.rows" :key="rowIndex">
                 <td class="tableViewData" v-for="(rowItem, valIndex) in row" :key="valIndex">
                     <span v-if="rowItem.elementType === 'text'">{{ rowItem.value }}</span>
                     <button v-else-if="rowItem.elementType === 'button'" :class="rowItem.elementClass ?? 'normalButton'" @click="rowItem.onClick">{{ rowItem.value }}</button>
-                    <a v-else-if="rowItem.elementType == 'a'" :href="rowItem.href">{{ rowItem.value }}</a>         
+                    <a v-else-if="rowItem.elementType === 'a'" :href="rowItem.href">{{ rowItem.value }}</a>   
+                    <input v-else-if="rowItem.elementType === 'checkbox'" type="checkbox" @change="(e) => rowItem.onChange?.(e.target?.checked)"
+                    :checked="rowItem.value === 'true'"/>                
                 </td>
             </tr>
         </tbody>
@@ -35,7 +41,6 @@ defineEmits<{
 .tableViewTitle {
     position: relative;
     font-size: 1.5em;
-    /* text-align: center; */
     padding: 0.5rem;
 }
 

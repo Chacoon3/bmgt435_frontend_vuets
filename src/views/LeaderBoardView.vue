@@ -18,7 +18,16 @@ const viewMoreButtonText = computed(() => {
 const { data: leaderBoard, isLoading, clearCache: clearLeaderBoard, getData: getLeaderBoard, hasMore: hasMoreRecords } = useLeaderBoard(1)
 const recordTableConfig = computed<TableConfig>(() => {
     return {
-        headers: ["Time", "Score"],
+        headers: [
+            {
+                elementType: "text",
+                value: "Date",
+            },
+            {
+                elementType: "text",
+                value: "Score",
+            },
+        ],
         rows: Array.from(leaderBoard.value, (record) => {
             return toTableRow(record);
         })
@@ -56,7 +65,7 @@ function toTableRow(record: CaseRecord): TableItemConfig[] {
 
         <div v-else>
             <TableView :table-config="recordTableConfig"></TableView>
-            <button class="normalButton" @click="getLeaderBoard" :disabled="hasMoreRecords === false">{{ viewMoreButtonText
+            <button class="normalButton" @click="getLeaderBoard" :disabled="hasMoreRecords === false || isLoading">{{ viewMoreButtonText
             }}</button>
         </div>
 

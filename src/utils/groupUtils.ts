@@ -2,7 +2,6 @@ import { useCurrentUser } from "./userUtils";
 import {
   httpGet,
   httpPost,
-  useCachedPaginatedGet,
   useCachedCumulatedGet,
   clearCacheByEndpoint,
 } from "./requests";
@@ -43,10 +42,6 @@ function getCurrrentGroup() {
 
 export function useCurrentGroup() {
   return { isCurrentGroupLoading, currentGroup, getCurrrentGroup };
-}
-
-export function useCachedPaginatedGroups() {
-  return useCachedPaginatedGet<Group>(endpoints.groups.paginated);
 }
 
 export function useCachedCumulatedGroups() {

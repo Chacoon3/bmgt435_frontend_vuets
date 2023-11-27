@@ -4,7 +4,6 @@ import App from "./App.vue";
 import router, { routePaths } from "./router";
 import { globalErrorHandler } from "./utils/errorUtils";
 import { useCurrentUser } from "./utils/userUtils";
-import type { User } from "./utils/backendTypes";
 
 const { currentUser, getCurrentUser } = useCurrentUser();
 

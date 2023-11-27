@@ -1,7 +1,7 @@
 import { httpPost } from "./requests";
 import { endpoints } from "./apis";
-import { type AxiosResponse } from "axios";
 import { computed, ref } from "vue";
+import type { ValidatedResponse } from "./backendTypes";
 
 const isOpen = ref<boolean>(false);
 const isFeedbackModalOpen = computed<boolean>(() => isOpen.value);
@@ -21,22 +21,22 @@ export function useSubmitFeedback() {
   const isSubmitting = ref(false);
 
   function submitFeedback(
-    feedback: Feedback,
-    onSuccess: (resp: AxiosResponse) => void,
+    content: string,
+    onSuccess: (msg: string) => void,
     onFail: (errMsg: string) => void
   ) {
     if (isSubmitting.value === true) return;
 
     isSubmitting.value = true;
-    httpPost<Feedback>(
+    httpPost(
       endpoints.feedback.post,
-      feedback,
-      (resp: AxiosResponse) => {
+      {content: content},
+      (resp: ValidatedResponse) => {
         isSubmitting.value = false;
         if (resp.data.data) {
-          onSuccess(resp);
+          onSuccess(resp.data.data ?? "Thank you for submitting your feedback!");
         } else {
-          onFail(resp.data.msg);
+          onFail(resp.data.errorMsg ?? "Failed to submit feedback. Please try again later.");
         }
       }
     );
