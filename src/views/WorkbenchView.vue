@@ -6,8 +6,9 @@ import { useCumulatedCases } from '../utils/caseUtils'
 import FoodCenter from './workbenchChildren/FoodCenter.vue'
 
 const caseSelection = ref<number | null>(null);
-const { currentUser } = useCurrentUser();
+const { currentUser, getCurrentUser } = useCurrentUser();
 const { isLoading: isCasesLoading, data: cases, getData: getCases } = useCumulatedCases();
+getCurrentUser();
 getCases();
 
 </script>

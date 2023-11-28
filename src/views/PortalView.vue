@@ -13,7 +13,7 @@ const { portalState, setPortalState } = usePortalState();
         <div class="streak" loc="top"></div>
 
         <div id="titleDiv">
-            <h1>BMGT435 Simulation</h1>
+            <h1>Business Process Simulation</h1>
             <h2>Experiential Learning Platform</h2>
             <hr>
         </div>

@@ -30,8 +30,8 @@ function handleSignIn() {
         signIn(
             signInForm,
             () => router.push({ name: routePaths.workbench}),
-            (msg) => {
-                inlineMsgState.content = msg ?? "Sign in failed!"
+            (errorMsg:string) => {
+                inlineMsgState.content = errorMsg;
                 inlineMsgState.show = true;
             }
         );

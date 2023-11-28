@@ -55,6 +55,10 @@ export const endpoints = {
       viewPaginated: "bmgt435-service/api/manage/groups/paginated",
       delete: "bmgt435-service/api/manage/groups/delete",
     },
+    foodDelivery: {
+      updateConfig: "bmgt435-service/api/manage/food-delivery-config/update",
+      viewConfig: "bmgt435-service/api/manage/food-delivery-config/view",
+    },
     semester: {
       create: "bmgt435-service/api/manage/semesters/create",
       all: "bmgt435-service/api/manage/semesters/all",

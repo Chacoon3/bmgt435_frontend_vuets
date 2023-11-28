@@ -40,7 +40,7 @@ export const {
   get,
   set,
   createKey,
-  clearCacheByEndpoint: clearCacheByEndpoint,
+  clearCacheByEndpoint,
   clearAllCache,
 } = useCache<AxiosResponse>();
 
@@ -48,12 +48,12 @@ export const {
 export function cachedHttpGet(
   endpoint: string,
   params: any,
-  onCompleted: any
+  onCompleted: (resp: AxiosResponse) => void
 ): void {
   try {
     const key = createKey(params);
     const cachedResp = get(endpoint, key);
-    if (cachedResp) {
+    if (cachedResp !== null) {
       onCompleted(cachedResp);
     } else {
       axios

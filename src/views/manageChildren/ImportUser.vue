@@ -16,9 +16,9 @@ const semesterDropdownMsgState = reactive<InLineMsgConfig>({
     show: false,
 });
 const { isLoading: isImporting, importUsers } = useImportUsers();
-const { data: semesters, getData: getSemesters } = useSemesterMgnt();
+const { semesterData, getData: getSemesters } = useSemesterMgnt();
 getSemesters();
-watch(semesters, (newVal) => {
+watch(semesterData, (newVal) => {
     semesterDropdownMsgState.show = newVal === undefined || newVal.length === 0;
 }, { immediate: true })
 
@@ -51,8 +51,8 @@ function handleImportUser() {
 
 const semesterDropdownConfig: DropdownConfig = reactive({
     name: "Semester",
-    options: semesters.value.map((item) => item.name),
-    values: semesters.value.map((item) => item.id.toString()),
+    options: semesterData.value.map((item) => item.name),
+    values: semesterData.value.map((item) => item.id.toString()),
 })
 const selectedSemesterId = ref<string>(semesterDropdownConfig.values?.[0] ?? "");
 </script>

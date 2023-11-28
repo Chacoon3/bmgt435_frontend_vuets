@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useCurrentGroup, useCachedCumulatedGroups, useLeaveGroup, useJoinGroup } from '@/utils/groupUtils';
+import { useCurrentUser } from '@/utils/userUtils';
 import { computed, reactive } from 'vue';
 import GroupList from './groupChildren/GroupList.vue';
 import MyGroup from './groupChildren/MyGroup.vue';
@@ -7,6 +8,7 @@ import type { ButtonConfig } from '@/components/types';
 import { useModal, type ModalConfig } from '@/utils/modalUtils';
 import type { Group } from '@/utils/backendTypes';
 
+const currentUserUtil = useCurrentUser();
 const { showModal, closeModal } = useModal();
 const modalState = reactive<ModalConfig>({ onConfirm: closeModal });
 const { isJoiningGroup, joinGroup } = useJoinGroup();
@@ -21,6 +23,10 @@ function handleLeaveGroup() {
         (msg: string) => {
             resetGroupData();
             getGroupData();
+            currentGroup.value = null;
+            if (currentUserUtil.currentUser.value !== null) {
+                currentUserUtil.currentUser.value.group_id = null;
+            }
         },
         (msg: string) => {
             modalState.message = msg;
@@ -48,9 +54,13 @@ function mapButtonConfig(groupId: number): ButtonConfig | null {
         onClick: () => {
             joinGroup(
                 groupId,
-                () => {
+                (group: Group) => {
                     resetGroupData();
                     getGroupData();
+                    currentGroup.value = group;
+                    if (currentUserUtil.currentUser.value !== null) {
+                        currentUserUtil.currentUser.value.group_id = group.id;
+                    }
                 },
                 (msg: string) => {
                     modalState.message = msg;

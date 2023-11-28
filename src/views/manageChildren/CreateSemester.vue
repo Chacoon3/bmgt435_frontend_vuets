@@ -5,7 +5,7 @@ import type { DropdownConfig, InLineMsgConfig } from '@/components/types';
 import InLineMsg from '@/components/InLineMsg.vue';
 import { reactive, ref } from 'vue';
 
-const { create: createSemester, clearCache, getData: getSemesters } = useSemesterMgnt();
+const { create: createSemester, resetSemesterData, getData: getSemesters, } = useSemesterMgnt();
 const date = new Date();
 const validYears = Array.from({ length: 3 }, (_, i) => date.getFullYear() + i);
 const yearDropdownConfig: DropdownConfig = {
@@ -41,7 +41,7 @@ function handleCreateSemester() {
             lineMsgState.content = msg ?? "Create semester failed";   
         }
     );
-    clearCache();
+    resetSemesterData();
     getSemesters();
 }
 </script>

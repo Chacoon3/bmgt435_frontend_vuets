@@ -5,6 +5,7 @@ import type { AxiosResponse } from "axios";
 export type User = {
   id: number;
   did: string;
+  activated: boolean;
   first_name: string;
   last_name: string;
   group_id: number | null;
@@ -67,6 +68,17 @@ export type CaseRecord = {
   detail_json: object;
   file_name: string;
 };
+
+export type CaseConfig<T=any> = {
+  id: number;
+  create_time: string;
+  edited_time: string;
+  case_id: number;
+  case_name: string;
+  semester_id: number;
+  semester_name: string;
+  config_json: T;
+}
 
 export type Group = {
   id: number;

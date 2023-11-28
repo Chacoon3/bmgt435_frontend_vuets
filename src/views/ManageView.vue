@@ -1,31 +1,20 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { type CustomSelectConfig, type TableConfig } from '@/components/types';
-import { useCumulatedCases } from '@/utils/caseUtils';
-import { type Case, type Group } from '@/utils/backendTypes';
+import { type Group, type Semester } from '@/utils/backendTypes';
 import CustomSelectGroup from '@/components/CustomSelectGroup.vue';
 import FoodcenterConfig from './manageChildren/FoodcenterConfig.vue'
 import ImportUser from './manageChildren/ImportUser.vue'
 import ObjectView from '@/components/ObjectView.vue';
 import CreateSemester from './manageChildren/CreateSemester.vue';
 import CreateGroup from './manageChildren/CreateGroup.vue';
+import FoodDeliveryConfig from './manageChildren/FoodDeliveryConfig.vue';
+import SystemConfig from './manageChildren/SystemConfig.vue';
 import { useUserMgnt, useGroupMgnt, useSemesterMgnt, useFeedbackMgnt } from '@/utils/manageUtils';
 import { formatUserName } from '@/utils/userUtils';
 import { useModal } from '@/utils/modalUtils';
 
 const { showModal, closeModal } = useModal();
-
-const { isLoading: isCasesLoading, data: cases, getData: getCases } = useCumulatedCases();
-getCases();
-const caseOptions = computed<string[]>(() => {
-    if (isCasesLoading.value === true) {
-        return ["Loading..."];
-    } else {
-        return cases.value.map((caseItem: Case) => {
-            return caseItem.name;
-        })
-    }
-})
 
 const { isLoading: isLoadingGroups, data: groups, getData: getGroups, hasMore: hasMoreGroups, batchDeleteGroups } = useGroupMgnt();
 getGroups();
@@ -141,10 +130,16 @@ const userTableState = computed<TableConfig>((): TableConfig => {
                 value: "DID",
             }, {
                 elementType: "text",
+                value: "Activation state"
+            }, {
+                elementType: "text",
                 value: "Group",
             }, {
                 elementType: "text",
                 value: "Role",
+            }, {
+                elementType: "text",
+                value: "Semester",
             }
         ],
         rows: users.value.map((user) => {
@@ -156,36 +151,113 @@ const userTableState = computed<TableConfig>((): TableConfig => {
                 value: user.did,
             }, {
                 elementType: "text",
+                value: user.activated === true ? "Activated" : "Not activated",
+            }, {
+                elementType: "text",
                 value: user.group_name ?? "",
             }, {
                 elementType: "text",
                 value: user.role,
+            }, {
+                elementType: "text",
+                value: user.semester_name ?? "",
             }];
         }
         )
     };
 });
 
-const { isLoading: isLoadingSemesters, data: semesters, getData: getSemesters } = useSemesterMgnt();
+const selectedSemesters = ref<Set<number>>(new Set());
+const { isLoading: isLoadingSemesters, semesterData, getData: getSemesters, deleteSemesters, resetSemesterData } = useSemesterMgnt();
 getSemesters();
 const semesterTableState = computed<TableConfig>((): TableConfig => {
     return {
         title: "Semesters",
         headers: [
             {
+                elementType: "checkbox",
+                value: "Select",
+                onChange: (newVal: boolean) => {
+                    if (newVal === true) {
+                        semesterData.value.forEach((semester: Semester) => {
+                            selectedSemesters.value.add(semester.id);
+                        })
+                    } else {
+                        selectedSemesters.value.clear();
+                    }
+                }
+            },
+            {
                 elementType: "text",
                 value: "Name",
             },
         ],
-        rows: semesters.value.map((semester) => {
-            return [{
-                elementType: "text",
-                value: semester.name,
-            },];
+        rows: semesterData.value.map((semester: Semester) => {
+            return [
+                {
+                    elementType: "checkbox",
+                    elementClass: "checkboxItem",
+                    value: selectedSemesters.value.has(semester.id) === true ? "true" : "false",
+                    onChange: (newVal: boolean) => {
+                        if (newVal === true) {
+                            selectedSemesters.value.add(semester.id);
+                        } else {
+                            if (selectedSemesters.value.has(semester.id) === true) {
+                                selectedSemesters.value.delete(semester.id);
+                            }
+                        }
+                    }
+                },
+                {
+                    elementType: "text",
+                    value: semester.name,
+                },
+            ];
         }
         )
     };
 });
+function handleBatchDeleteSemesters() {
+    if (selectedSemesters.value.size === 0) {
+        showModal({
+            title: "Delete semesters",
+            message: "Please select at least one semester to delete.",
+            onConfirm: closeModal,
+        })
+        return;
+    }
+
+    showModal({
+        title: "Delete semesters",
+        message: "Are you sure you want to delete the selected semesters?",
+        onConfirm: () => {
+            deleteSemesters(
+                Array.from(selectedSemesters.value),
+                (msg: string) => {
+                    selectedSemesters.value.clear();
+                    getSemesters();
+                    showModal({
+                        title: "Delete semesters",
+                        message: msg,
+                        onConfirm: closeModal,
+                    })
+                },
+                (msg: string) => {
+                    getSemesters();
+                    showModal({
+                        title: "Delete semesters",
+                        message: msg,
+                        onConfirm: closeModal,
+                    })
+                }
+            )
+            closeModal();
+        },
+        onCancel: closeModal,
+    })
+
+
+}
 
 const { isLoading: isLoadingFeedbacks, data: feedbacks, getData: getFeedbacks, hasMore: hasMoreFeedback } = useFeedbackMgnt();
 getFeedbacks();
@@ -204,10 +276,6 @@ const feedbackTableState = computed<TableConfig>((): TableConfig => {
             {
                 elementType: "text",
                 value: "Content",
-            },
-            {
-                elementType: "button",
-                value: "View detail",
             }
         ],
         rows: feedbacks.value.map((feedback) => {
@@ -253,16 +321,12 @@ const selectConfig = computed<CustomSelectConfig[]>(() => [
         options: ["View groups", "Create groups"],
     },
     {
-        name: "Case",
-        options: caseOptions.value,
-    },
-    {
         name: "Semester",
         options: ["View semesters", "Create semester",],
     },
     {
-        name: "System",
-        options: ["Config", "View feedback"],
+        name: "Setting",
+        options: ["Food delivery", "View feedback"],
     }
 ])
 </script>
@@ -288,6 +352,7 @@ const selectConfig = computed<CustomSelectConfig[]>(() => [
 
             <ObjectView v-else-if="moduleState === 'View semesters'" :config="semesterTableState"
                 :is-loading="isLoadingSemesters" :disable-get-data="true">
+                <button class="normalButton" @click="handleBatchDeleteSemesters">Delete selected</button>
             </ObjectView>
 
             <ObjectView v-else-if="moduleState === 'View feedback'" :config="feedbackTableState"
@@ -298,6 +363,8 @@ const selectConfig = computed<CustomSelectConfig[]>(() => [
             <FoodcenterConfig v-else-if="moduleState === 'Food center'"></FoodcenterConfig>
             <CreateSemester v-else-if="moduleState === 'Create semester'"></CreateSemester>
             <CreateGroup v-else-if="moduleState === 'Create groups'"></CreateGroup>
+            <FoodDeliveryConfig v-else-if="moduleState === 'Food delivery'"></FoodDeliveryConfig>
+            <SystemConfig v-else-if="moduleState === 'System config'"></SystemConfig>
         </div>
     </div>
 </template>

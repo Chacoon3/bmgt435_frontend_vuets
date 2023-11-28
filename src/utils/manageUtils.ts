@@ -1,13 +1,9 @@
-import { cachedHttpGet, httpPost, useCachedCumulatedGet, useCachedPaginatedGet } from "./requests";
-import { useCache } from "./cacheUtils";
+import { cachedHttpGet,  httpPost, useCachedCumulatedGet, clearCacheByEndpoint } from "./requests";
 import { endpoints } from "./apis";
 import {ref, type Ref } from "vue";
-import { type User, type SystemStatus, type Semester, type Group, type ValidatedResponse } from "./backendTypes";
-import type { AxiosResponse } from "axios";
+import { type User, type Semester, type Group, type ValidatedResponse, type CaseConfig } from "./backendTypes";
 import { type Feedback } from "./feedbackUtils";
 
-
-const { clearCacheByEndpoint } = useCache();
 export function useImportUsers() {
   const isLoading = ref<boolean>(false);
 
@@ -43,35 +39,8 @@ export function useUserMgnt() {
   return useCachedCumulatedGet<User>(endpoints.manage.user.view, 10);
 }
 
-export function useSystemMgnt() {
-  const isLoadingSystemState = ref<boolean>(false);
-  const systemState: Ref<SystemStatus | null> = ref<SystemStatus | null>(null);
-
-  function getSystemState() {
-    if (isLoadingSystemState.value === true) return;
-
-    isLoadingSystemState.value = true;
-    cachedHttpGet(
-      endpoints.manage.system.state,
-      null,
-      (resp: AxiosResponse) => {
-        isLoadingSystemState.value = false;
-        if (resp.status === 200) {
-          systemState.value = resp.data;
-        } else {
-          systemState.value = null;
-        }
-      }
-    );
-  }
-
-  return { isLoadingSystemState, systemState, getSystemState };
-}
-
-export function useSemesterMgnt() {
-
   const isLoading = ref<boolean>(false);
-  const data = ref<Semester[]>([]);
+  const semesterData = ref<Semester[]>([]) as Ref<Semester[]>;
   
   function getData() {
     if (isLoading.value === true) return;
@@ -80,9 +49,9 @@ export function useSemesterMgnt() {
     cachedHttpGet(endpoints.manage.semester.all, null, (resp: ValidatedResponse<Semester[]>) => {
       isLoading.value = false;
       if (resp.data.data) {
-        data.value = resp.data.data;
+        semesterData.value = resp.data.data;
       } else {
-        data.value = [];
+        semesterData.value = [];
       }
     });
   }
@@ -96,17 +65,41 @@ export function useSemesterMgnt() {
           onSuccess(resp.data.data);
         }
         else {
-          onFail(resp.data.errorMsg ?? "");
+          onFail(resp.data.errorMsg ?? "Failed to create semesters!");
         }
       }
     );
   }
+
+  function resetSemesterData() {
+    clearCacheByEndpoint(endpoints.manage.semester.all);
+    semesterData.value = [];
+  }
+
+  function deleteSemesters(arr_semester_id: number[], onSuccess: (msg: string) => void, onFail: (msg: string) => void) {
+    httpPost(
+      endpoints.manage.semester.delete,
+      { arr_semester_id: arr_semester_id },
+      (resp: ValidatedResponse) => {
+        resetSemesterData();
+        if (resp.data.data) {
+          onSuccess(resp.data.data);
+        }
+        else {
+          onFail(resp.data.errorMsg ?? "Failed to delete semesters!");
+        }
+      }
+    );
+  }
+
+export function useSemesterMgnt() {
   return {
     isLoading,
-    data,
+    semesterData,
     getData,
     create,
-    clearCache: () => clearCacheByEndpoint(endpoints.manage.semester.all),
+    deleteSemesters,
+    resetSemesterData
   };
 }
 
@@ -149,4 +142,46 @@ export function useGroupMgnt() {
 
 export function useFeedbackMgnt() {
   return useCachedCumulatedGet<Feedback>(endpoints.manage.feedback.paginated, 10);
+}
+
+
+const {isLoading: isLoadingConfig, data: configData, getData:getConfig, hasMore: hasMoreConfig, reset:resetConfigData } = useCachedCumulatedGet<CaseConfig<string[][]>>(endpoints.manage.foodDelivery.viewConfig, 10);
+export function useCaseMgnt() {
+
+  const isLoadingUpdate = ref<boolean>(false);
+  function updateFoodDeliveryConfig(
+    config: string[][],
+    semester_id: number,
+    onSuccess: (msg: string) => void,
+    onFail: (msg: string) => void
+  ) {
+      httpPost(
+        endpoints.manage.foodDelivery.updateConfig,
+        {
+          config:config,
+          semester_id: semester_id,
+        },
+        (resp: ValidatedResponse) => {
+        if (resp.data.data) {
+          onSuccess(resp.data.data ?? "Update succeeded!");
+        } else {
+          onFail(resp.data.errorMsg ?? "Update failed!");
+        }
+      }
+    );
+  }
+
+  return {
+    isLoadingConfig,
+    configData,
+    getConfig,
+    hasMoreConfig,
+    resetConfigData,
+    isLoadingUpdate,
+    updateFoodDeliveryConfig,
+  };
+}
+
+export type FoodDeliveryConfig = {
+  center_map: Map<number, number>;
 }

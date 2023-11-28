@@ -6,8 +6,8 @@ import { ref, watch } from "vue";
 const isCurrentUserLoading = ref<boolean>(false);
 const currentUser = ref<User | null>(null);
 
-watch(currentUser, (newUser) => {
-  if (newUser === null) {
+watch(currentUser, (newUser, oldUser) => {
+  if (newUser !== oldUser) {
     clearAllCache();
   }
 }, { immediate: true });
@@ -50,13 +50,12 @@ export function useCurrentUser() {
 }
 
 const isSignInLoading = ref<boolean>(false);
-export function useSignIn() {
-  function signIn(data: SignInForm, onSuccess?: (user: User) => void, onFail?: (errMsg: string) => void) {
-    if (isSignInLoading.value === true) {
-      return;
-    }
-    isSignInLoading.value = true;
-    httpPost<SignInForm>(endpoints.auth.signIn, data, (resp: ValidatedResponse<User>) => {
+function signIn(data: SignInForm, onSuccess?: (user: User) => void, onFail?: (errMsg: string) => void) {
+  if (isSignInLoading.value === true) {
+    return;
+  }
+  isSignInLoading.value = true;
+  httpPost<SignInForm>(endpoints.auth.signIn, data, (resp: ValidatedResponse<User>) => {
       isSignInLoading.value = false;
       if (resp.data.data) {
         currentUser.value = resp.data.data;
@@ -67,39 +66,41 @@ export function useSignIn() {
       }
     });
   }
+
+export function useSignIn() {
   return { isLoading: isSignInLoading, signIn };
 }
 
 const isSignUpLoading = ref<boolean>(false);
-export function useSignUp() {
-  function signUp(data: SignUpForm, onSuccess?: (msg: string) => void, onFail?: (msg: string) => void) {
-    if (isSignUpLoading.value === true) {
-      return;
-    }
-
-    isSignUpLoading.value = true;
-    httpPost<SignUpForm>(endpoints.auth.signUp, data, (resp: ValidatedResponse<string>) => {
-      isSignUpLoading.value = false;
-      if (resp.data.data) {
-        onSuccess?.(resp.data.data);
-      } else {
-        onFail?.(resp.data.errorMsg ?? "");
-      }
-    });
+function signUp(data: SignUpForm, onSuccess?: (msg: string) => void, onFail?: (msg: string) => void) {
+  if (isSignUpLoading.value === true) {
+    return;
   }
+  
+  isSignUpLoading.value = true;
+  httpPost<SignUpForm>(endpoints.auth.signUp, data, (resp: ValidatedResponse<string>) => {
+    isSignUpLoading.value = false;
+    if (resp.data.data) {
+      onSuccess?.(resp.data.data);
+    } else {
+      onFail?.(resp.data.errorMsg ?? "");
+    }
+  });
+}
+export function useSignUp() {
   return { isLoading: isSignUpLoading, signUp };
 }
 
 const isSignOutLoading = ref<boolean>(false);
+function signOut(callback?: (resp: ValidatedResponse) => void) {
+  currentUser.value = null;
+  isSignOutLoading.value = true;
+  httpPost(endpoints.auth.signOut, null, (resp: ValidatedResponse) => {
+    isSignOutLoading.value = false;
+    callback?.(resp);
+  });
+}
 export function useSignOut() {
-  function signOut(callback?: (resp: ValidatedResponse) => void) {
-    currentUser.value = null;
-    isSignOutLoading.value = true;
-    httpPost(endpoints.auth.signOut, null, (resp: ValidatedResponse) => {
-      isSignOutLoading.value = false;
-      callback?.(resp);
-    });
-  }
   return { isLoading: isSignOutLoading, signOut };
 }
 

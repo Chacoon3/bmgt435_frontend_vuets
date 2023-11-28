@@ -11,17 +11,17 @@ import type { ButtonConfig } from '@/components/types';
 import InLineMsg from '@/components/InLineMsg.vue';
 import type { InLineMsgConfig } from '@/components/types';
 
-const { data: semesters, getData: getSemesters } = useSemesterMgnt();
+const { semesterData, getData: getSemesters } = useSemesterMgnt();
 getSemesters();
 const { createGroup, isCreatingGroup } = useCreateGroup();
 const {reset: resetGroupData, getData: getGroups} = useGroupMgnt();
 
 const semesterDropdownConfig: DropdownConfig = {
     name: "Semester",
-    options: semesters.value.map((semester) => {
+    options: semesterData.value.map((semester) => {
         return semester.name;
     }),
-    values: semesters.value.map((semester) => {
+    values: semesterData.value.map((semester) => {
         return semester.id.toString();
     })
 }
@@ -62,7 +62,7 @@ const buttonConfig: ButtonConfig = {
     }
 }
 const formData = reactive({
-    semesterId: semesters.value?.[0]?.id.toString(),
+    semesterId: semesterData.value?.[0]?.id.toString(),
     numberOfGroups: inputConfig.defaultValue
 })
 const msgConfig = reactive<InLineMsgConfig>({
