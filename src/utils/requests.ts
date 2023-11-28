@@ -8,7 +8,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
 axios.defaults.headers["Content-Type"] = "text/plain";
 axios.defaults.baseURL = import.meta.env.VITE_BMGT435_SERVICE;
 axios.defaults.withCredentials = true;
-axios.defaults.validateStatus = (status) => status < 600;
+axios.defaults.validateStatus = (status) => status < 400;
 axios.defaults.timeout = 10000;
 
 const { setErrorContext } = useErrorUtil();
@@ -18,11 +18,11 @@ function raiseRequestError<T>(
   endpoint: string,
   dataOrParams: T
 ) {
-  throw error;
-  // setErrorContext(
-  //   error,
-  //   ` A request to server has failed with error. ${error.status ?? "", " ", error.message ?? ""}`
-  // );
+  // throw error;
+  setErrorContext(
+    error,
+    ` A request to server has failed with error. ${error.status ?? "", " ", error.message ?? ""}`
+  );
 }
 
 export function httpGet(url: string, params: any, onCompleted?: (resp:AxiosResponse) => void): void {

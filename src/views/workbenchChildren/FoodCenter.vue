@@ -15,7 +15,7 @@ const fcResult = ref<CaseSubmissionResult<FoodCenterSummary> | null>(null);
 const showBrief = ref<boolean>(true);
 const paramState = ref<FoodcenterCenterState[]>(
     Array.from([1, 2, 3, 4, 5, 6],
-        (index: number) => ({ isOn: false, smallS: 0, bigS: 0, name: `Center ${index}` }))
+        (index: number) => ({ isOn: false, smallS: 0, bigS: 0, name: `Hub ${index}` }))
 );
 const { isSubmitting, submitCase: submitFoodCenter, } = useFoodcenter();
 const resultState = ref<boolean>(false);
@@ -57,7 +57,7 @@ function handleSubmit() {
 <template>
     <div>
         <div v-show="showBrief">
-            <h2>Food Center - Introduction</h2>
+            <h2>Food Delivery - Introduction</h2>
             <hr class="lv2Hr">
             <p class="caseDescription">
                 <TextSection>
@@ -70,15 +70,14 @@ function handleSubmit() {
                     numbers as 1, 2, 3, 4, 5 and 6.
                 </TextSection>
                 <TextSection>
-                    Apart from the ongoing expansion, Terp Delivery also wants to optimize its inventory management by
+                    Apart from the expansion, Terp Delivery also wants to optimize its inventory management by
                     applying
                     s-S
-                    policy that decides how much raw materials its food delivery centers should buy weekly.
+                    policies that decides how much raw materials the selected food delivery hubs should buy weekly.
                 </TextSection>
                 <TextSection>
-                    The marketing team has conducted market research and built a simulation model to bettter estimate the
-                    performance
-                    if a delivery center is built at the location.
+                    The marketing team has conducted market research and built a simulation model to estimate the
+                    performance of possible expansion strategies.
                 </TextSection>
                 <TextSection>
                     The model is comprised of the following components:
@@ -87,29 +86,29 @@ function handleSubmit() {
                 <li>
                     <b>Decision variables:</b>
                     <br />
-                    Locations to expand.
+                    Delivery hubs to be selected for expansion.
                     <br />
-                    Inventory policy (s, S), one for each selected locations.
+                    Inventory policy (s, S), one for each selected hub.
                 </li>
                 <br />
                 <li>
                     <b>Random inputs:</b>
                     <br />
-                    Weekly demand: the number of orders observed at a center in a week.
+                    Weekly demand: the number of orders observed at a hub in a week.
                     <br />
-                    Order amount: the total amount of an order.
+                    Order amount: the total amount in dollar of a delivery order.
                 </li>
                 <br />
                 <li>
                     <b>Constraints:</b>
                     <br />
                     The number of raw materials that the company can buy and distribute weekly
-                    to the new centers cannot exceed 50,000.
+                    to the hubs cannot exceed 7,000.
                     <br />
-                    If the restock order across the new centers exceeds 50,000, 50,000 raw materials will be bought and
-                    distributed to each center according to the relative proportion of the original restock plan.
+                    If the total number of requested materials for restocking across the hubs exceeds 7,000, 7,000 raw materials will be bought and
+                    distributed to each hub according to the relative proportion of the original restock plan.
                     <br />
-                    A fixed weekly cost of $24,000 will be applied to each selected location.
+                    A fixed weekly cost of $24,000 will be applied to each selected hub.
                     <br />
                     The value of all the uncovered orders will be deducted from the revenue as a measure of penalty.
                 </li>
@@ -125,10 +124,10 @@ function handleSubmit() {
             <br />
             <ul>
                 <li>
-                    Find the best location(s) to expand.
+                    Find the best hub(s) to expand.
                 </li>
                 <li>
-                    Determine the optimal inventory policy for each selected location.
+                    Determine the optimal inventory policy for each selected hub.
                 </li>
                 <br />
             </ul>

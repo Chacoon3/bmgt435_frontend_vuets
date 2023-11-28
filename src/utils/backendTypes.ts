@@ -75,8 +75,6 @@ export type CaseConfig<T=any> = {
   edited_time: string;
   case_id: number;
   case_name: string;
-  semester_id: number;
-  semester_name: string;
   config_json: T;
 }
 

@@ -9,7 +9,8 @@ import type { InLineMsgConfig } from '@/components/types';
 const { isLoading, signIn } = useSignIn()
 const signInForm = reactive<SignInForm>({
     did: "",
-    password: ""
+    password: "",
+    remember: false,
 });
 
 const inlineMsgState : InLineMsgConfig = reactive({
@@ -59,8 +60,20 @@ function handleSignIn() {
                     v-model.lazy="signInForm.password">
             </div>
             <div class="formDiv">
+                <label for="remember">Remember me for a week</label>
+                <input type="checkbox" name="remember" value="remember" v-model="signInForm.remember">
+            </div>
+            <div class="formDiv">
                 <input type="submit" :disabled="isLoading" :value="isLoading? 'Signing in ...' : 'Sign In'">
             </div>
         </form>
     </div>
 </template>
+
+<style scoped>
+input[type=checkbox] {
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+}
+</style>

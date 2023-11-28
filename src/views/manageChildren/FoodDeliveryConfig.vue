@@ -47,7 +47,7 @@ const caseConfigTable = computed<TableConfig>(() => {
 
 const semesterMgnt = useSemesterMgnt();
 semesterMgnt.getData();
-const semesterSelected = ref<string>(semesterMgnt.semesterData.value[0].id.toString());
+const semesterSelected = ref<string | null>(null);
 const semesterDropdownConfig = {
     name: "Semester",
     options: semesterMgnt.semesterData.value.map((item) => item.name),
@@ -90,7 +90,7 @@ function handleCreate() {
         onConfirm: () => {
             caseMgnt.updateFoodDeliveryConfig(
                 centerMapAsArray.value,
-                +semesterSelected.value,
+                -1,
                 (msg: string) => {
                     caseMgnt.resetConfigData();
                     caseMgnt.getConfig();
@@ -121,7 +121,7 @@ function handleCreate() {
 
 <template>
     <div>
-        <h3>Alter configuration</h3>
+        <h3>Alter center mapping</h3>
         <div>
             <!-- <CustomDropdown :config="semesterDropdownConfig" @update:value="(val) => semesterSelected = val">
             </CustomDropdown> -->

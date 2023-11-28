@@ -6,10 +6,20 @@ export type ErrorContext = {
   message: string | null;
 };
 
+export type ErrorMode = 
+  "throw" |
+  "handle"
+
+
 const errorContext = reactive<ErrorContext>({
   error: null,
   message: null,
 });
+
+let errorMode = "throw" as ErrorMode;
+function setErrorMode(mode: ErrorMode) {
+  errorMode = mode;
+}
 
 function setErrorContext(error: any, message: string | null = null) {
   errorContext.message = message;
@@ -20,21 +30,24 @@ function setErrorContext(error: any, message: string | null = null) {
   }
 }
 
-export function globalErrorHandler(
+function globalErrorHandler(
   err: unknown,
   instance: any | null,
   info: string
 ) {
-  throw err;
-  // console.log("uncaughtErrorHandler starts -- -- -- -- -- -- -- --");
-  // console.log(err);
-  // console.log(instance);
-  // console.log(info);
-  // console.log("uncaughtErrorHandler ends -- -- -- -- -- -- -- --");
-
-  // setErrorContext(err);
+  if (errorMode === "throw") {
+    console.log("uncaughtErrorHandler starts -- -- -- -- -- -- -- --");
+    console.log(err);
+    console.log(instance);
+    console.log(info);
+    console.log("uncaughtErrorHandler ends -- -- -- -- -- -- -- --");
+    throw err;
+  }
+  else{
+    setErrorContext(err);  
+  }
 }
 
-export default function useErrorUtil() {
-  return { errorContext: errorContext, setErrorContext: setErrorContext };
+export default function useErrorUtils() {
+  return { errorContext, setErrorContext, setErrorMode, globalErrorHandler };
 }

@@ -3,7 +3,6 @@ import { computed, ref } from 'vue';
 import { type CustomSelectConfig, type TableConfig } from '@/components/types';
 import { type Group, type Semester } from '@/utils/backendTypes';
 import CustomSelectGroup from '@/components/CustomSelectGroup.vue';
-import FoodcenterConfig from './manageChildren/FoodcenterConfig.vue'
 import ImportUser from './manageChildren/ImportUser.vue'
 import ObjectView from '@/components/ObjectView.vue';
 import CreateSemester from './manageChildren/CreateSemester.vue';
@@ -19,13 +18,15 @@ const { showModal, closeModal } = useModal();
 const { isLoading: isLoadingGroups, data: groups, getData: getGroups, hasMore: hasMoreGroups, batchDeleteGroups } = useGroupMgnt();
 getGroups();
 const selectedGroups = ref<Set<number>>(new Set());
-function handleBatchDeleteGroups() {
+function handleDeleteGroups() {
     if (selectedGroups.value.size === 0) {
         showModal({
             title: "Delete groups",
             message: "Please select at least one group to delete.",
             onConfirm: closeModal,
         })
+
+        return;
     }
     showModal({
         title: "Delete groups",
@@ -217,7 +218,7 @@ const semesterTableState = computed<TableConfig>((): TableConfig => {
         )
     };
 });
-function handleBatchDeleteSemesters() {
+function handleDeleteSemesters() {
     if (selectedSemesters.value.size === 0) {
         showModal({
             title: "Delete semesters",
@@ -347,12 +348,12 @@ const selectConfig = computed<CustomSelectConfig[]>(() => [
 
             <ObjectView v-else-if="moduleState === 'View groups'" :config="groupTableState" :is-loading="isLoadingGroups"
                 :disable-get-data="hasMoreGroups === false || isLoadingGroups" @get-data="getGroups">
-                <button class="normalButton" @click="handleBatchDeleteGroups">Delete selected</button>
+                <button class="normalButton" @click="handleDeleteGroups">Delete selected</button>
             </ObjectView>
 
             <ObjectView v-else-if="moduleState === 'View semesters'" :config="semesterTableState"
                 :is-loading="isLoadingSemesters" :disable-get-data="true">
-                <button class="normalButton" @click="handleBatchDeleteSemesters">Delete selected</button>
+                <button class="normalButton" @click="handleDeleteSemesters">Delete selected</button>
             </ObjectView>
 
             <ObjectView v-else-if="moduleState === 'View feedback'" :config="feedbackTableState"
@@ -360,7 +361,6 @@ const selectConfig = computed<CustomSelectConfig[]>(() => [
             </ObjectView>
 
             <ImportUser v-else-if="moduleState === 'Import users'"></ImportUser>
-            <FoodcenterConfig v-else-if="moduleState === 'Food center'"></FoodcenterConfig>
             <CreateSemester v-else-if="moduleState === 'Create semester'"></CreateSemester>
             <CreateGroup v-else-if="moduleState === 'Create groups'"></CreateGroup>
             <FoodDeliveryConfig v-else-if="moduleState === 'Food delivery'"></FoodDeliveryConfig>

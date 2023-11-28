@@ -50,12 +50,12 @@ export function useCurrentUser() {
 }
 
 const isSignInLoading = ref<boolean>(false);
-function signIn(data: SignInForm, onSuccess?: (user: User) => void, onFail?: (errMsg: string) => void) {
+function signIn(signInData: SignInForm, onSuccess?: (user: User) => void, onFail?: (errMsg: string) => void) {
   if (isSignInLoading.value === true) {
     return;
   }
   isSignInLoading.value = true;
-  httpPost<SignInForm>(endpoints.auth.signIn, data, (resp: ValidatedResponse<User>) => {
+  httpPost<SignInForm>(endpoints.auth.signIn, signInData, (resp: ValidatedResponse<User>) => {
       isSignInLoading.value = false;
       if (resp.data.data) {
         currentUser.value = resp.data.data;
@@ -121,6 +121,7 @@ export function formatUserName(user: User | null) {
 export type SignInForm = {
   did: string;
   password: string;
+  remember: boolean;
 };
 
 export type SignUpForm = SignInForm;

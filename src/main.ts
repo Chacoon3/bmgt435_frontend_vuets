@@ -2,10 +2,11 @@ import "./assets/main.css";
 import { createApp } from "vue";
 import App from "./App.vue";
 import router, { routePaths } from "./router";
-import { globalErrorHandler } from "./utils/errorUtils";
+import useErrorUtils from "./utils/errorUtils";
 import { useCurrentUser } from "./utils/userUtils";
 
 const { currentUser, getCurrentUser } = useCurrentUser();
+const {globalErrorHandler, setErrorMode} = useErrorUtils();
 
 router.beforeEach((to, from, next) => {
   if (to.name === routePaths.loading) {
@@ -33,7 +34,11 @@ const app = createApp(App);
 app.use(router);
 
 if (import.meta.env.PROD === true) {
+  setErrorMode("handle");
   app.config.errorHandler = globalErrorHandler;
+}
+else {
+  setErrorMode("throw");
 }
 
 app.mount("#app");

@@ -27,22 +27,22 @@ const seasonSelected = ref<string>(seasonDropdownConfig.options[0]);
 const lineMsgState = reactive<InLineMsgConfig>({
     content: "",
     show: false,
-    textAlign:"left"
+    textAlign: "left"
 })
 
 function handleCreateSemester() {
-    createSemester(yearSelected.value, seasonSelected.value, 
-    (msg: string) => {
+    createSemester(yearSelected.value, seasonSelected.value,
+        (msg: string) => {
+            resetSemesterData();
+            getSemesters();
             lineMsgState.show = true;
-            lineMsgState.content = msg ?? "Create semester successfully";
+            lineMsgState.content = msg;
         },
-    (msg:string) => {
+        (msg: string) => {
             lineMsgState.show = true;
-            lineMsgState.content = msg ?? "Create semester failed";   
+            lineMsgState.content = msg;
         }
     );
-    resetSemesterData();
-    getSemesters();
 }
 </script>
 
