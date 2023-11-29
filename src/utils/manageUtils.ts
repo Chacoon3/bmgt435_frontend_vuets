@@ -23,9 +23,9 @@ export function useImportUsers() {
             isLoading.value = false;
             clearCacheByEndpoint(endpoints.manage.user.view);
             if (resp.data.data) {
-              onSuccess(resp.data.data);
+              onSuccess(resp.data.data ?? "Import succeeded!");
             } else {
-              onFail(resp.data.errorMsg ?? "");
+              onFail(resp.data.errorMsg ?? "Import failed!");
             }
           }
         );
@@ -35,8 +35,12 @@ export function useImportUsers() {
   return { importUsers, isLoading,};
 }
 
+const userMgnt = useCachedCumulatedGet<User>(endpoints.manage.user.view, 10);
 export function useUserMgnt() {
-  return useCachedCumulatedGet<User>(endpoints.manage.user.view, 10);
+  return {
+    ...userMgnt,
+  };
+
 }
 
   const isLoading = ref<boolean>(false);

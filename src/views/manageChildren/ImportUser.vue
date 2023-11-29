@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
-import { useImportUsers } from '@/utils/manageUtils';
+import { reactive, watch, ref } from 'vue';
+import { useImportUsers, useUserMgnt } from '@/utils/manageUtils';
 import CustomDropdown from '@/components/CustomDropdown.vue';
 import InLineMsg from '@/components/InLineMsg.vue';
-import { ref } from 'vue';
 import type { DropdownConfig, InLineMsgConfig } from '@/components/types';
 import { useSemesterMgnt } from '@/utils/manageUtils';
 
+const { reset: resetUserData, getData: getUserData } = useUserMgnt();
 const importMsgState = reactive<InLineMsgConfig>({
     content: "",
     show: false,
@@ -35,8 +35,11 @@ function handleImportUser() {
 
     if (fileObj) {
         importUsers(fileObj, selectedSemesterId.value,
-            (msg: any) => {
-                importMsgState.content = msg ?? "Import failed";
+            (msg: string) => {
+                resetUserData();
+                getUserData();
+                importMsgState.content = msg;
+                importMsgState.show = true;
             },
             (msg: string) => {
                 importMsgState.content = msg ?? "Import failed";

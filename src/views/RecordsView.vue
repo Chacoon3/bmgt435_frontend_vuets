@@ -95,8 +95,7 @@ function toTableRow(record: CaseRecord): TableItemConfig[] {
 
 <template>
     <div class="contentViewContainer">
-        <div v-if="isLoading === true && records.length === 0">Fetching Data..</div>
-        <div v-else-if="records.length > 0">
+        <div v-if="records.length > 0">
 
             <TableView :table-config="recordTableConfig" />
             <div>
@@ -106,6 +105,8 @@ function toTableRow(record: CaseRecord): TableItemConfig[] {
                 </button>
             </div>
         </div>
-        <div v-else>No records available at this time</div>
+        <div v-else>
+            {{ isLoading === false ? "No data available at this time." : "Fetching data..." }}
+        </div>
     </div>
 </template>

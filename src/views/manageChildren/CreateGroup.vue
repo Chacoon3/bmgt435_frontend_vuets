@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useSemesterMgnt, useGroupMgnt } from '@/utils/manageUtils';
 import { useCreateGroup } from '@/utils/groupUtils';
 import CustomDropdown from '@/components/CustomDropdown.vue';

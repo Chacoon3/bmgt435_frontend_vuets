@@ -51,23 +51,16 @@ function toTableRow(record: CaseRecord): TableItemConfig[] {
 
 <template>
     <div id="leaderboardContainer" class="contentViewContainer">
-        <div v-if="isLoading === true">
-            <div v-if="leaderBoard.length > 0">
-                <TableView :table-config="recordTableConfig"></TableView>
-                <button class="normalButton" @click="getLeaderBoard" :disabled="isLoading === true || hasMoreRecords === false">{{
+        <div v-if="leaderBoard.length > 0">
+            <TableView :table-config="recordTableConfig"></TableView>
+            <button class="normalButton" @click="getLeaderBoard"
+                :disabled="isLoading === true || hasMoreRecords === false">{{
                     viewMoreButtonText
                 }}</button>
-            </div>
-            <div v-else>
-                Fetching data...
-            </div>
         </div>
 
         <div v-else>
-            <TableView :table-config="recordTableConfig"></TableView>
-            <button class="normalButton" @click="getLeaderBoard" :disabled="hasMoreRecords === false || isLoading">{{ viewMoreButtonText
-            }}</button>
+            {{ isLoading === false ? "No data available at this time." : "Fetching data..." }}
         </div>
-
     </div>
 </template>
